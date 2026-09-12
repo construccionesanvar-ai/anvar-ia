@@ -18,7 +18,20 @@
       ]
     },
     {
-      "source": "/(.*).(css|js|svg|png|jpg|webp|woff2)",
+      "comment": "El CSS y el JS conservan el mismo nombre entre versiones, así que NO pueden ser inmutables: el navegador se quedaría con la copia vieja para siempre. Revalidan con ETag, que responde 304 y cuesta unos pocos bytes.",
+      "source": "/(.*).(css|js)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/(.*).(svg|png|jpg|jpeg|webp|avif|ico)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/(.*).(woff|woff2)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
