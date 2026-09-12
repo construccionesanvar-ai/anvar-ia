@@ -338,6 +338,13 @@ form{display:grid;gap:14px}
 .formmsg.ok{display:block;background:rgba(61,190,144,.12);border:1px solid rgba(61,190,144,.35);color:#84E6C2}
 .formmsg.err{display:block;background:rgba(224,112,94,.12);border:1px solid rgba(224,112,94,.35);color:#F2A797}
 
+/* Utilidades. Existen como clases y no como atributos style porque la política
+   de seguridad del sitio (style-src 'self') bloquea los estilos en línea. */
+.nav .btn-compacto{padding:10px 16px}
+.pie-marca{font-family:var(--disp);font-size:1rem;font-weight:700;letter-spacing:-.01em}
+.pie-nota{font-size:.72rem;color:var(--ink-3);margin-top:8px;letter-spacing:.05em}
+.nota-legal{font-size:.76rem;color:var(--ink-3);margin-top:22px}
+
 /* ---------- pie ---------- */
 footer{border-top:1px solid var(--rule);padding:34px 0 46px;margin-top:clamp(50px,7vw,90px)}
 .fgrid2{display:flex;flex-wrap:wrap;gap:22px;justify-content:space-between;align-items:flex-start}
