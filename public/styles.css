@@ -273,15 +273,16 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;background:var(--ambe
 .rfoot .v{font-family:var(--mono);font-weight:600;font-size:1.04rem;font-variant-numeric:tabular-nums}
 
 /* ---------- quién ---------- */
-.who{display:grid;grid-template-columns:.88fr 1.12fr;gap:clamp(24px,4vw,56px);align-items:start}
+.who{display:grid;grid-template-columns:.76fr 1.24fr;gap:clamp(24px,4vw,56px);align-items:start}
 .card-id{border:1px solid var(--rule-2);background:var(--panel);border-radius:3px;overflow:hidden;box-shadow:var(--sh)}
-.card-id .top{background:var(--deep);color:var(--on-deep);padding:22px 20px;display:flex;gap:16px;align-items:center}
-.mono-logo{width:60px;height:60px;border:1px solid var(--deep-rule);display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:1.3rem;color:var(--amber);flex:none;border-radius:2px;font-stretch:115%}
+.card-id .retrato{width:100%;height:auto;display:block;border-bottom:1px solid var(--rule-2)}
+.card-id .top{background:var(--deep);color:var(--on-deep);padding:18px 20px;display:flex;gap:16px;align-items:center;position:relative}
+.card-id .top::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--amber)}
 .card-id .top b{display:block;font-family:var(--disp);font-size:1.14rem;font-stretch:110%;letter-spacing:-.01em}
 .card-id .top span{font-family:var(--mono);font-size:.69rem;color:var(--on-deep-2);letter-spacing:.07em}
 .card-id dl{margin:0;display:grid;grid-template-columns:auto 1fr}
-.card-id dt{font-family:var(--mono);font-size:.63rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);padding:11px 14px;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule);white-space:nowrap}
-.card-id dd{margin:0;padding:11px 14px;border-bottom:1px solid var(--rule);font-size:.89rem}
+.card-id dt{font-family:var(--mono);font-size:.61rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);padding:9px 12px;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule);white-space:nowrap}
+.card-id dd{margin:0;padding:9px 12px;border-bottom:1px solid var(--rule);font-size:.86rem}
 .card-id dl > dt:last-of-type,.card-id dl > dd:last-of-type{border-bottom:0}
 .who .body p + p{margin-top:16px}
 .who .body p{color:var(--ink-2);font-size:1.02rem}

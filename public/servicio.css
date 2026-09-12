@@ -71,6 +71,9 @@
 /* cierre */
 .cierre{background:var(--deep);color:var(--on-deep);border-radius:3px;padding:clamp(28px,4.5vw,48px);text-align:center;position:relative;overflow:hidden;margin-top:20px}
 .cierre::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:30px 30px;-webkit-mask-image:radial-gradient(90% 90% at 50% 0%,#000,transparent 72%);mask-image:radial-gradient(90% 90% at 50% 0%,#000,transparent 72%);pointer-events:none}
+.cierre-foto{width:78px;height:78px;border-radius:50%;object-fit:cover;margin:0 auto 14px;position:relative;border:2px solid var(--amber);box-shadow:0 0 0 5px rgba(240,169,42,.14)}
+/* más específico que `.cierre p`, que si no le pisa el tamaño y los márgenes */
+.cierre p.cierre-quien{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--on-deep-2);position:relative;margin:0 auto 18px;max-width:none}
 .cierre h2{color:var(--on-deep);position:relative;max-width:22ch;margin:0 auto}
 .cierre p{color:var(--on-deep-2);margin:16px auto 0;max-width:52ch;position:relative;font-size:1.02rem}
 .cierre .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px;position:relative}
