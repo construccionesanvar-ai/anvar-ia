@@ -32,6 +32,37 @@ artifact-anvar-ia.html   copia del sitio en un archivo (generada, no versionada)
 > los guiones de venta y las plantillas de contrato. Nada de eso debe quedar
 > público.
 
+## Documentos publicados
+
+Viven como Artifacts en claude.ai. Se actualizan republicando el archivo local
+del proyecto; desde otra conversación hay que pasar la URL como `url`, si no se
+crea uno nuevo en vez de actualizar el que ya existe.
+
+| Documento | Archivo | URL |
+|---|---|---|
+| El sitio | `artifact-anvar-ia.html` | https://claude.ai/code/artifact/a0f3ef6f-e812-4aa9-ba10-48d38551b70f |
+| Propuesta de lanzamiento | `propuesta.html` | https://claude.ai/code/artifact/c0cb6926-83e2-4f32-926e-9ca2eb9803bd |
+| **Manual de operación** | `manual.html` | https://claude.ai/code/artifact/973bbe6c-8998-4466-bea5-9e3b5590a279 |
+
+El manual enlaza los ocho planes de acción por servicio, así que con ese basta:
+
+| Cód. | Servicio | URL |
+|---|---|---|
+| S-01 | Sesión Despegue | https://claude.ai/code/artifact/0932bec9-b9d2-4d8b-8a64-09473d13260c |
+| S-02 | Plan Piloto Personal | https://claude.ai/code/artifact/c5c2e003-611d-4612-b585-0fae1c2c4e57 |
+| S-03 | Acompañamiento Personal | https://claude.ai/code/artifact/cb3322bb-60cc-4bef-85dd-806f525bfaef |
+| E-01 | Diagnóstico IA | https://claude.ai/code/artifact/2a4c6f33-e74d-4003-8f40-06fdeb81bb52 |
+| E-02 | Piloto en Producción | https://claude.ai/code/artifact/b3d5fde5-ba65-4d7f-b8c4-53d9137f44f6 |
+| E-03 | Implementación a Medida | https://claude.ai/code/artifact/3d7701ca-cfeb-4312-97db-a9265da36fa4 |
+| E-04 | Capacitación In-Company | https://claude.ai/code/artifact/61751856-616f-4627-9092-e442c1e2b6f8 |
+| E-05 | Acompañamiento Empresa | https://claude.ai/code/artifact/e2177007-906c-47b6-baf3-bbf5f66eb223 |
+
+`artifact-anvar-ia.html` **no se edita a mano**: se genera juntando
+`public/index.html` + `styles.css` + `app.js`, y al republicarlo hay que pasarle
+la foto (`files: {"andres-vargas.jpg": "public/andres-vargas.jpg"}`) o el
+retrato sale roto. Los ocho planes se generan desde `servicios/` inyectando
+`servicios/_estilo.css`.
+
 ## Ver el sitio en tu computador
 
 ```bash
