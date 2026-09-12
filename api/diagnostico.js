@@ -21,6 +21,32 @@ Entregas exactamente tres párrafos cortos, sin títulos ni listas:
 3) Qué esperar en las primeras cuatro semanas, en términos medibles.
 Máximo 140 palabras en total.`;
 
+// Freno contra abuso. Este endpoint es público y cada llamada cuesta plata.
+// Ojo: las funciones serverless se reinician y pueden correr varias instancias
+// a la vez, así que esto frena el uso casual, NO a alguien decidido. La
+// protección de verdad es el límite de gasto en la consola de Anthropic.
+const VENTANA_MS = 60 * 60 * 1000;   // 1 hora
+const POR_IP = 5;                     // lecturas por IP por hora
+const POR_INSTANCIA_DIA = 200;        // techo diario por instancia
+const visitas = new Map();
+let delDia = { fecha: '', n: 0 };
+
+function permitido(ip) {
+  const hoy = new Date().toISOString().slice(0, 10);
+  if (delDia.fecha !== hoy) delDia = { fecha: hoy, n: 0 };
+  if (delDia.n >= POR_INSTANCIA_DIA) return false;
+
+  const ahora = Date.now();
+  const previas = (visitas.get(ip) || []).filter(t => ahora - t < VENTANA_MS);
+  if (previas.length >= POR_IP) return false;
+
+  previas.push(ahora);
+  visitas.set(ip, previas);
+  if (visitas.size > 2000) visitas.clear();   // que no crezca sin control
+  delDia.n++;
+  return true;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -28,6 +54,12 @@ export default async function handler(req, res) {
   }
   if (!ANTHROPIC_API_KEY) {
     return res.status(503).json({ error: 'Sin clave de IA configurada.' });
+  }
+
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'desconocida';
+  if (!permitido(ip)) {
+    // El sitio ya muestra su lectura local, así que el visitante no ve error.
+    return res.status(429).json({ error: 'Demasiadas lecturas seguidas.' });
   }
 
   let body = req.body;

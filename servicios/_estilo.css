@@ -1,0 +1,122 @@
+/* Plan de acción por servicio — ANVAR IA */
+:root{
+  --paper:#EFF0EC; --paper-2:#E5E7E0; --panel:#FBFBF9; --panel-2:#F3F4F0;
+  --ink:#14181B; --ink-2:#586460; --ink-3:#87908B;
+  --rule:#D2D6CD; --rule-2:#B6BCB1;
+  --amber:#D98A0B; --amber-soft:#F7E7C6; --amber-text:#8A5400;
+  --deep:#101A1E; --deep-2:#18252B; --deep-rule:#2C3B43; --on-deep:#E9EBE4; --on-deep-2:#9FACA6;
+  --good:#1C7A58; --bad:#A93B2C;
+  --disp:'Archivo',Haettenschweiler,'Arial Narrow',system-ui,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',Consolas,ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+    --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+    --rule:#243036; --rule-2:#324148;
+    --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063;
+    --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+    --good:#3DBE90; --bad:#E0705E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+  --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+  --rule:#243036; --rule-2:#324148;
+  --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063;
+  --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+  --good:#3DBE90; --bad:#E0705E;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.doc{max-width:760px;margin:0 auto;padding:clamp(24px,5vw,54px) clamp(18px,4vw,36px) 80px}
+h1,h2,h3{font-family:var(--disp);font-weight:700;line-height:1.07;letter-spacing:-.015em;margin:0;text-wrap:balance;font-stretch:110%}
+h1{font-size:clamp(1.9rem,5vw,2.7rem);font-stretch:118%}
+h2{font-size:clamp(1.24rem,2.5vw,1.6rem)}
+h3{font-size:1.04rem;font-stretch:104%}
+p{margin:0}
+strong{font-weight:600;color:var(--ink)}
+code{font-family:var(--mono);font-size:.86em;background:var(--panel-2);border:1px solid var(--rule);padding:1px 5px;border-radius:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* cabecera */
+.head{background:var(--deep);color:var(--on-deep);border-radius:3px;padding:clamp(22px,4vw,32px);margin-bottom:10px;position:relative;overflow:hidden}
+.head::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:28px 28px;-webkit-mask-image:radial-gradient(120% 90% at 92% 0%,#000,transparent 70%);mask-image:radial-gradient(120% 90% at 92% 0%,#000,transparent 70%);pointer-events:none}
+.head .marca{font-family:var(--mono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--on-deep-2);margin-bottom:16px;position:relative}
+.head .cod{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;color:var(--amber);margin-bottom:8px;position:relative}
+.head h1{color:var(--on-deep);position:relative}
+.head .val{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--deep-rule);position:relative}
+.head .val div b{display:block;font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--on-deep-2);font-weight:400;margin-bottom:4px}
+.head .val div span{font-family:var(--mono);font-weight:600;font-size:1rem;color:var(--amber)}
+.head .val div.s span{color:var(--on-deep);font-weight:500;font-size:.92rem}
+.promesa{border-left:3px solid var(--amber);background:var(--amber-soft);padding:16px 20px;border-radius:0 3px 3px 0;margin-bottom:38px;font-family:var(--disp);font-size:1.08rem;font-stretch:104%;font-weight:700;line-height:1.32;color:var(--ink)}
+
+section{margin-bottom:clamp(32px,5vw,48px)}
+.sh{display:flex;align-items:baseline;gap:13px;border-bottom:1px solid var(--rule-2);padding-bottom:9px;margin-bottom:20px}
+.sh .n{font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--amber-text);white-space:nowrap}
+section > p{color:var(--ink-2);max-width:66ch}
+section > p + p{margin-top:13px}
+
+/* expectativas */
+.exp{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.exp > div{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:18px 20px}
+.exp > div.imp{border-color:var(--amber);border-left-width:3px}
+.exp h3{margin-bottom:12px;font-size:.98rem}
+.exp .et{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:7px}
+.exp ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.exp li{font-size:.9rem;color:var(--ink-2);padding-left:17px;position:relative;line-height:1.5}
+.exp li::before{content:"";position:absolute;left:0;top:.68em;width:9px;height:1px;background:var(--amber)}
+
+/* checklist */
+.ck{display:grid;gap:9px;margin-top:16px}
+.ck > div{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;border:1px solid var(--rule);background:var(--panel);padding:13px 16px;border-radius:2px}
+.ck .b{width:15px;height:15px;border:1.5px solid var(--rule-2);border-radius:2px;margin-top:4px;flex:none}
+.ck b{display:block;font-weight:600;color:var(--ink);font-size:.95rem;margin-bottom:3px}
+.ck p{font-size:.88rem;color:var(--ink-2);line-height:1.5}
+.ck .listo{font-family:var(--mono);font-size:.72rem;color:var(--good);display:block;margin-top:6px}
+.ck .listo::before{content:"listo cuando: ";color:var(--ink-3)}
+
+/* cronograma */
+.crono{margin-top:16px;border-top:1px solid var(--rule)}
+.crono > div{display:grid;grid-template-columns:100px 1fr;gap:18px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.crono .h{font-family:var(--mono);font-size:.74rem;color:var(--amber-text);font-variant-numeric:tabular-nums;padding-top:2px}
+.crono b{display:block;font-weight:600;color:var(--ink);font-size:.96rem;margin-bottom:4px}
+.crono p{font-size:.91rem;color:var(--ink-2);max-width:58ch}
+.crono p + p{margin-top:7px}
+
+/* riesgos */
+.riesgo{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-top:8px;background:var(--panel)}
+.riesgo > div{padding:15px 18px;border-bottom:1px solid var(--rule)}
+.riesgo > div:nth-child(odd){border-right:1px solid var(--rule);background:var(--panel-2)}
+.riesgo > div:nth-last-child(-n+2){border-bottom:0}
+.riesgo .q{font-family:var(--mono);font-size:.6rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:6px}
+.riesgo p{font-size:.9rem;color:var(--ink-2);line-height:1.5}
+.riesgo > div:nth-child(odd) p{color:var(--bad)}
+.riesgo > div:nth-child(even) p{color:var(--ink)}
+
+/* cumpliste */
+.box{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:20px 22px;margin-top:18px}
+.box.dark{background:var(--deep);border-color:var(--deep-rule);color:var(--on-deep)}
+.box.dark p,.box.dark li{color:var(--on-deep-2)}
+.box.dark strong,.box.dark h3{color:var(--on-deep)}
+.box h3{margin-bottom:11px}
+.box p + p{margin-top:12px}
+.box ul{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:9px}
+.box li{padding-left:20px;position:relative;font-size:.93rem;color:var(--ink-2)}
+.box li::before{content:"";position:absolute;left:0;top:.68em;width:10px;height:1px;background:var(--amber)}
+.box.dark li::before{background:var(--amber)}
+
+.decir{font-family:var(--disp);font-size:1.06rem;font-stretch:104%;font-weight:700;line-height:1.34;color:var(--ink);border-left:2px solid var(--amber);padding-left:18px;margin-top:16px}
+.decir em{font-style:italic;font-weight:400;font-family:var(--body);font-size:.97rem;color:var(--ink-2);display:block;margin-top:8px}
+
+footer{border-top:1px solid var(--rule);margin-top:50px;padding-top:22px;font-family:var(--mono);font-size:.7rem;color:var(--ink-3);line-height:1.9}
+
+@media (max-width:620px){
+  .exp,.riesgo{grid-template-columns:1fr}
+  .riesgo > div:nth-child(odd){border-right:0}
+  .riesgo > div:nth-last-child(2){border-bottom:1px solid var(--rule)}
+  .crono > div{grid-template-columns:1fr;gap:4px}
+  .sh{flex-direction:column;gap:5px}
+  .head .val{gap:16px}
+}
