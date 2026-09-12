@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANVAR IA</title>
+<meta name="description" content="Asesoría e implementación de inteligencia artificial para personas y empresas en Chile. Diagnóstico, piloto y sistemas que quedan funcionando. Andrés Vargas.">
+<meta name="author" content="Andrés Vargas — ANVAR IA">
+<meta name="theme-color" content="#EFF0EC">
+<link rel="canonical" href="https://ia.anvartech.cl/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CL">
+<meta property="og:site_name" content="ANVAR IA">
+<meta property="og:title" content="ANVAR IA — IA que queda funcionando">
+<meta property="og:description" content="Diagnóstico honesto, un piloto en semanas y un sistema que sigue andando cuando me voy. Asesoría en IA para personas y empresas.">
+<meta property="og:url" content="https://ia.anvartech.cl/">
+<meta property="og:image" content="https://ia.anvartech.cl/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="sheet nav">
+    <a href="#top" class="brand" aria-label="ANVAR IA, inicio">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="4" fill="#101A1E"/><path d="M22 76 L50 22 L78 76" fill="none" stroke="#E9EBE4" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 56 L66 56" stroke="#F0A92A" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="22" r="5.5" fill="#F0A92A"/></svg>
+      ANVAR <em>IA</em>
+    </a>
+    <nav class="nav-links" aria-label="Secciones">
+      <a href="#servicios">Servicios</a>
+      <a href="#diagnostico">Diagnóstico</a>
+      <a href="#casos">Casos reales</a>
+      <a href="#calculadora">Calculadora</a>
+      <a href="#planes">Planes</a>
+    </nav>
+    <div class="seg" role="group" aria-label="Elegir público">
+      <button type="button" data-set-seg="personas" aria-pressed="true">Personas</button>
+      <button type="button" data-set-seg="empresas" aria-pressed="false">Empresas</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============================ PORTADA ============================ -->
+<section class="hero">
+  <div class="sheet hero-grid">
+    <div>
+      <span class="eyebrow"><i></i> Asesoría e implementación de IA · Santiago, Chile</span>
+      <h1>Que la IA haga el trabajo que hoy <span class="hl">te come el día</span>.</h1>
+      <p class="lede" id="heroLede">
+        Soy Andrés Vargas. No hago charlas sobre el futuro: levanto sistemas que hoy generan
+        documentos, leen boletas, dibujan planos y venden solos. Partimos por un diagnóstico
+        honesto, seguimos con un piloto en semanas y terminamos con algo que queda funcionando
+        cuando yo me voy.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-amber" href="#diagnostico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+          Hacer el diagnóstico · 2 min
+        </a>
+        <a class="btn btn-ghost" data-wsp href="#contacto">Hablar por WhatsApp</a>
+      </div>
+      <div class="hero-meta">
+        <span>Sistemas míos andando en producción</span>
+        <span>Retail, servicio técnico e ingeniería</span>
+        <span>Primera conversación sin costo</span>
+      </div>
+    </div>
+
+    <div class="instr" id="instr">
+      <div class="instr-top">
+        <span>Medición real de proyectos propios</span>
+        <span class="live"><i></i> en vivo</span>
+      </div>
+      <div class="instr-body">
+        <span class="kicker" id="iKicker">Proceso</span>
+        <p class="proc" id="iProc">Armar el procedimiento completo de un robo en tienda</p>
+        <div class="dial">
+          <div>
+            <div class="l">Antes</div>
+            <div class="v" id="iBefore">45 min</div>
+          </div>
+          <div class="arrow" aria-hidden="true">&rarr;</div>
+          <div>
+            <div class="l">Después</div>
+            <div class="v after" id="iAfter">4 min</div>
+          </div>
+        </div>
+        <div class="track"><i id="iTrack"></i></div>
+        <div class="delta" id="iDelta">&minus;91% de tiempo</div>
+        <div class="dots" id="iDots" role="tablist" aria-label="Ver otro proceso"></div>
+      </div>
+      <div class="titleblock">
+        <div><b>Proyecto</b><span>Asesoría IA</span></div>
+        <div><b>Lámina</b><span>00 / Portada</span></div>
+        <div><b>Escala</b><span>1 : 1</span></div>
+        <div><b>Ejecuta</b><span>A. Vargas</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SÍNTOMAS ============================ -->
+<div class="band">
+  <div class="sheet">
+    <div class="sympt">
+      <div class="rv">
+        <span class="q">Señal 01</span>
+        <h3>Rehaces lo mismo cada semana</h3>
+        <p class="only-per">El mismo informe, el mismo correo, el mismo resumen. Cambian tres datos y vuelves a partir de cero.</p>
+        <p class="only-emp">El mismo formulario, la misma planilla, el mismo reporte a jefatura. Tu equipo copia y pega en vez de decidir.</p>
+      </div>
+      <div class="rv">
+        <span class="q">Señal 02</span>
+        <h3>Probaste ChatGPT y quedó en nada</h3>
+        <p>Sirvió para un par de textos y después se te olvidó. No es el modelo: es que nadie lo amarró a tu trabajo de verdad.</p>
+      </div>
+      <div class="rv">
+        <span class="q">Señal 03</span>
+        <h3>Sabes que se puede, no sabes por dónde</h3>
+        <p class="only-per">Ves gente haciendo cosas increíbles con IA y no tienes claro cuál es tu primer paso concreto.</p>
+        <p class="only-emp">Te ofrecen "soluciones con IA" a UF 200 y nadie te explica qué proceso tuyo mejora ni cuánto te ahorra.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ SERVICIOS ============================ -->
+<section id="servicios">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 01 / SERVICIOS</div>
+      <div class="txt">
+        <h2 class="only-per">Para personas que quieren dejar de perder horas</h2>
+        <h2 class="only-emp">Para empresas que quieren un proceso funcionando, no una charla</h2>
+        <p class="only-per">Trabajo contigo en vivo. Salimos de la sesión con tus herramientas configuradas y funcionando en tu computador, no con una lista de tareas.</p>
+        <p class="only-emp">Todo parte por un diagnóstico que se paga solo: si avanzamos a implementación, se descuenta completo del proyecto.</p>
+      </div>
+    </div>
+
+    <!-- PERSONAS -->
+    <div class="svc only-per">
+      <div class="svc-row rv">
+        <div class="c">S-01</div>
+        <div>
+          <h3>Sesión Despegue</h3>
+          <p class="d">90 minutos en vivo, uno a uno. Elegimos tus tres tareas más pesadas y las dejamos resueltas ahí mismo.</p>
+        </div>
+        <ul>
+          <li>Tu asistente configurado con tu contexto real</li>
+          <li>3 flujos listos para usar al día siguiente</li>
+          <li>Grabación de la sesión y tus prompts guardados</li>
+        </ul>
+        <div class="price"><span class="p">$49.000</span><span class="u">sesión única</span></div>
+      </div>
+
+      <div class="svc-row rv">
+        <div class="c">S-02</div>
+        <div>
+          <h3>Plan Piloto Personal</h3>
+          <p class="d">Cuatro semanas acompañado. Pasamos de "probar IA" a tener un método que usas todos los días sin pensarlo.</p>
+        </div>
+        <ul>
+          <li>4 sesiones de 60 min + soporte por WhatsApp</li>
+          <li>Automatización de tu tarea más repetitiva</li>
+          <li>Plantillas y biblioteca de prompts tuya</li>
+        </ul>
+        <div class="price"><span class="p">$229.000</span><span class="u">programa completo</span></div>
+      </div>
+
+      <div class="svc-row rv">
+        <div class="c">S-03</div>
+        <div>
+          <h3>Acompañamiento mensual</h3>
+          <p class="d">Para quien ya partió y no quiere quedarse atrás. Yo pruebo las herramientas nuevas y te paso solo lo que te sirve.</p>
+        </div>
+        <ul>
+          <li>2 sesiones al mes + revisión de lo que armaste</li>
+          <li>Avisos cuando algo que usas cambia</li>
+          <li>Se puede cortar cuando quieras</li>
+        </ul>
+        <div class="price"><span class="p">$89.000</span><span class="u">por mes</span></div>
+      </div>
+      <p class="svc-note">Precios en pesos, IVA incluido: lo que ves es lo que pagas. Sesiones por videollamada o presenciales en la Región Metropolitana. Si en la primera hora te das cuenta de que no era para ti, te devuelvo el dinero.</p>
+    </div>
+
+    <!-- EMPRESAS -->
+    <div class="svc only-emp">
+      <div class="svc-row rv">
+        <div class="c">E-01</div>
+        <div>
+          <h3>Diagnóstico IA</h3>
+          <p class="d">Una semana adentro de tu operación. Levanto los procesos, los mido en horas y pesos, y te entrego qué automatizar primero y qué no tocar.</p>
+        </div>
+        <ul>
+          <li>Mapa de procesos con horas y costo real</li>
+          <li>3 oportunidades priorizadas por retorno</li>
+          <li>Informe con plan, plazos y valores</li>
+          <li>Se descuenta 100% si avanzamos</li>
+        </ul>
+        <div class="price"><span class="p">UF 12</span><span class="u">≈ $480.000 + IVA</span></div>
+      </div>
+
+      <div class="svc-row rv">
+        <div class="c">E-02</div>
+        <div>
+          <h3>Piloto en producción</h3>
+          <p class="d">Tres a cuatro semanas para dejar UN proceso andando de verdad, con las personas que lo van a usar sentadas al lado.</p>
+        </div>
+        <ul>
+          <li>Un proceso completo automatizado</li>
+          <li>Capacitación al equipo que lo opera</li>
+          <li>Medición antes / después documentada</li>
+          <li>Decides seguir o parar con datos en la mano</li>
+        </ul>
+        <div class="price"><span class="p">desde UF 28</span><span class="u">≈ $1.120.000 + IVA</span></div>
+      </div>
+
+      <div class="svc-row rv">
+        <div class="c">E-03</div>
+        <div>
+          <h3>Implementación a medida</h3>
+          <p class="d">El sistema completo: software propio, integraciones, correos, pagos, paneles. Lo mismo que ya tengo corriendo en mis proyectos.</p>
+        </div>
+        <ul>
+          <li>Desarrollo e instalación llave en mano</li>
+          <li>Manuales, respaldo y traspaso al equipo</li>
+          <li>Código y documentación quedan contigo</li>
+        </ul>
+        <div class="price"><span class="p">desde UF 60</span><span class="u">según alcance</span></div>
+      </div>
+
+      <div class="svc-row rv">
+        <div class="c">E-04</div>
+        <div>
+          <h3>Capacitación in-company</h3>
+          <p class="d">Taller práctico de 4 horas. Nadie escucha una charla: cada persona sale con una tarea suya automatizada.</p>
+        </div>
+        <ul>
+          <li>Hasta 15 personas, en tus oficinas</li>
+          <li>Casos de tu propio rubro, no genéricos</li>
+          <li>Material y guía de uso responsable</li>
+        </ul>
+        <div class="price"><span class="p">UF 14</span><span class="u">≈ $560.000 + IVA</span></div>
+      </div>
+      <p class="svc-note">Valores netos, referenciales, cotizados en UF para que no se desactualicen. Emito factura. Firmo acuerdo de confidencialidad antes de ver un solo dato tuyo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DIAGNÓSTICO ============================ -->
+<section id="diagnostico">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 02 / DIAGNÓSTICO</div>
+      <div class="txt">
+        <h2>Seis preguntas y sabes dónde estás parado</h2>
+        <p>El mismo cuestionario con el que parto cualquier proyecto. Mide tres cosas: cuánto tienes que ganar, qué tan ordenado está tu material y qué tan rápido puedes partir. No pide tu correo.</p>
+      </div>
+    </div>
+
+    <div class="diag">
+      <div class="qcard">
+        <div class="qhead">
+          <span class="step" id="qStep">Pregunta 1 de 6</span>
+          <div class="qprog" id="qProg" aria-hidden="true"></div>
+        </div>
+        <div class="qbody" id="qBody">
+          <p class="qt" id="qText">¿Cuánto de tu semana se va en tareas que se repiten casi igual?</p>
+          <div class="opts" id="qOpts"></div>
+        </div>
+        <div class="qfoot">
+          <button type="button" class="lnk" id="qBack">&larr; Volver</button>
+          <button type="button" class="lnk" id="qReset">Empezar de nuevo</button>
+        </div>
+      </div>
+
+      <aside class="gauge" aria-live="polite">
+        <span class="gtag">Índice de preparación</span>
+        <svg class="gsvg" viewBox="0 0 220 140" role="img" aria-labelledby="gaugeTitle">
+          <title id="gaugeTitle">Indicador de preparación para IA</title>
+          <path d="M22 116 A 88 88 0 0 1 198 116" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="12" stroke-linecap="round"/>
+          <path id="gArc" d="M22 116 A 88 88 0 0 1 198 116" fill="none" stroke="#F0A92A" stroke-width="12" stroke-linecap="round" stroke-dasharray="276" stroke-dashoffset="276"/>
+          <g stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round">
+            <line x1="18" y1="116" x2="8" y2="116"/>
+            <line x1="47.8" y1="53.8" x2="40.7" y2="46.7"/>
+            <line x1="110" y1="24" x2="110" y2="14"/>
+            <line x1="172.2" y1="53.8" x2="179.3" y2="46.7"/>
+            <line x1="202" y1="116" x2="212" y2="116"/>
+          </g>
+          <text x="8" y="133" fill="#93A09A" font-family="IBM Plex Mono, monospace" font-size="9">0</text>
+          <text x="196" y="133" fill="#93A09A" font-family="IBM Plex Mono, monospace" font-size="9" text-anchor="middle">100</text>
+        </svg>
+        <div class="gscore" id="gScore">0<small>/100</small></div>
+        <div class="gstage" id="gStage">sin responder</div>
+
+        <div class="gbars">
+          <div class="gbar">
+            <div class="gl"><span>Potencial a ganar</span><span id="gv1">—</span></div>
+            <div class="gt"><i id="gb1"></i></div>
+          </div>
+          <div class="gbar">
+            <div class="gl"><span>Base y orden</span><span id="gv2">—</span></div>
+            <div class="gt"><i id="gb2"></i></div>
+          </div>
+          <div class="gbar">
+            <div class="gl"><span>Tracción para partir</span><span id="gv3">—</span></div>
+            <div class="gt"><i id="gb3"></i></div>
+          </div>
+        </div>
+        <p class="gout" id="gOut">Responde las seis preguntas y acá aparece tu lectura: qué tienes a favor, qué te falta y cuál sería el primer paso que yo te recomendaría.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CASOS ============================ -->
+<section id="casos">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 03 / EVIDENCIA</div>
+      <div class="txt">
+        <h2>Cosas que ya construí y están funcionando</h2>
+        <p>No son ejemplos de curso. Son sistemas que uso yo, que usa mi empresa o que usa gente en su turno de trabajo. Abre cualquiera y mira los números.</p>
+      </div>
+    </div>
+
+    <div class="cases" id="cases">
+      <article class="case" data-open="true">
+        <button type="button" aria-expanded="true">
+          <span class="cid">C-01</span>
+          <span>
+            <h3>Ocho documentos legales que antes se llenaban a mano</h3>
+            <span class="sector">Prevención de pérdidas · Retail</span>
+          </span>
+          <span class="chev" aria-hidden="true">+</span>
+        </button>
+        <div class="panel"><div>
+          <div class="inner">
+            <div class="cid" aria-hidden="true"></div>
+            <div>
+              <div class="detail">
+                <div>
+                  <h4>Cómo era antes</h4>
+                  <p>Cada procedimiento por robo obligaba a llenar ocho formatos oficiales en Word, a mano, repitiendo los mismos datos ocho veces. Cuarenta y cinco minutos de una persona que debería estar en sala, con el riesgo de que un dato mal copiado invalidara el trámite.</p>
+                </div>
+                <div>
+                  <h4>Qué construí</h4>
+                  <p>Una aplicación de escritorio que pide los datos una sola vez y genera los ocho documentos en Word y PDF, más un PDF único listo para imprimir. Incluye lectura de boletas por foto o PDF sin internet, corrector ortográfico propio, historial editable, respaldos y una bitácora cifrada de accesos.</p>
+                </div>
+              </div>
+              <div class="metrics">
+                <div class="metric"><span class="mv">45 → 4</span><span class="ml">minutos por caso</span></div>
+                <div class="metric"><span class="mv">8</span><span class="ml">documentos automáticos</span></div>
+                <div class="metric"><span class="mv">10/10</span><span class="ml">productos leídos de la boleta</span></div>
+                <div class="metric"><span class="mv">0</span><span class="ml">programas extra que instalar</span></div>
+              </div>
+              <div class="stack"><span>Python</span><span>Tkinter</span><span>docxtpl</span><span>OCR sin internet</span><span>PyInstaller + instalador</span><span>Bitácora cifrada</span></div>
+            </div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="case" data-open="false">
+        <button type="button" aria-expanded="false">
+          <span class="cid">C-02</span>
+          <span>
+            <h3>Una empresa de servicios que vende sola, con IA adentro</h3>
+            <span class="sector">Servicio técnico · Negocio propio</span>
+          </span>
+          <span class="chev" aria-hidden="true">+</span>
+        </button>
+        <div class="panel"><div>
+          <div class="inner">
+            <div class="cid" aria-hidden="true"></div>
+            <div>
+              <div class="detail">
+                <div>
+                  <h4>Cómo era antes</h4>
+                  <p>Todo por WhatsApp: explicar el servicio, cotizar a mano, coordinar la hora, cobrar por transferencia y anotar la venta en una planilla que nadie actualizaba.</p>
+                </div>
+                <div>
+                  <h4>Qué construí</h4>
+                  <p>Un sitio donde el cliente describe su problema, un recomendador con IA le propone el servicio correcto, paga en línea y recibe su comprobante por correo automáticamente. La venta queda registrada sola en el CRM y el catálogo se sincroniza con el WhatsApp de la empresa.</p>
+                </div>
+              </div>
+              <div class="metrics">
+                <div class="metric"><span class="mv">24/7</span><span class="ml">cotiza y cobra sin mí</span></div>
+                <div class="metric"><span class="mv">1</span><span class="ml">fuente de verdad de precios</span></div>
+                <div class="metric"><span class="mv">auto</span><span class="ml">comprobante y registro</span></div>
+              </div>
+              <div class="stack"><span>Vercel</span><span>Funciones serverless</span><span>API de Claude</span><span>Flow (pagos)</span><span>Resend</span><span>Google Sheets como CRM</span><span>Catálogo Meta/WhatsApp</span></div>
+            </div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="case" data-open="false">
+        <button type="button" aria-expanded="false">
+          <span class="cid">C-03</span>
+          <span>
+            <h3>Planos de planta dibujados y acotados por instrucciones</h3>
+            <span class="sector">Ingeniería · AutoCAD y Civil 3D</span>
+          </span>
+          <span class="chev" aria-hidden="true">+</span>
+        </button>
+        <div class="panel"><div>
+          <div class="inner">
+            <div class="cid" aria-hidden="true"></div>
+            <div>
+              <div class="detail">
+                <div>
+                  <h4>Cómo era antes</h4>
+                  <p>Dibujar el layout de una planta de proceso, acotarlo, mover equipos cuando cambia el criterio y rehacer el cuadro de equipos. Días de trabajo repetitivo cada vez que el cliente pide una variante.</p>
+                </div>
+                <div>
+                  <h4>Qué construí</h4>
+                  <p>Conecté la IA directamente a AutoCAD. Le pido en español que dibuje muros, equipos, cotas y capas, que mueva una línea de proceso completa o que exporte el cuadro de equipos a Excel, y lo hace sobre el archivo real. Las revisiones que antes tomaban jornadas ahora son una conversación.</p>
+                </div>
+              </div>
+              <div class="metrics">
+                <div class="metric"><span class="mv">7</span><span class="ml">revisiones del plano en una semana</span></div>
+                <div class="metric"><span class="mv">.dwg</span><span class="ml">archivo real, no una imagen</span></div>
+                <div class="metric"><span class="mv">auto</span><span class="ml">cuadro de equipos a Excel</span></div>
+              </div>
+              <div class="stack"><span>AutoCAD / Civil 3D</span><span>Servidor MCP</span><span>Capas y cotas por comando</span><span>Exportación a Excel</span></div>
+            </div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="case" data-open="false">
+        <button type="button" aria-expanded="false">
+          <span class="cid">C-04</span>
+          <span>
+            <h3>Control de stock con un modelo entrenado a medida</h3>
+            <span class="sector">Operaciones · Bodega</span>
+          </span>
+          <span class="chev" aria-hidden="true">+</span>
+        </button>
+        <div class="panel"><div>
+          <div class="inner">
+            <div class="cid" aria-hidden="true"></div>
+            <div>
+              <div class="detail">
+                <div>
+                  <h4>El problema</h4>
+                  <p>Saber cuánto pedir y cuándo, sin depender de la intuición de quien esté ese día a cargo de la bodega.</p>
+                </div>
+                <div>
+                  <h4>Qué construí</h4>
+                  <p>Una red neuronal propia entrenada con el histórico de movimientos, envuelta en una aplicación de escritorio con interfaz, informes y diagrama de clases documentado. Es el mismo camino que recorro con una empresa: del Excel al modelo, y del modelo a algo que alguien usa sin saber que hay IA adentro.</p>
+                </div>
+              </div>
+              <div class="metrics">
+                <div class="metric"><span class="mv">propio</span><span class="ml">modelo entrenado con tus datos</span></div>
+                <div class="metric"><span class="mv">offline</span><span class="ml">corre en el computador local</span></div>
+              </div>
+              <div class="stack"><span>Python</span><span>Red neuronal</span><span>Tkinter</span><span>Informe y modelo de clases</span></div>
+            </div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="case" data-open="false">
+        <button type="button" aria-expanded="false">
+          <span class="cid">C-05</span>
+          <span>
+            <h3>De la herramienta al negocio: licenciarla bien</h3>
+            <span class="sector">Propiedad intelectual · Negociación</span>
+          </span>
+          <span class="chev" aria-hidden="true">+</span>
+        </button>
+        <div class="panel"><div>
+          <div class="inner">
+            <div class="cid" aria-hidden="true"></div>
+            <div>
+              <div class="detail">
+                <div>
+                  <h4>El problema</h4>
+                  <p>Construir algo bueno es la mitad. La otra mitad es que quede claro de quién es, cuánto vale y bajo qué condiciones lo usa una empresa grande.</p>
+                </div>
+                <div>
+                  <h4>Qué construí</h4>
+                  <p>Un dossier de autoría con la huella digital de cada archivo, una versión de la herramienta con marca neutra para poder licenciarla a cualquier empresa, y una propuesta comercial con el modelo de precios en UF por volumen, escenarios de despliegue y el retorno calculado para el cliente. Ese trabajo también lo hago para ti.</p>
+                </div>
+              </div>
+              <div class="metrics">
+                <div class="metric"><span class="mv">SHA-256</span><span class="ml">huella por archivo</span></div>
+                <div class="metric"><span class="mv">3-4x</span><span class="ml">retorno modelado para el cliente</span></div>
+                <div class="metric"><span class="mv">UF</span><span class="ml">precios que no se desactualizan</span></div>
+              </div>
+              <div class="stack"><span>Dossier de autoría</span><span>Marca licenciable</span><span>Modelo de precios</span><span>Propuesta comercial</span></div>
+            </div>
+          </div>
+        </div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ MÉTODO ============================ -->
+<section id="metodo">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 04 / MÉTODO</div>
+      <div class="txt">
+        <h2>Cuatro fases, y en cada una puedes bajarte</h2>
+        <p>Nunca te voy a pedir que firmes un proyecto largo antes de ver un resultado. El orden es siempre el mismo porque es el que evita gastar plata en la automatización equivocada.</p>
+      </div>
+    </div>
+    <div class="method">
+      <div class="phase hl rv">
+        <span class="dur">Semana 0 · sin costo</span>
+        <h3>Conversación</h3>
+        <p>Treinta minutos. Me cuentas qué te duele y te digo derecho si la IA sirve para eso o si tu problema es otro. A veces la respuesta es "esto se arregla con una planilla".</p>
+      </div>
+      <div class="phase rv">
+        <span class="dur">Semana 1</span>
+        <h3>Diagnóstico</h3>
+        <p>Levanto el proceso, lo cronometro y lo valorizo. Salimos con tres oportunidades ordenadas por retorno y una recomendación clara de por dónde empezar.</p>
+      </div>
+      <div class="phase rv">
+        <span class="dur">Semanas 2 a 5</span>
+        <h3>Piloto</h3>
+        <p>Un proceso, andando de verdad, con las personas que lo van a usar. Medimos antes y después. Si no mejora lo prometido, no seguimos.</p>
+      </div>
+      <div class="phase rv">
+        <span class="dur">Desde la semana 6</span>
+        <h3>Producción y traspaso</h3>
+        <p>Lo dejo instalado, documentado y con el equipo capacitado. Tú decides si me quedas de apoyo mensual o si sigues solo. Las dos respuestas están bien.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CALCULADORA ============================ -->
+<section id="calculadora">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 05 / NÚMEROS</div>
+      <div class="txt">
+        <h2>Cuánto te está costando no hacer nada</h2>
+        <p>Mueve los controles con tu realidad. Es la misma aritmética que uso en cada propuesta: horas reales por el costo de esas horas. Prefiero quedarme corto y que la sorpresa sea buena.</p>
+      </div>
+    </div>
+
+    <div class="calc">
+      <div class="ctrls">
+        <div class="ctrl">
+          <label for="cPers"><span id="cPersLbl">Personas que hacen esta tarea</span> <b id="cPersV">5</b></label>
+          <input type="range" id="cPers" min="1" max="50" step="1" value="5">
+          <div class="hint"><span>1</span><span>50</span></div>
+        </div>
+        <div class="ctrl">
+          <label for="cHrs">Horas a la semana, cada una <b id="cHrsV">6 h</b></label>
+          <input type="range" id="cHrs" min="1" max="25" step="1" value="6">
+          <div class="hint"><span>1 h</span><span>25 h</span></div>
+        </div>
+        <div class="ctrl">
+          <label for="cCost">Costo de la hora de trabajo <b id="cCostV">$9.000</b></label>
+          <input type="range" id="cCost" min="3000" max="40000" step="500" value="9000">
+          <div class="hint"><span>$3.000</span><span>$40.000</span></div>
+        </div>
+        <div class="ctrl">
+          <label for="cAuto">Parte del trabajo que es automatizable <b id="cAutoV">60%</b></label>
+          <input type="range" id="cAuto" min="20" max="90" step="5" value="60">
+          <div class="hint"><span>20%</span><span>90%</span></div>
+        </div>
+      </div>
+
+      <div class="result">
+        <div class="rhead">
+          <span>Estimación anual</span>
+          <span class="mono" id="rBase">44 semanas hábiles</span>
+        </div>
+        <div class="rbody">
+          <div class="bigv" id="rMoney">$0</div>
+          <p class="mono" style="font-size:.72rem;color:var(--ink-3);margin-top:8px;letter-spacing:.05em">QUE HOY SE VAN EN TAREAS REPETIBLES</p>
+
+          <div class="chart">
+            <div class="crow hoy">
+              <span class="cl">Hoy</span>
+              <div class="cb"><i id="rBarHoy"></i></div>
+              <span class="cv" id="rHoy">0 h</span>
+            </div>
+            <div class="crow ia">
+              <span class="cl">Con IA</span>
+              <div class="cb"><i id="rBarIA"></i></div>
+              <span class="cv" id="rIA">0 h</span>
+            </div>
+          </div>
+        </div>
+        <div class="rfoot">
+          <div>
+            <span class="k">Horas que recuperas al año</span>
+            <span class="v" id="rHoras">0 h</span>
+          </div>
+          <div>
+            <span class="k">Un piloto se paga solo en</span>
+            <span class="v" id="rPayback">— meses</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="svc-note">Supuestos a la vista: 44 semanas hábiles al año y un piloto de UF 28 (≈ $1.120.000). La estimación no considera lo que no se puede medir, que suele ser lo más caro: errores, reprocesos y gente calificada haciendo pega mecánica.</p>
+  </div>
+</section>
+
+<!-- ============================ QUIÉN ============================ -->
+<section id="quien">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 06 / QUIÉN</div>
+      <div class="txt">
+        <h2>Quién está detrás</h2>
+      </div>
+    </div>
+
+    <div class="who">
+      <div class="card-id">
+        <div class="top">
+          <div class="mono-logo">AV</div>
+          <div>
+            <b>Andrés Vargas</b>
+            <span>Asesoría e implementación de IA</span>
+          </div>
+        </div>
+        <dl>
+          <dt>Formación</dt><dd>Ingeniería de Ejecución Industrial · 3er año</dd>
+          <dt>Oficio</dt><dd>Prevención de pérdidas en retail</dd>
+          <dt>Empresa</dt><dd>ANVAR TECH SpA · RUT 77.982.517-5</dd>
+          <dt>Base</dt><dd>Santiago, Chile · trabajo remoto y presencial</dd>
+          <dt>Herramientas</dt><dd>Claude, GPT, Python, AutoCAD, Vercel</dd>
+        </dl>
+      </div>
+
+      <div class="body">
+        <p>No vengo del mundo del software. Vengo del piso de operaciones: turnos, procedimientos, formularios en papel y jefaturas que piden el reporte para ayer. Por eso cuando miro un proceso no veo una oportunidad de demo, veo las horas de alguien.</p>
+        <p>Estudio <strong>Ingeniería de Ejecución Industrial</strong> y trabajo en <strong>prevención de pérdidas</strong> en un local de retail. En paralelo levanté <strong>ANVAR TECH SpA</strong>, con la que opero un servicio técnico que vende en línea con IA adentro. Todo lo que aparece más arriba lo construí yo, para resolver un problema que tenía en frente.</p>
+        <div class="pullq">"Si no te puedo mostrar la hora que te ahorré, todavía no terminé el trabajo."</div>
+        <p>Eso también significa decirte que no cuando corresponde. Si tu problema es de proceso, de datos sucios o simplemente de que nadie escribió el procedimiento, te lo voy a decir antes de venderte una automatización que va a fallar igual.</p>
+        <p class="mono" style="font-size:.76rem;color:var(--ink-3);margin-top:22px">Confidencialidad por escrito antes de ver tus datos · Boleta o factura · Trabajo con tus herramientas actuales, no te obligo a cambiar de mundo</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PLANES ============================ -->
+<section id="planes">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 07 / VALORES</div>
+      <div class="txt">
+        <h2 class="only-per">Elige por dónde partir</h2>
+        <h2 class="only-emp">Formas de trabajar juntos</h2>
+        <p class="only-per">Precios publicados e IVA incluido, sin "cotiza con nosotros". Si algo no te calza, lo armamos a tu medida.</p>
+        <p class="only-emp">Valores en UF, netos. El diagnóstico se descuenta completo si avanzamos a implementación.</p>
+      </div>
+    </div>
+
+    <!-- personas -->
+    <div class="plans only-per">
+      <div class="plan">
+        <span class="pn">Punto de partida</span>
+        <h3>Sesión Despegue</h3>
+        <p class="pd">Una sesión, tres tareas resueltas. Para saber si esto es lo tuyo sin comprometerte a nada.</p>
+        <div class="pp">$49.000</div>
+        <div class="pu">90 minutos · una vez</div>
+        <ul>
+          <li>Diagnóstico rápido de tus tareas</li>
+          <li>Tu asistente configurado en vivo</li>
+          <li>3 flujos listos para usar</li>
+          <li>Grabación y prompts guardados</li>
+        </ul>
+        <a class="btn btn-ghost" href="#contacto">Reservar</a>
+      </div>
+      <div class="plan feat">
+        <span class="pn">El más elegido</span>
+        <h3>Plan Piloto Personal</h3>
+        <p class="pd">Cuatro semanas para que la IA deje de ser un experimento y pase a ser tu forma de trabajar.</p>
+        <div class="pp">$229.000</div>
+        <div class="pu">4 semanas · 4 sesiones</div>
+        <ul>
+          <li>Todo lo de la Sesión Despegue</li>
+          <li>Una tarea tuya automatizada de punta a punta</li>
+          <li>Soporte por WhatsApp entre sesiones</li>
+          <li>Tu biblioteca de prompts y plantillas</li>
+          <li>Revisión final y plan de los próximos 3 meses</li>
+        </ul>
+        <a class="btn btn-amber" href="#contacto">Postular al piloto</a>
+      </div>
+      <div class="plan">
+        <span class="pn">Para no quedarse atrás</span>
+        <h3>Acompañamiento</h3>
+        <p class="pd">Yo pruebo lo nuevo, tú recibes solo lo que te sirve. Sin permanencia mínima.</p>
+        <div class="pp">$89.000</div>
+        <div class="pu">por mes</div>
+        <ul>
+          <li>2 sesiones mensuales</li>
+          <li>Revisión de lo que armaste</li>
+          <li>Aviso cuando cambia algo que usas</li>
+          <li>Se corta cuando quieras</li>
+        </ul>
+        <a class="btn btn-ghost" href="#contacto">Conversemos</a>
+      </div>
+    </div>
+
+    <!-- empresas -->
+    <div class="plans only-emp">
+      <div class="plan">
+        <span class="pn">Entrada</span>
+        <h3>Diagnóstico IA</h3>
+        <p class="pd">Una semana para saber exactamente qué automatizar y cuánto vale hacerlo.</p>
+        <div class="pp">UF 12</div>
+        <div class="pu">≈ $480.000 + IVA · 1 semana</div>
+        <ul>
+          <li>Levantamiento en terreno</li>
+          <li>Procesos medidos en horas y pesos</li>
+          <li>3 oportunidades priorizadas</li>
+          <li>Informe con plan y valores</li>
+          <li>Se descuenta 100% si avanzamos</li>
+        </ul>
+        <a class="btn btn-ghost" href="#contacto">Agendar visita</a>
+      </div>
+      <div class="plan feat">
+        <span class="pn">Recomendado</span>
+        <h3>Piloto en producción</h3>
+        <p class="pd">Un proceso andando de verdad, medido antes y después, con tu equipo capacitado.</p>
+        <div class="pp">desde UF 28</div>
+        <div class="pu">≈ $1.120.000 + IVA · 3 a 4 semanas</div>
+        <ul>
+          <li>Incluye el diagnóstico</li>
+          <li>Un proceso completo automatizado</li>
+          <li>Capacitación a quienes lo operan</li>
+          <li>Medición documentada del resultado</li>
+          <li>Decides seguir o parar con datos</li>
+        </ul>
+        <a class="btn btn-amber" href="#contacto">Cotizar piloto</a>
+      </div>
+      <div class="plan">
+        <span class="pn">Escala</span>
+        <h3>Implementación y soporte</h3>
+        <p class="pd">El sistema completo, instalado, documentado y con alguien respondiendo cuando algo falla.</p>
+        <div class="pp">desde UF 60</div>
+        <div class="pu">según alcance · soporte UF 8/mes</div>
+        <ul>
+          <li>Desarrollo llave en mano</li>
+          <li>Integraciones con lo que ya usas</li>
+          <li>Manuales, respaldos y traspaso</li>
+          <li>Código y documentación quedan contigo</li>
+          <li>Acompañamiento mensual opcional</li>
+        </ul>
+        <a class="btn btn-ghost" href="#contacto">Conversemos</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PREGUNTAS ============================ -->
+<section id="preguntas">
+  <div class="sheet">
+    <div class="shead">
+      <div class="code">§ 08 / PREGUNTAS</div>
+      <div class="txt">
+        <h2>Lo que todos preguntan</h2>
+      </div>
+    </div>
+
+    <div class="faq" id="faq">
+      <div class="fq" data-open="true">
+        <button type="button" aria-expanded="true">¿Esto no lo puedo hacer solo con ChatGPT?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="panel"><div><p>Una parte sí, y te voy a enseñar a hacerla. Lo que rara vez sale solo es lo otro: amarrar la IA a tus archivos, a tu formato oficial, a tu sistema de pagos o a tu plano, y dejarlo andando sin que alguien tenga que copiar y pegar todos los días. Esa parte es ingeniería, no prompts.</p></div></div>
+      </div>
+      <div class="fq" data-open="false">
+        <button type="button" aria-expanded="false">¿Mis datos quedan expuestos?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="panel"><div><p>Firmo confidencialidad antes de ver cualquier información tuya. Cuando el dato es sensible, trabajo con herramientas que corren en tu propio computador y sin internet: el lector de boletas de uno de mis proyectos funciona completamente offline justamente por eso. Y te digo siempre qué información sale de tu red y cuál no.</p></div></div>
+      </div>
+      <div class="fq" data-open="false">
+        <button type="button" aria-expanded="false">¿Y si la IA se equivoca?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="panel"><div><p>Se equivoca. Por eso todo lo que construyo tiene una persona revisando antes de que el documento salga: campos marcados en amarillo cuando el dato es dudoso, validaciones que bloquean lo incompleto y avisos cuando los números no cuadran. La IA propone, alguien firma.</p></div></div>
+      </div>
+      <div class="fq" data-open="false">
+        <button type="button" aria-expanded="false">¿Cuánto demora ver un resultado?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="panel"><div><p class="only-per">En la primera sesión de 90 minutos ya te llevas tres cosas funcionando. El cambio de hábito toma unas cuatro semanas, que es justo lo que dura el piloto personal.</p><p class="only-emp">El diagnóstico toma una semana. El primer proceso en producción, entre tres y cuatro semanas más. Si alguien te promete una transformación completa en diez días, desconfía.</p></div></div>
+      </div>
+      <div class="fq" data-open="false">
+        <button type="button" aria-expanded="false">¿Tengo que cambiar los sistemas que ya uso?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="panel"><div><p>No. Trabajo sobre lo que ya tienes: Word, Excel, Drive, WhatsApp, tu ERP o tu AutoCAD. Cambiar de sistema es caro, lento y casi nunca es el verdadero problema. Si al final hay que cambiar algo, te lo voy a justificar con números.</p></div></div>
+      </div>
+      <div class="fq" data-open="false">
+        <button type="button" aria-expanded="false">¿Quién se queda con lo que construimos?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="panel"><div><p>Tú. Código, documentación y manuales quedan en tu poder, y queda por escrito en el contrato. Lo aprendí por experiencia propia: hice el trabajo de proteger la autoría de mis herramientas, con dossier y huella digital por archivo, y ese mismo criterio lo aplico cuando el que contrata eres tú.</p></div></div>
+      </div>
+      <div class="fq" data-open="false">
+        <button type="button" aria-expanded="false">Somos chicos. ¿Vale la pena?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="panel"><div><p>Casi siempre sí, y suele rendir más que en una empresa grande, porque acá no hay comité que apruebe nada. Usa la calculadora de más arriba con tus números reales: si el ahorro anual no llega a un par de millones, te voy a recomendar partir por la Sesión Despegue y no por un proyecto.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CONTACTO ============================ -->
+<section id="contacto">
+  <div class="sheet">
+    <div class="cta-wrap">
+      <div class="cta-in">
+        <div>
+          <h2>Treinta minutos, sin costo y sin discurso</h2>
+          <p class="lede">Me cuentas qué te está comiendo el tiempo y te digo derechamente si puedo ayudarte, cuánto costaría y en cuánto lo verías. Si no es para mí, te voy a decir a quién buscar.</p>
+
+          <div class="ways">
+            <a class="way" data-wsp href="#contacto">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2"/></svg>
+              <span><b>WhatsApp</b><span>+56 9 2633 3760 · lo más rápido</span></span>
+            </a>
+            <a class="way" href="mailto:contacto@anvartech.cl?subject=Asesor%C3%ADa%20IA">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+              <span><b>Correo</b><span>contacto@anvartech.cl</span></span>
+            </a>
+            <div class="way">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
+              <span><b>Horario de respuesta</b><span>lunes a sábado · antes de 24 horas</span></span>
+            </div>
+          </div>
+        </div>
+
+        <form id="form" novalidate>
+          <div class="fgrid">
+            <div class="field">
+              <label for="fNombre">Nombre</label>
+              <input id="fNombre" name="nombre" type="text" autocomplete="name" required placeholder="Cómo te llamas">
+            </div>
+            <div class="field">
+              <label for="fContacto">WhatsApp o correo</label>
+              <input id="fContacto" name="contacto" type="text" autocomplete="email" required placeholder="Para responderte">
+            </div>
+          </div>
+          <div class="field">
+            <label for="fTipo">Qué necesitas</label>
+            <select id="fTipo" name="tipo">
+              <option value="personal">Quiero usar IA en mi trabajo o estudio</option>
+              <option value="diagnostico">Diagnóstico para mi empresa</option>
+              <option value="piloto">Automatizar un proceso puntual</option>
+              <option value="capacitacion">Capacitar a mi equipo</option>
+              <option value="otro">Otra cosa, te cuento</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fMsg">Qué tarea te está comiendo el tiempo</label>
+            <textarea id="fMsg" name="mensaje" placeholder="Ejemplo: cada semana armo el mismo reporte y me toma media jornada."></textarea>
+          </div>
+          <div class="formmsg" id="fMsgBox" role="status"></div>
+          <button class="btn btn-amber" type="submit" id="fSend">Enviar y coordinar los 30 minutos</button>
+          <p class="formnote">Uso tus datos solo para responderte. No los comparto, no los vendo y no te voy a llenar de correos.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="sheet fgrid2">
+    <div class="legal">
+      <strong style="font-family:var(--disp);font-size:1rem;letter-spacing:-.01em">ANVAR IA</strong><br>
+      Unidad de asesoría en inteligencia artificial de ANVAR TECH SpA<br>
+      RUT 77.982.517-5 · Santiago, Chile<br>
+      &copy; <span id="year">2026</span> ANVAR TECH SpA. Todos los derechos reservados.
+    </div>
+    <nav aria-label="Enlaces del pie">
+      <a href="#servicios">Servicios</a>
+      <a href="#casos">Casos</a>
+      <a href="#planes">Planes</a>
+      <a href="#contacto">Contacto</a>
+      <a href="https://anvartech.cl" rel="noopener">anvartech.cl</a>
+    </nav>
+  </div>
+</footer>
+
+<a class="wsp" data-wsp href="#contacto" aria-label="Escribir por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2"/></svg>
+  <span>Hablemos</span>
+</a>
+
+<script src="app.js"></script>
+</body>
+</html>

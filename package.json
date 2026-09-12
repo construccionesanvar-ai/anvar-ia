@@ -1,0 +1,14 @@
+{
+  "name": "anvar-ia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ANVAR IA — sitio de asesoría e implementación de inteligencia artificial (Andrés Vargas, Santiago de Chile).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}

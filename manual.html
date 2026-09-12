@@ -1,0 +1,578 @@
+<title>Manual de Operación ANVAR IA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#EFF0EC; --paper-2:#E5E7E0; --panel:#FBFBF9; --panel-2:#F3F4F0;
+  --ink:#14181B; --ink-2:#586460; --ink-3:#87908B;
+  --rule:#D2D6CD; --rule-2:#B6BCB1;
+  --amber:#D98A0B; --amber-soft:#F7E7C6; --amber-text:#8A5400;
+  --deep:#101A1E; --deep-2:#18252B; --deep-rule:#2C3B43; --on-deep:#E9EBE4; --on-deep-2:#9FACA6;
+  --good:#1C7A58; --bad:#A93B2C;
+  --disp:'Archivo',Haettenschweiler,'Arial Narrow',system-ui,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',Consolas,ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+    --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+    --rule:#243036; --rule-2:#324148;
+    --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063;
+    --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+    --good:#3DBE90; --bad:#E0705E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+  --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+  --rule:#243036; --rule-2:#324148;
+  --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063;
+  --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+  --good:#3DBE90; --bad:#E0705E;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.doc{max-width:880px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(18px,4vw,40px) 90px}
+h1,h2,h3,h4{font-family:var(--disp);font-weight:700;line-height:1.06;letter-spacing:-.015em;margin:0;text-wrap:balance;font-stretch:110%}
+h1{font-size:clamp(2rem,5.2vw,3rem);font-stretch:118%}
+h2{font-size:clamp(1.38rem,2.8vw,1.9rem)}
+h3{font-size:1.14rem;font-stretch:106%}
+h4{font-size:.98rem;font-stretch:104%}
+p{margin:0}
+a{color:var(--amber-text);text-decoration:underline;text-underline-offset:3px}
+strong{font-weight:600;color:var(--ink)}
+code{font-family:var(--mono);font-size:.86em;background:var(--panel-2);border:1px solid var(--rule);padding:1px 5px;border-radius:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.head{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:14px}
+.kicker{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber-text);margin-bottom:14px}
+.head p{color:var(--ink-2);margin-top:18px;font-size:1.06rem;max-width:62ch}
+.rot{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule-2);border-top:0;font-family:var(--mono);font-size:.63rem;margin-bottom:46px}
+.rot div{padding:10px 12px;border-right:1px solid var(--rule)}
+.rot div:last-child{border-right:0}
+.rot b{display:block;color:var(--ink-3);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-size:.56rem;margin-bottom:3px}
+
+section{margin-bottom:clamp(40px,6vw,66px)}
+.sh{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule-2);padding-bottom:10px;margin-bottom:22px}
+.sh .n{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--amber-text);white-space:nowrap}
+section > p,section > div > p{color:var(--ink-2);max-width:68ch}
+section > p + p{margin-top:14px}
+h3 + p,h4 + p{margin-top:9px}
+
+.box{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:20px 22px;margin-top:20px}
+.box.dark{background:var(--deep);border-color:var(--deep-rule);color:var(--on-deep)}
+.box.dark p,.box.dark li{color:var(--on-deep-2)}
+.box.dark strong,.box.dark h3,.box.dark h4{color:var(--on-deep)}
+.box.amber{border-left:3px solid var(--amber);background:var(--amber-soft)}
+.box.amber p,.box.amber li,.box.amber strong{color:var(--ink)}
+.box h3,.box h4{margin-bottom:10px}
+
+ul,ol{margin:14px 0 0;padding-left:0;list-style:none;display:grid;gap:9px}
+li{color:var(--ink-2);padding-left:20px;position:relative;max-width:68ch}
+li::before{content:"";position:absolute;left:0;top:.68em;width:10px;height:1px;background:var(--amber)}
+ol{counter-reset:oo}
+ol li{padding-left:30px}
+ol li::before{counter-increment:oo;content:counter(oo) ".";width:auto;height:auto;background:none;top:0;font-family:var(--mono);font-size:.8rem;color:var(--amber-text);font-weight:600}
+
+.tabla{width:100%;border-collapse:collapse;margin-top:18px;font-size:.92rem}
+.tabla th{font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);text-align:left;font-weight:600;padding:0 14px 9px 0;border-bottom:1px solid var(--rule-2)}
+.tabla td{padding:12px 14px 12px 0;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--ink-2)}
+.tabla td:first-child{color:var(--ink);font-weight:500}
+.tabla td.num,.tabla th.num{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;padding-right:0}
+.tabla td.num{font-family:var(--mono)}
+.scroll{overflow-x:auto;margin-top:20px}
+
+/* ficha de servicio */
+.svc{border:1px solid var(--rule-2);border-radius:3px;overflow:hidden;margin-top:26px;background:var(--panel)}
+.svc > header{background:var(--deep);color:var(--on-deep);padding:16px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.svc > header .id{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;color:var(--amber);display:block;margin-bottom:5px}
+.svc > header h3{color:var(--on-deep)}
+.svc > header .pr{font-family:var(--mono);font-weight:600;font-size:1.06rem;color:var(--amber);white-space:nowrap}
+.svc .in{padding:20px 22px}
+.svc .in > *:first-child{margin-top:0}
+.promesa{font-family:var(--disp);font-size:1.1rem;font-stretch:104%;font-weight:700;line-height:1.28;color:var(--ink);border-left:2px solid var(--amber);padding-left:16px;margin-bottom:20px}
+.svc h4{margin-top:22px;margin-bottom:4px;color:var(--amber-text);font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;font-weight:600}
+
+/* cronograma */
+.crono{margin-top:12px;border-top:1px solid var(--rule)}
+.crono .t{display:grid;grid-template-columns:104px 1fr;gap:18px;padding:13px 0;border-bottom:1px solid var(--rule)}
+.crono .t .h{font-family:var(--mono);font-size:.74rem;color:var(--amber-text);font-variant-numeric:tabular-nums;padding-top:2px}
+.crono .t b{display:block;font-weight:600;color:var(--ink);font-size:.96rem;margin-bottom:3px}
+.crono .t p{font-size:.92rem;color:var(--ink-2);max-width:60ch}
+
+.entreg{display:grid;gap:8px;margin-top:12px}
+.entreg div{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;font-size:.93rem;color:var(--ink-2)}
+.entreg .mk{font-family:var(--mono);color:var(--amber-text);font-size:.8rem;line-height:1.7}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+.tile{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:18px 20px}
+.tile .k{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:8px}
+.tile .v{font-family:var(--disp);font-size:1.42rem;font-stretch:108%;font-weight:700;line-height:1.12;display:block}
+.tile p{font-size:.88rem;margin-top:8px;color:var(--ink-2)}
+
+.regla{display:grid;grid-template-columns:auto 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--rule);align-items:start}
+.regla .nr{font-family:var(--mono);font-size:.8rem;font-weight:600;color:var(--paper);background:var(--ink);width:26px;height:26px;display:grid;place-items:center;border-radius:2px;flex:none}
+.regla b{display:block;font-family:var(--disp);font-size:1.04rem;font-stretch:104%;color:var(--ink);margin-bottom:5px}
+.regla p{font-size:.93rem}
+
+.paso{display:grid;grid-template-columns:34px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.paso .nn{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--amber-text);padding-top:2px}
+.paso b{display:block;font-family:var(--disp);font-size:1.06rem;font-stretch:104%;margin-bottom:6px}
+.paso p{font-size:.94rem}
+.paso p + p{margin-top:8px}
+pre{background:var(--deep);color:var(--on-deep);border:1px solid var(--deep-rule);border-radius:3px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:.8rem;line-height:1.7;margin:12px 0 0}
+pre .c{color:var(--on-deep-2)}
+
+.diagrama{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:18px;margin-top:22px}
+.diagrama svg{display:block;min-width:680px;width:100%;height:auto}
+.diagrama figcaption{font-family:var(--mono);font-size:.68rem;color:var(--ink-3);margin-top:12px;letter-spacing:.04em}
+
+footer{border-top:1px solid var(--rule);margin-top:60px;padding-top:24px;font-family:var(--mono);font-size:.72rem;color:var(--ink-3);line-height:1.9}
+@media (max-width:640px){
+  .cols{grid-template-columns:1fr}
+  .rot{grid-template-columns:1fr 1fr}
+  .rot div:nth-child(2){border-right:0}
+  .rot div:nth-child(1),.rot div:nth-child(2){border-bottom:1px solid var(--rule)}
+  .crono .t{grid-template-columns:1fr;gap:4px}
+  .sh{flex-direction:column;gap:6px}
+}
+</style>
+
+<div class="doc">
+
+<header class="head">
+  <p class="kicker">Manual de operación · ANVAR IA · septiembre 2026</p>
+  <h1>Qué vendemos y cómo se entrega</h1>
+  <p>El sitio ya dice qué ofreces. Este documento dice qué haces exactamente cuando alguien te compra: minuto a minuto, qué preparas antes, qué entregas después y qué no haces nunca. Es el manual que convierte una lista de precios en un negocio.</p>
+</header>
+<div class="rot">
+  <div><b>Marca</b>ANVAR IA</div>
+  <div><b>Dominio</b>ia.anvartech.cl</div>
+  <div><b>Servicios</b>3 personas · 5 empresas</div>
+  <div><b>Estado</b>Listo para vender</div>
+</div>
+
+<!-- 00 -->
+<section>
+  <div class="sh"><span class="n">§ 00</span><h2>De dónde sale cada peso</h2></div>
+  <p>Antes del detalle, el mapa completo. Cuatro canales traen gente, todos pasan por la misma llamada de 30 minutos, y de ahí se bifurca en dos escaleras. <strong>El destino de ambas es el mismo: el acompañamiento mensual</strong>, porque es el único ingreso que llega sin volver a vender.</p>
+
+  <figure class="diagrama">
+    <div class="scroll">
+    <svg viewBox="0 0 700 330" role="img" aria-labelledby="mapaTitulo">
+      <title id="mapaTitulo">Mapa del embudo: cuatro canales llevan a una llamada de 30 minutos, que se bifurca en la escalera de personas y la de empresas, ambas terminando en acompañamiento mensual</title>
+      <defs>
+        <marker id="fl" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" fill="var(--rule-2)"/>
+        </marker>
+      </defs>
+      <g font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)" letter-spacing="1">
+        <text x="10" y="14">CANALES</text>
+        <text x="196" y="14">CALIFICACIÓN</text>
+        <text x="338" y="14">ESCALERA</text>
+        <text x="590" y="14">RECURRENTE</text>
+      </g>
+
+      <!-- canales -->
+      <g>
+        <rect x="10" y="28" width="150" height="34" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+        <text x="22" y="49" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--ink)">El sitio · diagnóstico</text>
+        <rect x="10" y="72" width="150" height="34" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+        <text x="22" y="93" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--ink)">Prospección directa</text>
+        <rect x="10" y="116" width="150" height="34" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+        <text x="22" y="137" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--ink)">Perfil de Google</text>
+        <rect x="10" y="160" width="150" height="34" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+        <text x="22" y="181" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--ink)">Casos publicados</text>
+      </g>
+      <g stroke="var(--rule-2)" stroke-width="1.2" fill="none" marker-end="url(#fl)">
+        <path d="M160 45 C 186 45 186 105 202 111"/>
+        <path d="M160 89 C 186 89 186 105 202 111"/>
+        <path d="M160 133 C 186 133 186 115 202 117"/>
+        <path d="M160 177 C 186 177 186 125 202 121"/>
+      </g>
+
+      <!-- llamada -->
+      <rect x="208" y="88" width="104" height="56" rx="2" fill="var(--deep)" stroke="var(--amber)" stroke-width="1.5"/>
+      <text x="260" y="110" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="700" font-size="13" fill="var(--on-deep)">Llamada</text>
+      <text x="260" y="126" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--amber)">30 MIN · GRATIS</text>
+
+      <!-- bifurcacion -->
+      <g stroke="var(--rule-2)" stroke-width="1.2" fill="none" marker-end="url(#fl)">
+        <path d="M312 104 C 334 104 334 62 348 58"/>
+        <path d="M312 128 C 334 128 334 192 348 196"/>
+      </g>
+
+      <!-- personas -->
+      <g font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--amber-text)" letter-spacing="1">
+        <text x="354" y="34">PERSONAS</text>
+      </g>
+      <rect x="354" y="42" width="98" height="32" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+      <text x="403" y="58" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink)">Sesión Despegue</text>
+      <text x="403" y="69" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">$49.000</text>
+      <rect x="466" y="42" width="98" height="32" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+      <text x="515" y="58" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink)">Plan Piloto</text>
+      <text x="515" y="69" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">$229.000</text>
+      <path d="M452 58 L 462 58" stroke="var(--rule-2)" stroke-width="1.2" marker-end="url(#fl)" fill="none"/>
+
+      <!-- empresas -->
+      <g font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--amber-text)" letter-spacing="1">
+        <text x="354" y="172">EMPRESAS</text>
+      </g>
+      <rect x="354" y="180" width="98" height="32" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+      <text x="403" y="196" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink)">Diagnóstico</text>
+      <text x="403" y="207" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">UF 12</text>
+      <rect x="466" y="180" width="98" height="32" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)"/>
+      <text x="515" y="196" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink)">Piloto</text>
+      <text x="515" y="207" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">UF 28</text>
+      <path d="M452 196 L 462 196" stroke="var(--rule-2)" stroke-width="1.2" marker-end="url(#fl)" fill="none"/>
+      <rect x="354" y="230" width="210" height="30" rx="2" fill="var(--panel-2)" stroke="var(--rule-2)" stroke-dasharray="3 3"/>
+      <text x="459" y="249" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink-2)">Capacitación UF 14 · entra por cualquier lado</text>
+
+      <!-- recurrente -->
+      <rect x="580" y="88" width="110" height="66" rx="2" fill="var(--deep)" stroke="var(--amber)" stroke-width="1.5"/>
+      <text x="635" y="112" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="700" font-size="13" fill="var(--on-deep)">Acompaña-</text>
+      <text x="635" y="127" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="700" font-size="13" fill="var(--on-deep)">miento</text>
+      <text x="635" y="142" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--amber)">TODOS LOS MESES</text>
+      <g stroke="var(--amber)" stroke-width="1.4" fill="none" marker-end="url(#fl)" opacity=".85">
+        <path d="M564 58 C 578 58 570 82 620 84"/>
+        <path d="M564 196 C 578 196 570 162 620 158"/>
+      </g>
+
+      <text x="10" y="300" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink-3)">Todo lo de la izquierda existe para llegar a la caja de la derecha.</text>
+      <text x="10" y="318" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink-3)">La capacitación es la excepción: se prepara una vez y se vende muchas.</text>
+    </svg>
+    </div>
+    <figcaption>Mapa del negocio — cuatro canales, una calificación, dos escaleras, un destino.</figcaption>
+  </figure>
+</section>
+
+<!-- 01 -->
+<section>
+  <div class="sh"><span class="n">§ 01</span><h2>El catálogo, en una frase cada uno</h2></div>
+  <p>Si alguien te pregunta en un ascensor qué vendes, esto es lo que contestas. Fíjate que ninguna dice "asesoría": todas dicen un resultado.</p>
+  <div class="scroll"><table class="tabla">
+    <thead><tr><th>Código</th><th>Servicio</th><th>Lo que realmente vendes</th><th class="num">Valor</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">S-01</td><td>Sesión Despegue</td><td>Que salgas de una videollamada de 90 minutos con tres tareas tuyas ya resueltas y andando en tu computador.</td><td class="num">$49.000</td></tr>
+      <tr><td class="mono">S-02</td><td>Plan Piloto Personal</td><td>Que en cuatro semanas la IA deje de ser algo que probaste y pase a ser cómo trabajas.</td><td class="num">$229.000</td></tr>
+      <tr><td class="mono">S-03</td><td>Acompañamiento</td><td>Que alguien pruebe las herramientas nuevas por ti y te pase solo lo que te sirve.</td><td class="num">$89.000/mes</td></tr>
+      <tr><td class="mono">E-01</td><td>Diagnóstico IA</td><td>Saber por escrito, en horas y pesos, qué conviene automatizar y qué no tocar.</td><td class="num">UF 12</td></tr>
+      <tr><td class="mono">E-02</td><td>Piloto en producción</td><td>Un proceso andando de verdad en cuatro semanas, medido antes y después.</td><td class="num">desde UF 28</td></tr>
+      <tr><td class="mono">E-03</td><td>Implementación</td><td>El sistema completo instalado, documentado y traspasado a tu equipo.</td><td class="num">desde UF 60</td></tr>
+      <tr><td class="mono">E-04</td><td>Capacitación</td><td>Que tu equipo salga de un taller de 4 horas con una tarea suya resuelta cada uno.</td><td class="num">UF 14</td></tr>
+      <tr><td class="mono">E-05</td><td>Acompañamiento</td><td>Que lo que instalamos siga funcionando y mejorando sin que tengas que pensarlo.</td><td class="num">UF 8/mes</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section>
+  <div class="sh"><span class="n">§ 02</span><h2>Personas — cómo se entrega</h2></div>
+
+  <!-- S-01 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">S-01</span><h3>Sesión Despegue</h3></div>
+      <span class="pr">$49.000 · 90 min</span>
+    </header>
+    <div class="in">
+      <p class="promesa">Sale de la llamada con tres cosas funcionando, no con apuntes. Si sale con apuntes, fallaste.</p>
+
+      <h4>Antes · 20 minutos tuyos</h4>
+      <p>Le mandas el formulario de 5 preguntas (está en <code>operacion/01-formulario-previo.md</code>) mínimo 24 horas antes. Con sus respuestas decides: qué asistente le vas a crear y cuáles serán los tres flujos. <strong>Si entras sin eso decidido, la sesión se te desarma.</strong></p>
+
+      <h4>Durante · minuto a minuto</h4>
+      <div class="crono">
+        <div class="t"><span class="h">00 – 10</span><div><b>Encuadre</b><p>"Hoy no hay teoría. Vamos a dejar tres cosas andando. Comparte pantalla." Pides permiso para grabar. Le dices los tres flujos que armaron, para que sepa a dónde van.</p></div></div>
+        <div class="t"><span class="h">10 – 25</span><div><b>Flujo 1 · su asistente base</b><p>Le creas un asistente con SU contexto cargado: quién es, qué hace, cómo escribe, qué formato usa, qué palabras usa su rubro. Lo prueban ahí mismo con un caso real suyo. Este es el que más le sorprende porque de golpe la IA "lo conoce".</p></div></div>
+        <div class="t"><span class="h">25 – 50</span><div><b>Flujo 2 · su tarea más repetitiva</b><p>La que salió en la pregunta 5 del formulario. La hacen juntos, completa, de principio a fin. Guardan el prompt como plantilla reutilizable. <strong>Que la haga él con el teclado, no tú.</strong></p></div></div>
+        <div class="t"><span class="h">50 – 70</span><div><b>Flujo 3 · el que impresiona</b><p>Eliges según su perfil: sacarle lo importante a un PDF largo, transcribir y resumir una reunión, redactar un correo difícil, limpiar una planilla desordenada, preparar una clase. Este es el que va a contar a otros.</p></div></div>
+        <div class="t"><span class="h">70 – 85</span><div><b>Los tres errores</b><p>Le muestras con SU material dónde la IA se equivoca, cómo verificar antes de mandar algo, y qué nunca subir: datos de clientes, RUT, información de la empresa sin permiso. <strong>Esta parte es la que te hace distinto del tutorial de YouTube.</strong></p></div></div>
+        <div class="t"><span class="h">85 – 90</span><div><b>Cierre</b><p>"Tu tarea de esta semana es usar el flujo 2 tres veces." Y si corresponde: "Si quieres que esto quede automatizado de verdad, eso es el Plan Piloto." No insistas si no engancha.</p></div></div>
+      </div>
+
+      <h4>Después · dentro de 24 horas</h4>
+      <div class="entreg">
+        <div><span class="mk">01</span><span>La grabación de la sesión.</span></div>
+        <div><span class="mk">02</span><span>Un documento de una página con los tres flujos y el prompt de cada uno, listo para copiar.</span></div>
+        <div><span class="mk">03</span><span>Los tres errores a cuidar, escritos.</span></div>
+        <div><span class="mk">04</span><span>La tarea de la semana, en una línea.</span></div>
+      </div>
+
+      <h4>Tu costo real</h4>
+      <p>2 horas en total. Te quedan <span class="mono">$24.500</span> la hora. Es tu producto de entrada: se vende fácil, se entrega un sábado y de aquí salen los testimonios y los pilotos.</p>
+    </div>
+  </article>
+
+  <!-- S-02 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">S-02</span><h3>Plan Piloto Personal</h3></div>
+      <span class="pr">$229.000 · 4 semanas</span>
+    </header>
+    <div class="in">
+      <p class="promesa">No es "cuatro sesiones". Es que al final tenga una tarea suya automatizada de verdad y sepa resolver solo la siguiente.</p>
+      <div class="crono">
+        <div class="t"><span class="h">Semana 1</span><div><b>Despegue</b><p>La Sesión Despegue completa, igual que arriba. Además eligen juntos cuál será la tarea que vas a automatizar en la semana 2.</p></div></div>
+        <div class="t"><span class="h">Semana 2</span><div><b>Construcción</b><p>Tú trabajas solo unas 5 horas: armas la automatización real. Puede ser una plantilla que se llena sola, un documento que se arma con sus datos, una planilla conectada, un flujo de correos. Sesión de 60 min para entregársela y que la use contigo mirando.</p></div></div>
+        <div class="t"><span class="h">Semana 3</span><div><b>Ajuste</b><p>Sesión de 60 min. Revisan qué usó y qué no usó — <strong>lo que no usó es la información valiosa</strong>. Arreglas lo que falló y agregan un flujo nuevo.</p></div></div>
+        <div class="t"><span class="h">Semana 4</span><div><b>Autonomía</b><p>Sesión de 60 min. Le entregas su biblioteca de prompts ordenada y el plan de los próximos tres meses. Le enseñas a resolver solo: cómo pedir, cómo corregir, cómo saber cuándo la IA se está equivocando.</p></div></div>
+      </div>
+      <h4>Entre semanas</h4>
+      <p>WhatsApp, respuesta en menos de 24 horas hábiles. Déjalo claro al inicio: <strong>no es soporte inmediato</strong>, y no contestas a las 11 de la noche.</p>
+      <h4>Tu costo real</h4>
+      <p>Unas 10 horas repartidas en un mes. Te quedan <span class="mono">$22.900</span> la hora.</p>
+    </div>
+  </article>
+
+  <!-- S-03 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">S-03</span><h3>Acompañamiento</h3></div>
+      <span class="pr">$89.000 / mes</span>
+    </header>
+    <div class="in">
+      <p class="promesa">Le vendes no tener que estar pendiente. Tú pruebas lo nuevo, él recibe solo lo que le sirve.</p>
+      <div class="entreg">
+        <div><span class="mk">01</span><span>Dos sesiones de 60 minutos al mes, agendadas fijas (por ejemplo, el primer y tercer martes).</span></div>
+        <div><span class="mk">02</span><span>Revisión de lo que armó entre medio.</span></div>
+        <div><span class="mk">03</span><span>Un correo mensual: qué cambió este mes y qué de eso le sirve a él. Cuatro líneas, no un boletín.</span></div>
+        <div><span class="mk">04</span><span>WhatsApp para dudas cortas.</span></div>
+      </div>
+      <p style="margin-top:16px">Sin permanencia mínima, y dilo en voz alta al venderlo: quita la objeción antes de que aparezca. <strong>Tu costo: 3 horas al mes. Te quedan <span class="mono">$29.700</span> la hora</strong> — es el mejor negocio de la escalera de personas.</p>
+    </div>
+  </article>
+</section>
+
+<!-- 03 -->
+<section>
+  <div class="sh"><span class="n">§ 03</span><h2>Empresas — cómo se entrega</h2></div>
+
+  <!-- E-01 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">E-01</span><h3>Diagnóstico IA</h3></div>
+      <span class="pr">UF 12 · 1 semana</span>
+    </header>
+    <div class="in">
+      <p class="promesa">Vendes certeza: saber qué automatizar, cuánto ahorra y qué NO tocar. Es lo único que te compran antes de confiar en ti.</p>
+      <div class="crono">
+        <div class="t"><span class="h">Día 1 · 2 h</span><div><b>Encuadre con quien decide</b><p>Qué proceso duele, cuánta gente lo hace, qué sistemas usan, y la pregunta clave: <em>"¿qué pasó la última vez que intentaron mejorar algo?"</em> — ahí sale la verdadera historia de la empresa.</p></div></div>
+        <div class="t"><span class="h">Días 2-3 · 6 h</span><div><b>Terreno</b><p>Te sientas al lado de <strong>quien hace el trabajo</strong>, no de quien lo describe. Cronometras con el reloj a la vista. Tomas capturas y fotos. Esta es la parte que ningún consultor hace y es exactamente de donde sale tu autoridad: nadie más va a poder decir "lo medí".</p></div></div>
+        <div class="t"><span class="h">Día 4 · 6 h</span><div><b>Análisis</b><p>Valorizas: horas por costo-hora. Priorizas dividiendo ahorro anual por esfuerzo de implementación. Eliges tres, y eliges también las que vas a recomendar NO hacer.</p></div></div>
+        <div class="t"><span class="h">Día 5 · 6 h</span><div><b>Informe y presentación</b><p>Documento de 8 a 10 páginas según la plantilla, más una reunión de una hora para presentarlo. <strong>Nunca lo mandes por correo sin presentarlo</strong>: el informe presentado se vende, el informe enviado se archiva.</p></div></div>
+      </div>
+      <h4>El informe, siete capítulos</h4>
+      <p>Está completo en <code>operacion/04-plantilla-informe-diagnostico.md</code>. El capítulo que importa es el 4: <strong>"Lo que NO recomiendo automatizar"</strong>. Nadie lo escribe. Es lo que te convierte en asesor en vez de vendedor, y es la razón por la que te van a llamar de vuelta.</p>
+      <h4>Tu costo real</h4>
+      <p>20 horas. Te quedan <span class="mono">$24.000</span> la hora. Y si avanzan al piloto, se lo descuentas completo — pero ya lo cobraste.</p>
+    </div>
+  </article>
+
+  <!-- E-02 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">E-02</span><h3>Piloto en producción</h3></div>
+      <span class="pr">desde UF 28 · 3-4 semanas</span>
+    </header>
+    <div class="in">
+      <p class="promesa">Un proceso, andando de verdad, con las personas que lo van a usar. No una demo.</p>
+      <div class="crono">
+        <div class="t"><span class="h">Semana 1</span><div><b>Diseño y acuerdo de medición</b><p>Defines cómo va a funcionar y, sobre todo, <strong>qué se va a medir y cómo</strong>, firmado antes de construir. Sin esto, al final cada uno recuerda una promesa distinta.</p></div></div>
+        <div class="t"><span class="h">Semanas 2-3</span><div><b>Construcción y pruebas</b><p>Construyes y lo pruebas con usuarios reales, no contigo. Aquí aparece todo lo que no viste en el diagnóstico: la excepción que nadie mencionó, el campo que siempre va vacío, la persona que lo hace distinto.</p></div></div>
+        <div class="t"><span class="h">Semana 4</span><div><b>Capacitación, medición y cierre</b><p>Capacitas a quienes lo operan, mides el después con el mismo método del antes, y firman el acta de resultado.</p></div></div>
+      </div>
+      <div class="box amber">
+        <h4>El entregable que más vale no es el sistema</h4>
+        <p>Es el <strong>acta de resultado firmada</strong>, con el antes y el después medidos y la autorización de uso como referencia. Ese documento es tu próximo caso de venta y vale más que el proyecto mismo. La plantilla está en <code>operacion/06-acta-de-resultado.md</code>.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- E-03 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">E-03</span><h3>Implementación a medida</h3></div>
+      <span class="pr">desde UF 60 · según alcance</span>
+    </header>
+    <div class="in">
+      <p class="promesa">Lo mismo que ya hiciste para ti: software propio, integraciones, correos, pagos, paneles. Instalado, documentado y traspasado.</p>
+      <p>Se cotiza por alcance y <strong>solo después de un diagnóstico o un piloto</strong>. Nunca cotices una implementación a ciegas: es la forma más rápida de perder plata en un proyecto.</p>
+      <h4>Lo que siempre incluye</h4>
+      <div class="entreg">
+        <div><span class="mk">01</span><span>Desarrollo, instalación y puesta en marcha.</span></div>
+        <div><span class="mk">02</span><span>Manual de uso y manual técnico.</span></div>
+        <div><span class="mk">03</span><span>Respaldo y procedimiento de recuperación.</span></div>
+        <div><span class="mk">04</span><span>Capacitación al equipo que lo va a operar.</span></div>
+        <div><span class="mk">05</span><span>Código y documentación en poder del cliente, por escrito en el contrato.</span></div>
+        <div><span class="mk">06</span><span>30 días de garantía sobre lo entregado.</span></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- E-04 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">E-04</span><h3>Capacitación in-company</h3></div>
+      <span class="pr">UF 14 · 4 horas</span>
+    </header>
+    <div class="in">
+      <p class="promesa">Nadie escucha una charla. Cada persona sale con una tarea suya resuelta. <strong>Es tu mejor negocio por hora y el que más se repite.</strong></p>
+      <div class="crono">
+        <div class="t"><span class="h">0:00 – 0:30</span><div><b>Qué es y qué no es</b><p>Con demos en vivo, cero teoría. Partes mostrando algo que a ellos les sirva, no explicando qué es un modelo de lenguaje.</p></div></div>
+        <div class="t"><span class="h">0:30 – 1:30</span><div><b>Taller 1 · la tarea propia</b><p>Cada uno llega con una tarea suya (se pide por correo antes) y la resuelve en vivo. Tú circulas por la sala. Es la hora donde se gana o se pierde el taller.</p></div></div>
+        <div class="t"><span class="h">1:30 – 1:45</span><div><b>Pausa</b><p>Aquí es donde se acerca el que decide y te cuenta el problema real de la empresa. No te vayas a mirar el teléfono.</p></div></div>
+        <div class="t"><span class="h">1:45 – 2:45</span><div><b>Taller 2 · documentos y datos de ellos</b><p>Trabajan con material real de la empresa: un informe tipo, una planilla, un procedimiento. Acá se nota que preparaste el taller para ellos y no es el genérico.</p></div></div>
+        <div class="t"><span class="h">2:45 – 3:30</span><div><b>Errores, verificación y qué no se sube</b><p>La parte seria: dónde falla, cómo se revisa antes de mandar algo, y la política de qué información no puede salir de la empresa. Les dejas esto por escrito.</p></div></div>
+        <div class="t"><span class="h">3:30 – 4:00</span><div><b>Cierre y plan de 30 días</b><p>Cada uno cuenta en 30 segundos qué resolvió. Se llevan un plan de 30 días. Y tú te llevas la lista de quién quedó entusiasmado: son tus próximos proyectos adentro de esa empresa.</p></div></div>
+      </div>
+      <div class="box dark">
+        <h4>Por qué este es tu mejor negocio</h4>
+        <p>La primera vez te toma 10 horas: 4 de taller y 6 de preparación. Te quedan <strong>$56.000 la hora</strong>. La segunda empresa a la que le dictas el mismo taller te toma 5 horas, porque el material ya existe: te quedan <strong>$112.000 la hora</strong>. Es la única parte de tu negocio que no escala con tus horas. <strong>Prepáralo bien una vez y véndelo diez.</strong></p>
+      </div>
+    </div>
+  </article>
+
+  <!-- E-05 -->
+  <article class="svc">
+    <header>
+      <div><span class="id">E-05</span><h3>Acompañamiento mensual</h3></div>
+      <span class="pr">UF 8 / mes</span>
+    </header>
+    <div class="in">
+      <p class="promesa">Que lo instalado siga funcionando y mejorando sin que el cliente tenga que pensarlo.</p>
+      <div class="entreg">
+        <div><span class="mk">01</span><span>Monitoreo de que lo entregado sigue andando.</span></div>
+        <div><span class="mk">02</span><span>Hasta [X] horas de mejoras o ajustes al mes, definidas al contratar.</span></div>
+        <div><span class="mk">03</span><span>Soporte con tiempo de respuesta comprometido por escrito.</span></div>
+        <div><span class="mk">04</span><span>Un reporte mensual de una página: qué pasó, qué se mejoró, qué viene.</span></div>
+      </div>
+      <p style="margin-top:16px">Ofrécelo <strong>siempre</strong> al firmar el acta de resultado, no dos meses después. En ese momento están contentos y el sí es fácil. <span class="mono">$40.000</span> la hora, todos los meses, sin volver a vender.</p>
+    </div>
+  </article>
+</section>
+
+<!-- 04 -->
+<section>
+  <div class="sh"><span class="n">§ 04</span><h2>Cómo entra un cliente</h2></div>
+  <p>Cuatro canales, y todos desembocan en la misma llamada de 30 minutos. El guion completo está en <code>operacion/03-guion-llamada-30min.md</code>; acá va lo esencial.</p>
+
+  <div class="cols">
+    <div class="tile"><span class="k">Canal 1</span><span class="v">El sitio</span><p>Hace el diagnóstico y te escribe por WhatsApp con el resultado ya redactado. <strong>Es el mejor cliente que te va a llegar</strong>: se midió solo antes de hablar contigo.</p></div>
+    <div class="tile"><span class="k">Canal 2</span><span class="v">Prospección<br>directa</span><p>20 empresas donde tengas un conocido adentro. No abres vendiendo asesoría: abres nombrando un proceso que sabes que hacen a mano.</p></div>
+    <div class="tile"><span class="k">Canal 3</span><span class="v">Perfil de<br>Google</span><p>El de ANVAR TECH ya está posicionado. Agregar "Asesoría en inteligencia artificial" como servicio es gratis y tarda diez minutos.</p></div>
+    <div class="tile"><span class="k">Canal 4</span><span class="v">Tus casos<br>publicados</span><p>Cuatro publicaciones, una por proyecto, cada una con grabación de pantalla. Sin el video es una frase más; con el video es prueba.</p></div>
+  </div>
+
+  <div class="box amber">
+    <h4>La regla de la llamada de 30 minutos</h4>
+    <p><strong>Diagnosticar sí, resolver no.</strong> Si le resuelves el problema en la llamada, no te compra. Si le demuestras que sabes exactamente dónde está el problema — repitiéndoselo ordenado, con sus propios números — te compra.</p>
+    <p style="margin-top:12px">Y nunca cierres con "te mando la propuesta y me dices". Cierra con fecha: <em>"te la mando hoy, ¿hablamos el jueves a las 4?"</em></p>
+  </div>
+</section>
+
+<!-- 05 -->
+<section>
+  <div class="sh"><span class="n">§ 05</span><h2>Las siete reglas que no se rompen</h2></div>
+  <div style="border-top:1px solid var(--rule-2);margin-top:18px">
+    <div class="regla"><span class="nr">1</span><div><b>No bajes el precio, baja el alcance</b><p>"En UF 8 hago el levantamiento y las tres oportunidades, pero sin informe escrito ni valorización." Bajar el precio sin tocar el alcance te enseña al cliente que tu primer número era mentira.</p></div></div>
+    <div class="regla"><span class="nr">2</span><div><b>Cobra siempre el diagnóstico</b><p>Y descuéntalo completo si avanzan. Regalarlo te llena de empresas que nunca iban a comprar y te deja haciendo consultoría gratis.</p></div></div>
+    <div class="regla"><span class="nr">3</span><div><b>Mide antes de construir</b><p>Si no cronometraste el antes, no vas a poder demostrar el después, y sin el después no tienes caso que vender al siguiente.</p></div></div>
+    <div class="regla"><span class="nr">4</span><div><b>Siempre hay una persona que revisa</b><p>La IA propone, alguien firma. Ningún sistema tuyo manda un documento al mundo sin que un humano lo haya mirado. Es tu política y además es tu defensa.</p></div></div>
+    <div class="regla"><span class="nr">5</span><div><b>Di que no cuando corresponde</b><p>Proceso no definido, ahorro que no da los números, o quien te llama no decide. Decirlo en la misma llamada te posiciona más que cualquier venta.</p></div></div>
+    <div class="regla"><span class="nr">6</span><div><b>Nunca uses el nombre de tu empleador</b><p>Ni el de la tienda, ni sus marcas, en ningún material. "Cadena de retail nacional" funciona igual de bien y te protege.</p></div></div>
+    <div class="regla"><span class="nr">7</span><div><b>Pide el testimonio en el momento de la firma</b><p>Cuando están contentos con el resultado. Un mes después cuesta el triple, y en video vale diez veces más que escrito.</p></div></div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section>
+  <div class="sh"><span class="n">§ 06</span><h2>Lo que falta para estar vendiendo</h2></div>
+  <p>El sitio está construido, el precio corregido y los documentos operativos listos. Esto es exactamente lo que queda, en orden.</p>
+
+  <div style="border-top:1px solid var(--rule-2);margin-top:18px">
+    <div class="paso"><span class="nn">01</span><div><b>Subir el repositorio a GitHub</b>
+      <p>Ya dejé la carpeta con git iniciado, el <code>.gitignore</code> puesto y el primer commit hecho con el autor <code>construcciones.anvar@gmail.com</code> — el autorizado en Vercel. Falta crear el repo y empujarlo. En GitHub, con la cuenta <strong>construccionesanvar-ai</strong>, crea un repositorio vacío llamado <code>anvar-ia</code> (privado está bien) y después, en esta carpeta:</p>
+      <pre><span class="c"># reemplaza solo si el repo quedó con otro nombre</span>
+git remote add origin https://github.com/construccionesanvar-ai/anvar-ia.git
+git branch -M main
+git push -u origin main</pre>
+    </div></div>
+
+    <div class="paso"><span class="nn">02</span><div><b>Crear el proyecto en Vercel</b>
+      <p>En el equipo <strong>ANVAR TECH</strong> (el mismo donde vive <code>anvartechcl</code>): <em>Add New → Project</em> → importa <code>anvar-ia</code> → framework <em>Other</em> → Deploy. No toques nada más: el <code>vercel.json</code> ya trae las cabeceras de seguridad y la caché.</p>
+      <p>Vas a quedar con una URL tipo <code>anvar-ia.vercel.app</code> funcionando de inmediato.</p>
+    </div></div>
+
+    <div class="paso"><span class="nn">03</span><div><b>Apuntar ia.anvartech.cl</b>
+      <p>En el proyecto nuevo: <em>Settings → Domains → Add</em> → <code>ia.anvartech.cl</code>.</p>
+      <p>Si el DNS de <code>anvartech.cl</code> ya está administrado por Vercel, el registro se crea solo y en minutos queda andando. Si está en NIC Chile o en otro proveedor, Vercel te va a pedir un registro <strong>CNAME</strong>: nombre <code>ia</code>, valor <code>cname.vercel-dns.com</code>. Propaga en menos de una hora.</p>
+    </div></div>
+
+    <div class="paso"><span class="nn">04</span><div><b>Encender el correo del formulario</b> <span class="mono" style="color:var(--ink-3);font-size:.75rem">· opcional</span>
+      <p>Sin esto el formulario igual funciona: cae solo a WhatsApp con el mensaje redactado. Si quieres que además te llegue por correo, en <em>Settings → Environment Variables</em> del proyecto nuevo agrega <code>RESEND_API_KEY</code> (la misma que ya usas) y <code>NOTIFY_EMAIL</code>. El dominio anvartech.cl ya está verificado en Resend, así que no hay nada más que hacer.</p>
+    </div></div>
+
+    <div class="paso"><span class="nn">05</span><div><b>Tu foto</b>
+      <p>Lo único que no puedo hacer yo y lo que más convierte. Sobria, fondo neutro, mirando a cámara. Me la pasas y la monto en la sección "Quién está detrás" en cinco minutos.</p>
+    </div></div>
+
+    <div class="paso"><span class="nn">06</span><div><b>Google: que te encuentren</b>
+      <p>Search Console con el subdominio, enviar <code>sitemap.xml</code>, y en el perfil de Google de ANVAR TECH agregar "Asesoría en inteligencia artificial" como servicio con el link al sitio nuevo. Gratis y son veinte minutos.</p>
+    </div></div>
+
+    <div class="paso"><span class="nn">07</span><div><b>Los tres regalados</b>
+      <p>Tres Sesiones Despegue gratis a conocidos con trabajos distintos, a cambio de un testimonio en video. El mensaje está escrito en <code>operacion/02-mensajes-prospeccion.md</code>. <strong>Esto es lo que desbloquea todo lo demás</strong>: sin testimonios, el sitio es una promesa; con tres videos, es un negocio.</p>
+    </div></div>
+  </div>
+
+  <div class="box">
+    <h4>Cuánto te toma en total</h4>
+    <p>Los pasos 1 a 4 son una tarde. El 5 y el 6, otra. El 7 son tres sábados. <strong>Puedes estar vendiendo en dos semanas sin descuidar nada de lo que ya tienes andando.</strong></p>
+  </div>
+</section>
+
+<!-- 07 -->
+<section>
+  <div class="sh"><span class="n">§ 07</span><h2>Cómo cabe esto en tu semana</h2></div>
+  <p>Tu riesgo real no es el mercado, es el tiempo: estudias, trabajas en turnos, operas ANVAR Tech y estás negociando el licenciamiento. Por eso la escalera está diseñada para entregarse en bloques cortos.</p>
+  <div class="scroll"><table class="tabla">
+    <thead><tr><th>Si tienes...</th><th>Puedes vender y entregar</th><th class="num">Ingreso mensual</th></tr></thead>
+    <tbody>
+      <tr><td>4 horas a la semana</td><td>2 Sesiones Despegue al mes</td><td class="num">$98.000</td></tr>
+      <tr><td>8 horas a la semana</td><td>2 sesiones + 1 Plan Piloto</td><td class="num">$327.000</td></tr>
+      <tr><td>Una semana completa (vacaciones o permiso)</td><td>1 Diagnóstico de empresa</td><td class="num">$480.000 neto</td></tr>
+      <tr><td>8 h/semana sostenidas + 3 acompañamientos</td><td>La escalera completa de personas</td><td class="num">$594.000</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box dark">
+    <h4>La señal de que hay que subir precios</h4>
+    <p>Cuando la Sesión Despegue se te llene sola dos meses seguidos, <strong>no trabajes más horas: sube el precio</strong>. Primero a $69.000, después a $89.000. El mercado te está diciendo que vales más, y tu tiempo es lo único que no puedes fabricar.</p>
+    <p style="margin-top:12px">Y si no se llena en dos meses, el diagnóstico no es "no hay mercado" — es que no saliste a buscar. Revisa cuántos de los 20 mensajes de prospección mandaste de verdad.</p>
+  </div>
+</section>
+
+<!-- 08 -->
+<section>
+  <div class="sh"><span class="n">§ 08</span><h2>Los archivos que te dejé listos</h2></div>
+  <p>Todos en la carpeta <code>operacion/</code> del proyecto. Son para copiar y pegar o para llenar, no para leer.</p>
+  <div class="scroll"><table class="tabla">
+    <thead><tr><th>Archivo</th><th>Cuándo lo usas</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01-formulario-previo</td><td>Apenas alguien te confirma una Sesión Despegue. Se lo mandas por WhatsApp.</td></tr>
+      <tr><td class="mono">02-mensajes-prospeccion</td><td>Cuando sales a buscar: al conocido, al que decide, al del diagnóstico, y el de los tres regalados. Incluye la estructura de las publicaciones de caso.</td></tr>
+      <tr><td class="mono">03-guion-llamada-30min</td><td>Lo tienes abierto en otra pestaña durante la llamada. Minuto a minuto, con las preguntas y cuándo decir que no.</td></tr>
+      <tr><td class="mono">04-plantilla-informe-diagnostico</td><td>El entregable de las UF 12. Siete capítulos, para llenar y exportar a PDF.</td></tr>
+      <tr><td class="mono">05-acuerdo-de-servicio</td><td>Antes de empezar cualquier trabajo. Tiene dos versiones: con cliente empresa y con colaborador.</td></tr>
+      <tr><td class="mono">06-acta-de-resultado</td><td>Al cerrar un piloto o implementación. Es el documento que se convierte en tu próximo caso de venta.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>
+  Manual de operación ANVAR IA · septiembre 2026<br>
+  Complemento de la propuesta de lanzamiento · archivos operativos en <code>operacion/</code><br>
+  Preparado para Andrés Vargas — ANVAR TECH SpA
+</footer>
+
+</div>

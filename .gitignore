@@ -1,0 +1,19 @@
+# dependencias y build
+node_modules/
+.vercel/
+.next/
+dist/
+
+# secretos — nunca subir
+.env
+.env.*
+!.env.example
+
+# generado: se rehace juntando public/index.html + styles.css + app.js
+artifact-anvar-ia.html
+
+# sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+*.bak

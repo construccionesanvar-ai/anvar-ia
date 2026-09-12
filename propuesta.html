@@ -1,0 +1,416 @@
+<title>Lanzamiento de ANVAR IA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#EFF0EC; --paper-2:#E5E7E0; --panel:#FBFBF9; --panel-2:#F3F4F0;
+  --ink:#14181B; --ink-2:#586460; --ink-3:#87908B;
+  --rule:#D2D6CD; --rule-2:#B6BCB1;
+  --amber:#D98A0B; --amber-soft:#F7E7C6; --amber-text:#8A5400; --amber-hl:rgba(217,138,11,.34);
+  --deep:#101A1E; --deep-2:#18252B; --deep-rule:#2C3B43; --on-deep:#E9EBE4; --on-deep-2:#9FACA6;
+  --good:#1C7A58; --warn:#A96A12; --bad:#A93B2C;
+  --disp:'Archivo',Haettenschweiler,'Arial Narrow',system-ui,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',Consolas,ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+    --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+    --rule:#243036; --rule-2:#324148;
+    --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063; --amber-hl:rgba(240,169,42,.3);
+    --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+    --good:#3DBE90; --warn:#E7B65C; --bad:#E0705E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+  --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+  --rule:#243036; --rule-2:#324148;
+  --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063; --amber-hl:rgba(240,169,42,.3);
+  --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+  --good:#3DBE90; --warn:#E7B65C; --bad:#E0705E;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.doc{max-width:860px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(18px,4vw,40px) 90px}
+h1,h2,h3{font-family:var(--disp);font-weight:700;line-height:1.06;letter-spacing:-.015em;margin:0;text-wrap:balance;font-stretch:110%}
+h1{font-size:clamp(2.1rem,5.4vw,3.2rem);font-stretch:118%}
+h2{font-size:clamp(1.4rem,2.9vw,1.95rem)}
+h3{font-size:1.06rem;font-stretch:104%}
+p{margin:0}
+a{color:var(--amber-text);text-decoration:underline;text-underline-offset:3px}
+strong{font-weight:600;color:var(--ink)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.head{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:14px}
+.kicker{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber-text);margin-bottom:14px}
+.head p{color:var(--ink-2);margin-top:18px;font-size:1.06rem;max-width:60ch}
+.rot{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule-2);border-top:0;font-family:var(--mono);font-size:.63rem;margin-bottom:52px}
+.rot div{padding:10px 12px;border-right:1px solid var(--rule)}
+.rot div:last-child{border-right:0}
+.rot b{display:block;color:var(--ink-3);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-size:.56rem;margin-bottom:3px}
+
+section{margin-bottom:clamp(40px,6vw,64px)}
+.sh{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule-2);padding-bottom:10px;margin-bottom:22px}
+.sh .n{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--amber-text);white-space:nowrap}
+section > p,section > div > p{color:var(--ink-2);max-width:68ch}
+section > p + p{margin-top:14px}
+h3 + p{margin-top:10px}
+
+.box{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:20px 22px;margin-top:20px}
+.box.dark{background:var(--deep);border-color:var(--deep-rule);color:var(--on-deep)}
+.box.dark p{color:var(--on-deep-2)}
+.box.dark strong{color:var(--on-deep)}
+.box.dark h3{color:var(--on-deep)}
+.box h3{margin-bottom:10px}
+.box.amber{border-left:3px solid var(--amber);background:var(--amber-soft)}
+.box.amber p,.box.amber li{color:var(--ink)}
+
+ul,ol{margin:14px 0 0;padding-left:0;list-style:none;display:grid;gap:9px}
+li{color:var(--ink-2);padding-left:20px;position:relative;max-width:68ch}
+li::before{content:"";position:absolute;left:0;top:.68em;width:10px;height:1px;background:var(--amber)}
+ol{counter-reset:oo}
+ol li{padding-left:30px}
+ol li::before{counter-increment:oo;content:counter(oo) ".";width:auto;height:auto;background:none;top:0;font-family:var(--mono);font-size:.8rem;color:var(--amber-text);font-weight:600}
+
+.tabla{width:100%;border-collapse:collapse;margin-top:18px;font-size:.92rem}
+.tabla th{font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);text-align:left;font-weight:600;padding:0 14px 9px 0;border-bottom:1px solid var(--rule-2)}
+.tabla td{padding:12px 14px 12px 0;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--ink-2)}
+.tabla td:first-child{color:var(--ink);font-weight:500}
+.tabla td.num,.tabla th.num{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;padding-right:0}
+.tabla td.num{font-family:var(--mono)}
+.tabla tr.top td{background:var(--amber-soft)}
+.scroll{overflow-x:auto}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:2px;border:1px solid var(--rule-2);color:var(--ink-2);background:var(--panel-2);white-space:nowrap}
+.pill.ok{color:var(--good);border-color:var(--good)}
+.pill.no{color:var(--bad);border-color:var(--bad)}
+.pill.now{color:#1B1200;background:var(--amber);border-color:var(--amber)}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+.tile{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:18px 20px}
+.tile .k{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:8px}
+.tile .v{font-family:var(--disp);font-size:1.5rem;font-stretch:108%;font-weight:700;line-height:1.1;display:block}
+.tile p{font-size:.88rem;margin-top:8px;color:var(--ink-2)}
+
+.opt{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:20px 22px;margin-top:14px}
+.opt.rec{border-color:var(--amber);border-left-width:3px}
+.opt .oh{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.opt .oh h3{font-size:1.2rem;font-stretch:108%}
+.opt .dom{font-family:var(--mono);font-size:.74rem;color:var(--amber-text)}
+.opt p{font-size:.94rem;color:var(--ink-2)}
+.opt .pro{color:var(--good);font-weight:500}
+.opt .con{color:var(--ink-3)}
+
+.pasos{border-top:1px solid var(--rule-2);margin-top:20px}
+.paso{display:grid;grid-template-columns:96px 1fr;gap:20px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.paso .d{font-family:var(--mono);font-size:.72rem;color:var(--amber-text);padding-top:3px}
+.paso p{font-size:.94rem;margin-top:5px}
+
+.check{display:grid;gap:10px;margin-top:18px}
+.check div{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;border:1px solid var(--rule);background:var(--panel);padding:12px 15px;border-radius:2px}
+.check .box2{width:15px;height:15px;border:1.5px solid var(--rule-2);border-radius:2px;margin-top:4px}
+.check span{font-size:.93rem}
+.check b{display:block;font-weight:600;color:var(--ink);font-size:.95rem}
+.check em{font-style:normal;color:var(--ink-3);font-family:var(--mono);font-size:.76rem;display:block;margin-top:3px}
+
+footer{border-top:1px solid var(--rule);margin-top:60px;padding-top:24px;font-family:var(--mono);font-size:.72rem;color:var(--ink-3);line-height:1.9}
+@media (max-width:640px){
+  .cols{grid-template-columns:1fr}
+  .rot{grid-template-columns:1fr 1fr}
+  .rot div:nth-child(2){border-right:0}
+  .rot div:nth-child(1),.rot div:nth-child(2){border-bottom:1px solid var(--rule)}
+  .paso{grid-template-columns:1fr;gap:4px}
+  .sh{flex-direction:column;gap:6px}
+}
+</style>
+
+<div class="doc">
+
+<header class="head">
+  <p class="kicker">Propuesta de lanzamiento · revisión 02 · septiembre 2026</p>
+  <h1>ANVAR IA</h1>
+  <p>Marca, oferta, precios, sitio y plan de salida para vender asesoría e implementación de inteligencia artificial en Chile. Esta revisión incorpora tus tres respuestas: el nombre sigue abierto, los precios necesitaban explicación y apareció la posibilidad de sumar un socio.</p>
+</header>
+<div class="rot">
+  <div><b>Para</b>Andrés Vargas</div>
+  <div><b>Revisión</b>02</div>
+  <div><b>Sitio</b>Construido y publicado</div>
+  <div><b>Decide</b>Nombre y socio</div>
+</div>
+
+<!-- 00 -->
+<section>
+  <div class="sh"><span class="n">§ 00</span><h2>Qué cambió desde la revisión 01</h2></div>
+  <ul>
+    <li><strong>Tu carrera está corregida en el sitio:</strong> Ingeniería de Ejecución Industrial, 3er año. Ya no dice Civil.</li>
+    <li><strong><code>anvar.ai</code> no está disponible.</strong> Lo verifiqué con precios reales. Aparecieron alternativas mejores y más baratas, en § 04.</li>
+    <li><strong>Los precios ahora tienen su aritmética a la vista</strong> en § 02: cuánto te toma cada servicio y cuánto te queda por hora. Encontré un precio mal puesto y te digo cuál.</li>
+    <li><strong>El socio cambia la recomendación del nombre.</strong> Es el punto que conecta tus tres respuestas, y está en § 05.</li>
+  </ul>
+</section>
+
+<!-- 01 -->
+<section>
+  <div class="sh"><span class="n">§ 01</span><h2>Por qué tú y no cualquiera</h2></div>
+  <p>El mercado chileno de "asesoría en IA" está lleno de gente que enseña a escribir prompts. Casi nadie puede mostrar un sistema propio funcionando. Tú puedes mostrar cuatro, y todos nacieron de un problema real que tenías al frente:</p>
+  <ul>
+    <li><strong>Una app que reemplazó ocho formularios legales llenados a mano</strong>, con lectura de boletas sin internet, corrector propio, bitácora cifrada e instalador. Usada en turno, no en demo.</li>
+    <li><strong>Un negocio que vende solo</strong>: recomendador con IA, pago en línea, comprobante automático, CRM y catálogo sincronizado a WhatsApp.</li>
+    <li><strong>Planos de AutoCAD dibujados por instrucciones en español</strong>, sobre el archivo real, con cuadro de equipos exportado a Excel.</li>
+    <li><strong>Una red neuronal propia</strong> para control de stock, envuelta en una aplicación que alguien usa sin saber que hay IA adentro.</li>
+  </ul>
+  <div class="box amber">
+    <h3>La frase que ordena todo</h3>
+    <p><strong>"No te enseño a usar IA. Te dejo funcionando lo que la IA hace por ti."</strong></p>
+    <p style="margin-top:10px">De ahí sale la promesa del sitio: <em>IA que queda funcionando</em>. Todo lo demás — precios, secciones, tono — se deriva de esa frase.</p>
+  </div>
+  <div class="box dark">
+    <h3>Sobre ser estudiante de 3er año</h3>
+    <p>No es una debilidad que haya que esconder, pero tampoco es tu titular. <strong>Nadie contrata asesoría por el año de carrera en que vas</strong>: contrata por lo que ya resolviste. Por eso en el sitio la formación está en la ficha de identidad, abajo, y el titular es que vienes del piso de operaciones con sistemas andando.</p>
+    <p style="margin-top:12px">Si alguien te pregunta directo, la respuesta honesta y fuerte es: <em>"estoy en tercer año de Ingeniería de Ejecución Industrial, y mientras estudio levanté una empresa y puse cuatro sistemas en producción. Te puedo mostrar los cuatro."</em> Eso cierra el tema.</p>
+  </div>
+</section>
+
+<!-- 02 -->
+<section>
+  <div class="sh"><span class="n">§ 02</span><h2>Los precios, explicados de verdad</h2></div>
+
+  <h3>Primero, las dos palabras raras</h3>
+  <p><strong>UF.</strong> Es una unidad de cuenta chilena que se reajusta con la inflación. Hoy vale alrededor de <span class="mono">$40.000</span> y se publica todos los días en el Banco Central y en el SII. Cotizar en UF significa que <strong>una propuesta que mandas en marzo sigue siendo válida en octubre</strong>: si sube el costo de la vida, tu precio sube solo. Es lo que usan las constructoras, los arriendos y los contratos serios, y por eso se ve profesional frente a una empresa.</p>
+  <p><strong>Neto y bruto.</strong> "Neto" es el precio antes del IVA. Como facturas con tu SpA, a las empresas les cobras el neto más 19%: <span class="mono">UF 12 = $480.000 neto + $91.200 de IVA = $571.200</span> en la factura. A la empresa no le importa, porque el IVA lo recupera. A una persona natural sí le importa, así que a ellas <strong>los precios se les muestran con IVA incluido</strong> — ya lo dejé así en el sitio.</p>
+
+  <h3 style="margin-top:32px">Segundo, la aritmética que importa</h3>
+  <p>Un precio no se entiende mirando el número, sino dividiéndolo por las horas que te va a costar. Estas son mis estimaciones de tu tiempo real, incluyendo preparación:</p>
+
+  <p class="mono" style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:24px">Personas · precios con IVA incluido</p>
+  <div class="scroll"><table class="tabla">
+    <thead><tr><th>Servicio</th><th>Precio</th><th>Tu tiempo real</th><th class="num">Te queda por hora</th></tr></thead>
+    <tbody>
+      <tr><td>Sesión Despegue</td><td class="mono">$49.000</td><td>1,5 h de sesión + 0,5 h de preparación = 2 h</td><td class="num">$24.500</td></tr>
+      <tr><td>Plan Piloto Personal</td><td class="mono">$169.000</td><td>4 h de sesiones + 5 h construyendo + 1 h de soporte = 10 h</td><td class="num">$16.900</td></tr>
+      <tr class="top"><td>Acompañamiento</td><td class="mono">$89.000</td><td>2 h de sesiones + 1 h de revisión = 3 h al mes</td><td class="num">$29.700</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="mono" style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:30px">Empresas · precios netos, sin IVA</p>
+  <div class="scroll"><table class="tabla">
+    <thead><tr><th>Servicio</th><th>Precio</th><th>Tu tiempo real</th><th class="num">Te queda por hora</th></tr></thead>
+    <tbody>
+      <tr><td>Diagnóstico</td><td class="mono">UF 12 · $480.000</td><td>8 h en terreno + 6 h de análisis + 6 h de informe = 20 h</td><td class="num">$24.000</td></tr>
+      <tr><td>Piloto</td><td class="mono">UF 28 · $1.120.000</td><td>unas 50 h entre construcción, pruebas y capacitación</td><td class="num">$22.400</td></tr>
+      <tr><td>Implementación</td><td class="mono">UF 60 · $2.400.000</td><td>unas 100 h, depende del alcance</td><td class="num">$24.000</td></tr>
+      <tr class="top"><td>Capacitación</td><td class="mono">UF 14 · $560.000</td><td>4 h de taller + 6 h de preparación la primera vez; después solo 5 h</td><td class="num">$56.000<br>y luego $112.000</td></tr>
+      <tr class="top"><td>Acompañamiento</td><td class="mono">UF 8 · $320.000</td><td>unas 8 h al mes</td><td class="num">$40.000</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box amber">
+    <h3>Lo que esta tabla te está diciendo</h3>
+    <p><strong>1. Casi todo converge a unos $24.000 la hora.</strong> Eso no es casualidad, es el criterio con el que armé la escalera: que ningún servicio te pague mucho peor que otro, para que no termines prefiriendo el trabajo equivocado.</p>
+    <p style="margin-top:12px"><strong>2. El Plan Piloto Personal está mal puesto.</strong> A $169.000 te deja $16.900 la hora, casi la mitad que el acompañamiento. Mi recomendación concreta: <strong>súbelo a $229.000</strong> y queda en $22.900. Quien compra un programa de cuatro semanas no se va a ir por $60.000 de diferencia; el que se va por eso te compra la sesión de $49.000, que es justo para lo que está.</p>
+    <p style="margin-top:12px"><strong>3. Los dos mejores negocios son los que menos se ven:</strong> la capacitación y el acompañamiento. La capacitación porque se prepara una vez y se dicta muchas — la segunda empresa a la que le hagas el mismo taller te paga $112.000 la hora. El acompañamiento porque es ingreso que llega todos los meses sin volver a vender. <strong>Todo lo demás existe para llegar a esos dos.</strong></p>
+  </div>
+
+  <h3 style="margin-top:32px">Tercero, qué hacer cuando te regateen</h3>
+  <p>Te va a pasar, sobre todo con empresas. La regla es una sola y no tiene excepciones: <strong>no bajes el precio, baja el alcance.</strong></p>
+  <ul>
+    <li>"¿Me lo dejas en UF 8?" → <em>"En UF 8 puedo hacer el levantamiento y las tres oportunidades, pero sin el informe escrito ni la valorización. ¿Te sirve así?"</em></li>
+    <li>Nunca regales el diagnóstico. Cóbralo y descuéntalo completo si avanzan: el riesgo del cliente baja a cero igual, y a ti te pagan la semana aunque no sigan.</li>
+    <li>Si insisten en que "es mucho", ese no es tu cliente todavía. Mándalo a la calculadora del sitio: si su ahorro anual no justifica tu precio, tienen razón en no comprar y tú te ahorras un proyecto malo.</li>
+  </ul>
+  <p style="margin-top:14px">Y la última: <strong>sube precios cada seis meses o cada diez clientes</strong>, lo que pase primero. Los precios de hoy son de alguien que está partiendo. En un año, con casos con nombre y testimonios, estos mismos servicios valen el doble.</p>
+</section>
+
+<!-- 03 -->
+<section>
+  <div class="sh"><span class="n">§ 03</span><h2>El sitio: qué hace cada sección</h2></div>
+  <p>No es una página bonita con secciones; es un embudo. Cada bloque tiene un trabajo asignado y se puede medir si lo cumple.</p>
+  <div class="scroll"><table class="tabla">
+    <thead><tr><th>Sección</th><th>Su trabajo</th></tr></thead>
+    <tbody>
+      <tr><td>Portada</td><td>Decir la promesa y mostrar una medición real en 5 segundos. El panel oscuro rota entre 4 procesos tuyos con el antes y el después.</td></tr>
+      <tr><td>Señales</td><td>Que el visitante se reconozca. "Esto me pasa a mí" antes de hablar de precios.</td></tr>
+      <tr><td>Servicios</td><td>Mostrar la escalera completa con precios a la vista. Cambia entera según el público elegido.</td></tr>
+      <tr><td>Diagnóstico</td><td><strong>La pieza clave.</strong> Seis preguntas, indicador en vivo, lectura personalizada y recomendación de plan. No pide correo: manda el resultado por WhatsApp ya escrito.</td></tr>
+      <tr><td>Casos reales</td><td>La prueba. Cinco proyectos con antes, después, métricas y tecnologías. Es lo que te separa del resto.</td></tr>
+      <tr><td>Método</td><td>Bajar el miedo: cuatro fases y en cada una el cliente puede bajarse.</td></tr>
+      <tr><td>Calculadora</td><td>Que el visitante calcule su propio dolor en pesos. Un número que él mismo produjo convence más que uno que tú le dices.</td></tr>
+      <tr><td>Quién</td><td>Confianza. Ficha de identidad + tu historia de operaciones + la frase que te define.</td></tr>
+      <tr><td>Planes</td><td>La decisión. Tres opciones, una destacada.</td></tr>
+      <tr><td>Preguntas</td><td>Desactivar las siete objeciones reales, incluida "¿y si la IA se equivoca?".</td></tr>
+      <tr><td>Contacto</td><td>Cierre. Formulario que, si no hay backend, abre WhatsApp con el mensaje ya redactado.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box dark">
+    <h3>Las tres cosas que lo hacen distinto</h3>
+    <p><strong>1. El conmutador Personas / Empresas.</strong> Vendes a dos públicos sin diluir el mensaje ni hacer dos sitios. Cambia titulares, servicios, precios, ejemplos y hasta el texto que se manda por WhatsApp.</p>
+    <p style="margin-top:12px"><strong>2. El diagnóstico con indicador.</strong> Mide tres ejes y escribe una lectura distinta para cada combinación. Incluso te hace decir que no cuando no hay caso: eso genera más confianza que vender siempre.</p>
+    <p style="margin-top:12px"><strong>3. La calculadora.</strong> Cuatro controles, resultado en pesos, y en cuánto tiempo se paga un piloto. Con los supuestos a la vista, que es lo que te da credibilidad frente a alguien de finanzas.</p>
+  </div>
+
+  <h3 style="margin-top:30px">El sistema visual, y por qué no es otro degradado morado</h3>
+  <p>Todas las páginas de IA se ven igual: fondo negro, degradado violeta, tipografía Inter. Elegí lo contrario, y lo elegí desde tu mundo: <strong>la página está diagramada como una lámina de plano</strong>. Marco de hoja, secciones numeradas como referencias, líneas finas en vez de tarjetas redondeadas, y un cuadro de rotulación real en la portada — proyecto, lámina, escala, quién ejecuta. Un ingeniero lo reconoce al instante y nadie más en este rubro lo está usando.</p>
+</section>
+
+<!-- 04 -->
+<section>
+  <div class="sh"><span class="n">§ 04</span><h2>El nombre y el dominio</h2></div>
+  <p><strong>Primero el dato duro:</strong> <code>anvar.ai</code> <span class="pill no">no disponible</span>. Está tomado. Verifiqué disponibilidad y precios reales el 11 de septiembre; esto es lo que sí se puede comprar hoy.</p>
+
+  <h3 style="margin-top:28px">Familia A — seguir bajo ANVAR</h3>
+  <div class="opt">
+    <div class="oh"><h3>ANVAR IA</h3><span class="dom">ia.anvartech.cl · $0</span></div>
+    <p><span class="pro">A favor:</span> gratis, disponible hoy, hereda la confianza y el posicionamiento en Google que ya tiene anvartech.cl. Cero costo de construir marca nueva.</p>
+    <p style="margin-top:8px"><span class="con">En contra:</span> amarra la asesoría al servicio técnico, y <strong>ANVAR es tu SpA</strong> — si entra un socio, queda raro que la sociedad lleve el nombre de la empresa de uno solo.</p>
+  </div>
+  <div class="opt">
+    <div class="oh"><h3>ANVAR Labs</h3><span class="dom">anvarlabs.ai · US$160 / 2 años</span></div>
+    <p>Suena a taller que construye, no a consultora que habla. Mismo problema del socio.</p>
+  </div>
+
+  <h3 style="margin-top:30px">Familia B — marca propia, sacada de tu oficio</h3>
+  <div class="opt rec">
+    <div class="oh"><h3>Acota <span class="pill now">mi favorito</span></h3><span class="dom">acota.ai · US$160 / 2 años</span></div>
+    <p><strong>Acotar es poner las medidas en un plano</strong> — lo que haces literalmente en AutoCAD — <strong>y también delimitar un problema hasta que se vuelve manejable.</strong> Que es exactamente lo que vendes: tomar algo difuso ("quiero usar IA") y acotarlo hasta que sea un proceso medido con un precio y un plazo.</p>
+    <p style="margin-top:8px"><span class="pro">A favor:</span> es un verbo, es corto, se escribe como suena, se dicta por teléfono sin deletrear, es español neutro (sirve en todo Latinoamérica) y no es de nadie — un socio puede entrar sin incomodidad. El eslogan sale solo: <em>"Acotamos el problema. La IA hace el resto."</em></p>
+    <p style="margin-top:8px"><span class="con">En contra:</span> partes de cero en Google. Se compensa manteniendo el link desde anvartech.cl.</p>
+  </div>
+  <div class="opt">
+    <div class="oh"><h3>Acotar</h3><span class="dom">acotar.ai · US$160 / 2 años</span></div>
+    <p>La misma idea en infinitivo. Un poco menos ágil que Acota, pero disponible si prefieres el verbo completo.</p>
+  </div>
+
+  <h3 style="margin-top:30px">Familia C — marca propia, sacada del resultado</h3>
+  <div class="opt">
+    <div class="oh"><h3>Holgura</h3><span class="dom">holgura.ai · US$160 / 2 años &nbsp;·&nbsp; holgura.io · US$30 / año</span></div>
+    <p>En ruta crítica, la holgura es el tiempo que te sobra antes de que algo se atrase. <em>"Te devolvemos la holgura."</em> Es elegante y muy de ingeniería industrial — el problema es que a una persona común no le dice nada, y tú vendes a los dos públicos.</p>
+  </div>
+
+  <h3 style="margin-top:30px">Familia D — marca personal</h3>
+  <div class="opt">
+    <div class="oh"><h3>Andrés Vargas</h3><span class="dom">andresvargas.ai · por verificar</span></div>
+    <p>En asesoría convierte muy bien, porque la gente contrata personas. Pero no escala si entra un socio ni si algún día contratas a alguien, y te obliga a estar tú en cada venta.</p>
+  </div>
+
+  <div class="box amber">
+    <h3>Mi recomendación, y depende de una sola cosa</h3>
+    <p><strong>Si vas solo los próximos seis meses:</strong> ANVAR IA en <code>ia.anvartech.cl</code>. Cero costo, cero fricción, sales esta semana. Si funciona, compras la marca definitiva después con plata del negocio.</p>
+    <p style="margin-top:12px"><strong>Si sumas al socio:</strong> <code>acota.ai</code>, sin dudarlo. Son US$160 por dos años — unos $150.000 pesos, menos de lo que cuesta una mantención de notebook — y evita la conversación incómoda de por qué la sociedad se llama como la empresa de uno.</p>
+    <p style="margin-top:12px">En los dos casos <strong>publica igual en ia.anvartech.cl esta semana</strong> y compras el dominio en paralelo. Mover un sitio de dominio después toma veinte minutos; esperar el nombre perfecto toma meses.</p>
+  </div>
+  <p style="margin-top:18px;font-size:.88rem"><strong>Nota:</strong> los precios son de Vercel Domains en dólares. Los <code>.cl</code> se compran aparte en <a href="https://nic.cl">nic.cl</a> y cuestan del orden de $10.000 al año; si te gusta Acota, vale la pena tomar también <code>acota.cl</code> para que nadie lo use en Chile. Yo no compré nada: las compras las haces tú.</p>
+</section>
+
+<!-- 05 -->
+<section>
+  <div class="sh"><span class="n">§ 05</span><h2>El socio: mi opinión franca</h2></div>
+  <p>Tu compañero tiene algo que a ti te falta en el papel — Ingeniería Civil Industrial a un año de terminar, con magíster articulado — y eso <strong>sí sirve, pero no para lo que crees</strong>.</p>
+
+  <div class="cols">
+    <div class="tile">
+      <span class="k">Dónde sí pesa</span>
+      <span class="v">Empresas<br>grandes</span>
+      <p>Gerencias, compras y licitaciones todavía miran títulos. Un Civil Industrial con magíster en la propuesta abre puertas que un estudiante de tercer año no abre solo. Y poder decir "somos un equipo" cambia cómo te evalúan.</p>
+    </div>
+    <div class="tile">
+      <span class="k">Dónde no pesa nada</span>
+      <span class="v">Todo<br>lo demás</span>
+      <p>A una persona que quiere ordenar su semana con IA, y a una pyme que quiere dejar de digitar boletas, el título les da exactamente igual. Ahí lo que vende es lo que ya construiste.</p>
+    </div>
+  </div>
+
+  <div class="box dark">
+    <h3>Lo que NO haría</h3>
+    <p><strong>Formar sociedad 50 y 50 antes del primer peso facturado.</strong> Tres razones concretas:</p>
+    <p style="margin-top:12px">Uno: el diferenciador de esta marca es <em>"yo construí estos sistemas y están andando"</em>. Un socio que aporta título pero todavía no ha puesto nada en producción suma credencial, no suma prueba — y la prueba es lo que vende acá.</p>
+    <p style="margin-top:12px">Dos: repartir la propiedad antes de saber si el negocio existe es la forma más común de terminar sin negocio y sin amigo. Hoy no sabes si vas a facturar $300.000 o $8.000.000 al mes, y esa diferencia cambia por completo qué es justo.</p>
+    <p style="margin-top:12px">Tres: tu problema real no son las credenciales, <strong>es el tiempo</strong> — estudias, trabajas en turnos, operas ANVAR Tech y estás negociando el licenciamiento de tu herramienta. Un socio no te devuelve horas por sí solo; una estructura de colaboración bien hecha sí.</p>
+  </div>
+
+  <div class="box amber">
+    <h3>Lo que sí haría</h3>
+    <p><strong>Traerlo como colaborador por proyecto, con acuerdo escrito, y evaluar sociedad en seis meses con números sobre la mesa.</strong></p>
+    <ul style="margin-top:14px">
+      <li><strong>Cómo se le paga:</strong> un porcentaje del proyecto en el que participa — entre 30% y 40% del valor neto de lo que él ejecuta — o una tarifa por hora acordada antes de partir. Nunca un sueldo fijo antes de facturar.</li>
+      <li><strong>Qué firma antes de empezar:</strong> confidencialidad, y que <strong>lo que se construye para un cliente es de la empresa, no del colaborador</strong>. Es exactamente el mismo cuidado que ya tomaste con tu herramienta de procedimientos: ahí te tocó defender tu autoría, acá te toca el otro lado del mostrador.</li>
+      <li><strong>Cómo aparece afuera:</strong> en las propuestas a empresas va como parte del equipo, con su formación completa. Ahí es donde rinde.</li>
+      <li><strong>Cuándo se revisa:</strong> a los seis meses, mirando cuánto trajo cada uno y cuánto ejecutó cada uno. Si los dos números son parejos, ahí conversas sociedad, con abogado y con datos, no con entusiasmo.</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:22px">En el sitio esto se refleja en una sola cosa: <strong>la ficha de identidad de la sección "Quién está detrás" pasa de una persona a dos</strong>. Es un cambio de veinte minutos y lo dejo listo apenas me digas que va. Mientras tanto, no lo pongo: prometer un equipo que todavía no existe es la clase de detalle que después te cuesta caro.</p>
+</section>
+
+<!-- 06 -->
+<section>
+  <div class="sh"><span class="n">§ 06</span><h2>Lo que todavía falta</h2></div>
+  <div class="check">
+    <div><span class="box2"></span><span><b>Decidir el nombre</b><em>ANVAR IA si vas solo · Acota si entra el socio. Es la decisión que bloquea el resto.</em></span></div>
+    <div><span class="box2"></span><span><b>Confirmar o corregir el Plan Piloto Personal</b><em>Recomiendo subirlo de $169.000 a $229.000. Es una línea en el sitio; dime y lo cambio.</em></span></div>
+    <div><span class="box2"></span><span><b>Una foto tuya</b><em>Lo único importante que falta. Sobria, fondo neutro, mirando a cámara. En asesoría la cara del asesor es la mitad de la venta.</em></span></div>
+    <div><span class="box2"></span><span><b>Correo de la marca</b><em>Hoy usa contacto@anvartech.cl. Si compras dominio nuevo, se cambia en una línea.</em></span></div>
+    <div><span class="box2"></span><span><b>La métrica "7 revisiones en una semana"</b><em>La estimé del proyecto de planta. Ajústala al número real.</em></span></div>
+    <div><span class="box2"></span><span><b>Hablar con tu compañero</b><em>Si le interesa, define colaboración por proyecto antes de hablar de porcentajes de sociedad.</em></span></div>
+  </div>
+
+  <div class="box">
+    <h3>Dos cuidados que ya dejé cubiertos</h3>
+    <p><strong>Marcas de terceros.</strong> En ninguna parte del sitio aparece el nombre de la cadena donde trabajas ni el de la tienda. Los casos dicen "retail" y "cadena nacional". Proteges la relación laboral y además el caso te sirve para vender a cualquier empresa.</p>
+    <p style="margin-top:12px"><strong>Conflicto de interés.</strong> Ser trabajador y proveedor a la vez es delicado. El sitio no menciona a tu empleador como cliente. Antes de salir a buscar clientes de retail, revisa tu contrato y el código de ética, y si hay una negociación de licenciamiento en curso, decláralo por escrito.</p>
+  </div>
+</section>
+
+<!-- 07 -->
+<section>
+  <div class="sh"><span class="n">§ 07</span><h2>Plan de salida: diez días</h2></div>
+  <div class="pasos">
+    <div class="paso"><span class="d">Día 1</span><div><h3>Decidir</h3><p>Nombre y precio del piloto personal. Comprar el dominio si eliges marca propia. Son las decisiones que bloquean todo lo demás.</p></div></div>
+    <div class="paso"><span class="d">Días 2 y 3</span><div><h3>Publicar</h3><p>Repo nuevo con la cuenta de ANVAR (ojo con el bloqueo de Vercel por autor de commit), conectar, apuntar ia.anvartech.cl y subir. Agregar tu foto.</p></div></div>
+    <div class="paso"><span class="d">Día 4</span><div><h3>Dejar que te encuentren</h3><p>Search Console, sitemap enviado, y agregar "Asesoría en inteligencia artificial" como servicio en el perfil de Google de ANVAR TECH, que ya está posicionado.</p></div></div>
+    <div class="paso"><span class="d">Día 5</span><div><h3>Los primeros tres</h3><p>Regala tres Sesiones Despegue a cambio de un testimonio grabado en video, no escrito. Gente con trabajos distintos entre sí: un contador, un profesor, alguien de operaciones.</p></div></div>
+    <div class="paso"><span class="d">Días 6 a 8</span><div><h3>Contar lo que ya hiciste</h3><p>Cuatro publicaciones, una por proyecto, con el antes y el después y una grabación de pantalla corta. No expliques qué es la IA: muestra el resultado y deja que pregunten.</p></div></div>
+    <div class="paso"><span class="d">Días 9 y 10</span><div><h3>Salir a buscar</h3><p>Veinte empresas medianas de Santiago donde tengas un conocido adentro. El mensaje no es "hago asesoría en IA", es "vi que hacen X a mano, ¿te muestro cómo lo resolví en mi caso?".</p></div></div>
+  </div>
+</section>
+
+<!-- 08 -->
+<section>
+  <div class="sh"><span class="n">§ 08</span><h2>Qué medir para saber si funciona</h2></div>
+  <div class="cols">
+    <div class="tile"><span class="k">Señal 1</span><span class="v">Diagnósticos<br>terminados</span><p>De cada 100 visitas, cuántas completan las seis preguntas. Si baja de 8, el sitio no está enganchando.</p></div>
+    <div class="tile"><span class="k">Señal 2</span><span class="v">Mensajes<br>con resultado</span><p>Cuántos llegan por WhatsApp con el diagnóstico adjunto. Esos son los buenos: ya se midieron solos.</p></div>
+    <div class="tile"><span class="k">Señal 3</span><span class="v">Diagnósticos<br>que avanzan</span><p>De cada diagnóstico de empresa vendido, cuántos siguen a piloto. La meta razonable es la mitad.</p></div>
+    <div class="tile"><span class="k">Señal 4</span><span class="v">Valor<br>por cliente</span><p>Lo que deja cada cliente en 12 meses. Decide si te conviene enfocarte en personas o en empresas.</p></div>
+  </div>
+  <p style="margin-top:20px">Vercel Analytics te da las visitas gratis. Para lo demás basta una pestaña en el mismo Sheets que ya usas de CRM.</p>
+</section>
+
+<!-- 09 -->
+<section>
+  <div class="sh"><span class="n">§ 09</span><h2>Lo que viene después, si esto camina</h2></div>
+  <ol>
+    <li><strong>Página por servicio.</strong> Una URL propia para "Diagnóstico IA" y otra para "Capacitación in-company", como hiciste en anvartech.cl. Cada una posiciona sola en Google.</li>
+    <li><strong>Un caso escrito completo.</strong> Cuando un cliente te autorice: proceso, números y testimonio. Un caso con nombre vale más que diez publicaciones.</li>
+    <li><strong>El taller empaquetado.</strong> Es tu mejor negocio por hora. Prepararlo una vez bien y venderlo diez veces es la forma más rápida de que esto deje de depender de tus horas.</li>
+    <li><strong>Cobro en línea.</strong> Enchufar Flow para vender la Sesión Despegue directo desde el sitio. Quien decide a las once de la noche, paga a las once de la noche.</li>
+    <li><strong>Agenda automática.</strong> Cal.com embebido después del pago, que ya sabes configurar.</li>
+  </ol>
+</section>
+
+<!-- 10 -->
+<section>
+  <div class="sh"><span class="n">§ 10</span><h2>Mi opinión honesta sobre el riesgo</h2></div>
+  <p>Tienes producto, tienes pruebas y tienes una historia que se sostiene sola. El riesgo no está ahí: <strong>está en el tiempo</strong>. Estás en tercer año, trabajando en turnos, operando ANVAR Tech y negociando un licenciamiento. Sumar una consultora puede terminar en cuatro cosas a medias.</p>
+  <p>Por eso la escalera empieza con una sesión de 90 minutos y no con proyectos de tres meses: <strong>se puede vender y entregar un sábado</strong>. Si en dos meses la Sesión Despegue no se llena sola, el diagnóstico es que no hay tiempo, no que no hay mercado, y ahí la decisión correcta es subir el precio y bajar el volumen, no trabajar más horas.</p>
+  <p>Y si el socio entra bien — como colaborador, con acuerdo escrito y sin repartir la torta antes de hornearla — es justamente lo que resuelve ese riesgo. Ahí está la única razón de peso para sumarlo.</p>
+</section>
+
+<footer>
+  ANVAR IA · propuesta de lanzamiento · revisión 02 · septiembre 2026<br>
+  Disponibilidad y precios de dominios verificados el 11-09-2026 · ninguna compra realizada<br>
+  Preparado para Andrés Vargas — ANVAR TECH SpA
+</footer>
+
+</div>
