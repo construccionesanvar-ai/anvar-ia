@@ -43,6 +43,7 @@ crea uno nuevo en vez de actualizar el que ya existe.
 | El sitio | `artifact-anvar-ia.html` | https://claude.ai/code/artifact/a0f3ef6f-e812-4aa9-ba10-48d38551b70f |
 | Propuesta de lanzamiento | `propuesta.html` | https://claude.ai/code/artifact/c0cb6926-83e2-4f32-926e-9ca2eb9803bd |
 | **Manual de operación** | `manual.html` | https://claude.ai/code/artifact/973bbe6c-8998-4466-bea5-9e3b5590a279 |
+| Ensayo de cliente | `ensayo.html` | https://claude.ai/code/artifact/05be5c9d-010b-419d-86a6-5cd756a9731c |
 
 El manual enlaza los ocho planes de acción por servicio, así que con ese basta:
 
