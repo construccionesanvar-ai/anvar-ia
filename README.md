@@ -90,6 +90,33 @@ ya redactado, y el diagnóstico usa su lectura local.
 El número de WhatsApp está una sola vez, en la constante `WSP` de `app.js`
 (y en el texto visible de la sección de contacto).
 
+## Caché: por qué css y js NO son inmutables
+
+`styles.css` y `app.js` conservan el mismo nombre entre versiones. Si se sirven
+con `immutable`, el navegador de quien ya visitó el sitio se queda con la copia
+vieja **para siempre** y no ve ningún cambio publicado. Pasó, y costó encontrarlo
+porque `curl` mostraba el archivo nuevo y el navegador el viejo.
+
+Por eso `vercel.json` sirve:
+
+| Tipo | Política | Razón |
+|---|---|---|
+| css, js | `max-age=0, must-revalidate` | El ETag responde 304: son bytes y siempre está fresco |
+| imágenes | `max-age=86400, must-revalidate` | Cambian poco, pero cambian |
+| tipografías | `max-age=31536000, immutable` | Esas sí que nunca cambian |
+
+Las referencias en el HTML llevan `?v=N`. **Si publicas un cambio de CSS o JS y
+no lo ves en el navegador pero sí con `curl`, sube ese número.**
+
+> **Ojo con `vercel.json`:** el esquema solo acepta `source`, `headers`, `has` y
+> `missing` en cada entrada, y rechaza cualquier clave extra. Agregar un
+> `"comment"` hace fallar el deploy **sin logs de build**, porque Vercel valida
+> la configuración antes de construir. Para validarlo antes de subir:
+
+```bash
+python -c "import json;json.load(open('vercel.json',encoding='utf-8'));print('JSON OK')"
+```
+
 ## Detalles que conviene no romper
 
 - Los colores salen todos de variables CSS en `:root`. Hay tres juegos: claro,
