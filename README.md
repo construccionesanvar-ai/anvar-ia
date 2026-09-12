@@ -16,9 +16,21 @@ api/             <- funciones serverless (opcionales)
   contacto.js      formulario -> correo (Resend) -> CRM en Sheets
   diagnostico.js   lectura personalizada del diagnóstico con Claude
 vercel.json      cabeceras de seguridad y caché
-propuesta.html   documento de estrategia (marca, precios, plan de salida)
-artifact-anvar-ia.html   copia del sitio en un solo archivo (la publicada en Claude)
+operacion/       <- material comercial para usar, no para leer
+  01-formulario-previo.md              antes de una Sesión Despegue
+  02-mensajes-prospeccion.md           para salir a buscar clientes
+  03-guion-llamada-30min.md            la llamada de calificación
+  04-plantilla-informe-diagnostico.md  el entregable de las UF 12
+  05-acuerdo-de-servicio.md            cliente empresa y colaborador
+  06-acta-de-resultado.md              cierre de piloto o implementación
+propuesta.html   estrategia: marca, precios, dominio, socio, plan de salida
+manual.html      qué se vende y cómo se entrega cada servicio
+artifact-anvar-ia.html   copia del sitio en un archivo (generada, no versionada)
 ```
+
+> **El repositorio tiene que ser PRIVADO.** Adentro van tus precios con margen,
+> los guiones de venta y las plantillas de contrato. Nada de eso debe quedar
+> público.
 
 ## Ver el sitio en tu computador
 
@@ -30,13 +42,26 @@ Después abre `http://127.0.0.1:8123`. No necesita nada instalado.
 
 ## Publicarlo
 
-1. Crea un repo nuevo en GitHub **con la cuenta de ANVAR** (no la personal antigua:
-   Vercel bloquea los deploys cuyo autor de commit no esté autorizado).
-2. Sube esta carpeta completa.
-3. En Vercel: *Add New Project* → importa el repo → sin framework → Deploy.
-4. En *Settings → Domains*, agrega `ia.anvartech.cl` y crea el CNAME en tu DNS.
+El repo local **ya está iniciado**, en la rama `main`, con el primer commit hecho
+y el autor configurado como `construcciones.anvar@gmail.com` (el autorizado en
+Vercel; los commits de la cuenta personal antigua quedan bloqueados).
 
-Cada `git push` a `main` vuelve a publicar solo.
+1. Crea un repo **privado** y vacío llamado `anvar-ia` en GitHub, con la cuenta
+   **construccionesanvar-ai**.
+2. Empuja:
+
+```bash
+git remote add origin https://github.com/construccionesanvar-ai/anvar-ia.git
+git push -u origin main
+```
+
+3. En Vercel, equipo **ANVAR TECH**: *Add New → Project* → importa `anvar-ia` →
+   framework *Other* → Deploy.
+4. *Settings → Domains* → `ia.anvartech.cl`. Si el DNS de anvartech.cl está en
+   Vercel el registro se crea solo; si está en NIC Chile, crea un CNAME
+   `ia` → `cname.vercel-dns.com`.
+
+Desde ahí, cada `git push` a `main` vuelve a publicar solo.
 
 ## Variables de entorno (todas opcionales)
 
