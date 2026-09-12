@@ -37,20 +37,42 @@
     calcular();
   }
   $$('[data-set-seg]').forEach(function (b) {
-    b.addEventListener('click', function () { setSeg(b.getAttribute('data-set-seg')); });
+    b.addEventListener('click', function () {
+      var v = b.getAttribute('data-set-seg');
+      setSeg(v);
+      medir('segmento', { elegido: v });
+    });
   });
 
+  /* -------------------------------------------------------------- medición */
+  // Vercel Web Analytics. Si no está habilitado, no hace nada y no rompe nada.
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  function medir(nombre, datos) {
+    try { window.va('event', { name: nombre, data: datos || {} }); } catch (e) { /* da igual */ }
+  }
+
   /* ------------------------------------------------------------- whatsapp */
-  function wspHref() {
-    var t = seg === 'empresas'
-      ? 'Hola Andrés, vengo de la página de ANVAR IA. Quiero ver un diagnóstico de IA para mi empresa.'
-      : 'Hola Andrés, vengo de la página de ANVAR IA. Quiero usar IA en mi trabajo y no sé por dónde partir.';
+  // Cada puerta de entrada manda una primera línea distinta: así Andrés sabe
+  // de dónde viene el mensaje sin depender de ninguna herramienta de analítica.
+  var ENTRADAS = {
+    portada:  'Vengo de la portada',
+    contacto: 'Vengo de la sección de contacto',
+    flotante: 'Vengo del botón flotante',
+    formulario: 'Vengo del formulario'
+  };
+  function wspHref(origen) {
+    var de = ENTRADAS[origen] ? ENTRADAS[origen] + ' de anvar ia.' : 'Vengo de la página de ANVAR IA.';
+    var t = 'Hola Andrés. ' + de + '\n\n' + (seg === 'empresas'
+      ? 'Quiero ver un diagnóstico de IA para mi empresa.'
+      : 'Quiero usar IA en mi trabajo y no sé por dónde partir.');
     return 'https://wa.me/' + WSP + '?text=' + encodeURIComponent(t);
   }
   $$('[data-wsp]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
-      window.open(wspHref(), '_blank', 'noopener');
+      var origen = a.getAttribute('data-wsp') || 'otro';
+      medir('whatsapp', { origen: origen, publico: seg });
+      window.open(wspHref(origen), '_blank', 'noopener');
     });
   });
 
@@ -244,6 +266,51 @@
     qBack.style.visibility = qPaso === 0 ? 'hidden' : 'visible';
   }
 
+  function lecturaConIA(ej, idx) {
+    var destino = $('#qLectura');
+    if (!destino) return;
+    var fin = false;
+    // Aviso de que está pensando, solo si demora: nunca deja el texto en blanco.
+    var aviso = setTimeout(function () {
+      if (!fin) destino.insertAdjacentHTML('afterend',
+        '<p id="qPensando" class="mono" style="margin-top:10px;font-size:.76rem;color:var(--ink-3)">Escribiendo una lectura para tu caso…</p>');
+    }, 450);
+
+    fetch('/api/diagnostico', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        indice: idx, potencial: ej.potencial, base: ej.base,
+        traccion: ej.traccion, publico: seg
+      })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('sin ia');
+      return r.json();
+    }).then(function (j) {
+      if (!j || !j.texto) throw new Error('vacio');
+      var parrafos = j.texto.split(/\n{2,}/).filter(Boolean);
+      destino.innerHTML = parrafos.map(function (p, i) {
+        return i === 0 ? '<b>' + esc(p) + '</b>' : esc(p);
+      }).join('<br><br>');
+      destino.insertAdjacentHTML('afterend',
+        '<p class="mono" style="margin-top:10px;font-size:.72rem;color:var(--ink-3)">↳ lectura escrita para tu caso, no una respuesta guardada</p>');
+      medir('diagnostico_ia', { indice: idx, publico: seg });
+    }).catch(function () {
+      /* se queda la lectura local, que ya está en pantalla */
+    }).then(function () {
+      fin = true;
+      clearTimeout(aviso);
+      var p = $('#qPensando');
+      if (p) p.remove();
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c];
+    });
+  }
+
   function pintarCierre() {
     var ej = ejes();
     var idx = Math.round((ej.potencial + ej.base + ej.traccion) / 3);
@@ -259,10 +326,11 @@
 
     qStep.textContent = 'Resultado';
     enResultado = true;
+    medir('diagnostico_completado', { indice: idx, publico: seg, etapa: etapa(idx) });
     qBody.innerHTML =
       '<div class="qdone">' +
       '<h3>Tu índice es ' + idx + ' de 100: ' + etapa(idx) + '</h3>' +
-      '<p>' + lectura(ej, idx) + '</p>' +
+      '<p id="qLectura">' + lectura(ej, idx) + '</p>' +
       '<div class="rec"><span class="k">Lo que yo te recomendaría</span><b></b><p></p>' +
       '<p class="mono" style="margin-top:10px;color:var(--amber-text);font-size:.9rem"></p></div>' +
       '<div class="acts">' +
@@ -275,9 +343,14 @@
     $$('i', qProg).forEach(function (i) { i.classList.add('on'); });
     qBack.style.visibility = 'visible';
 
+    // Lectura escrita por la IA para este caso puntual. La local ya está en
+    // pantalla: si el endpoint no existe o falla, no se nota nada.
+    lecturaConIA(ej, idx);
+
     var env = $('[data-wsp-result]', qBody);
     if (env) env.addEventListener('click', function (e) {
       e.preventDefault();
+      medir('whatsapp', { origen: 'diagnostico', publico: seg, indice: idx });
       var t = 'Hola Andrés, hice el diagnóstico en tu página.\n\n' +
         'Índice: ' + idx + '/100 (' + etapa(idx) + ')\n' +
         'Potencial a ganar: ' + ej.potencial + '%\n' +
@@ -336,8 +409,15 @@
     else txt = (meses < 10 ? meses.toFixed(1).replace('.', ',') : Math.round(meses)) + ' meses';
     $('#rPayback').textContent = txt;
   }
+  var calcUsada = false;
   [cPers, cHrs, cCost, cAuto].forEach(function (el) {
-    if (el) el.addEventListener('input', calcular);
+    if (!el) return;
+    el.addEventListener('input', calcular);
+    el.addEventListener('change', function () {
+      if (calcUsada) return;          // una sola vez por visita
+      calcUsada = true;
+      medir('calculadora', { publico: seg });
+    });
   });
 
   /* ------------------------------------------------------------ acordeones */
@@ -382,7 +462,8 @@
     btn.textContent = 'Enviando…';
 
     function aWhatsApp() {
-      var t = 'Hola Andrés, vengo de la página de ANVAR IA.\n\n' +
+      medir('whatsapp', { origen: 'formulario', publico: seg, tipo: d.tipo });
+      var t = 'Hola Andrés. Vengo del formulario de anvar ia.\n\n' +
         'Nombre: ' + d.nombre + '\n' +
         'Contacto: ' + d.contacto + '\n' +
         'Necesito: ' + $('#fTipo').selectedOptions[0].text + '\n' +
@@ -402,6 +483,7 @@
       if (!r.ok) throw new Error('sin backend');
       return r.json();
     }).then(function () {
+      medir('formulario', { tipo: d.tipo, publico: seg });
       box.className = 'formmsg ok';
       box.textContent = 'Listo, me llegó. Te respondo antes de 24 horas.';
       form.reset();
