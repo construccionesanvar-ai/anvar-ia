@@ -1,0 +1,546 @@
+<title>Ensayo de Cliente</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#EFF0EC; --paper-2:#E5E7E0; --panel:#FBFBF9; --panel-2:#F3F4F0;
+  --ink:#14181B; --ink-2:#586460; --ink-3:#87908B;
+  --rule:#D2D6CD; --rule-2:#B6BCB1;
+  --amber:#D98A0B; --amber-soft:#F7E7C6; --amber-text:#8A5400;
+  --deep:#101A1E; --deep-2:#18252B; --deep-rule:#2C3B43; --on-deep:#E9EBE4; --on-deep-2:#9FACA6;
+  --good:#1C7A58; --good-soft:#DCEFE6; --bad:#A93B2C; --bad-soft:#F6E0DC;
+  --disp:'Archivo',Haettenschweiler,'Arial Narrow',system-ui,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',Consolas,ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+    --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+    --rule:#243036; --rule-2:#324148;
+    --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063;
+    --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+    --good:#3DBE90; --good-soft:#122A22; --bad:#E0705E; --bad-soft:#2E1714;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1215; --paper-2:#111A1E; --panel:#151F24; --panel-2:#101A1E;
+  --ink:#E9EBE4; --ink-2:#9AA7A1; --ink-3:#6F7C77;
+  --rule:#243036; --rule-2:#324148;
+  --amber:#F0A92A; --amber-soft:#3A2C10; --amber-text:#F5C063;
+  --deep:#080D10; --deep-2:#0F181D; --deep-rule:#233037;
+  --good:#3DBE90; --good-soft:#122A22; --bad:#E0705E; --bad-soft:#2E1714;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.doc{max-width:820px;margin:0 auto;padding:clamp(24px,5vw,52px) clamp(16px,4vw,34px) 90px}
+h1,h2,h3,h4{font-family:var(--disp);font-weight:700;line-height:1.07;letter-spacing:-.015em;margin:0;text-wrap:balance;font-stretch:110%}
+h1{font-size:clamp(1.9rem,5vw,2.7rem);font-stretch:118%}
+h2{font-size:clamp(1.2rem,2.4vw,1.5rem)}
+h3{font-size:1.02rem;font-stretch:104%}
+p{margin:0}
+strong{font-weight:600;color:var(--ink)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.head{border-bottom:2px solid var(--ink);padding-bottom:20px;margin-bottom:26px}
+.kicker{font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber-text);margin-bottom:12px}
+.head p{color:var(--ink-2);margin-top:16px;font-size:1.04rem;max-width:60ch}
+
+/* controles */
+.mando{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--rule);padding:12px 0 14px;margin-bottom:26px}
+.casos{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.casos button{font-family:var(--body);text-align:left;padding:10px 12px;border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer;border-radius:2px;transition:border-color .16s,background .16s,color .16s;line-height:1.3}
+.casos button:hover{border-color:var(--amber)}
+.casos button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.casos button .et{display:block;font-family:var(--mono);font-size:.56rem;letter-spacing:.13em;text-transform:uppercase;opacity:.65;margin-bottom:4px}
+.casos button .nb{display:block;font-size:.84rem;font-weight:600}
+.ensayo{display:flex;align-items:center;gap:10px;margin-top:11px;flex-wrap:wrap}
+.ensayo button{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:7px 12px;border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer;border-radius:2px}
+.ensayo button[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#1B1200;font-weight:600}
+.ensayo span{font-family:var(--mono);font-size:.68rem;color:var(--ink-3)}
+
+/* ficha del caso */
+.ficha{border:1px solid var(--rule-2);border-radius:3px;overflow:hidden;background:var(--panel);margin-bottom:30px}
+.ficha .top{background:var(--deep);color:var(--on-deep);padding:20px 22px}
+.ficha .top .et{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px}
+.ficha .top h2{color:var(--on-deep)}
+.ficha .top p{color:var(--on-deep-2);font-size:.93rem;margin-top:9px}
+.ficha dl{margin:0;display:grid;grid-template-columns:auto 1fr}
+.ficha dt{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:9px 12px;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule);white-space:nowrap}
+.ficha dd{margin:0;padding:9px 12px;border-bottom:1px solid var(--rule);font-size:.88rem;color:var(--ink-2)}
+.ficha dl>dt:last-of-type,.ficha dl>dd:last-of-type{border-bottom:0}
+
+/* línea de tiempo */
+.linea{border-left:2px solid var(--rule);margin-left:6px;padding-left:clamp(14px,3vw,26px)}
+.bloque{position:relative;margin-bottom:22px}
+.bloque::before{content:"";position:absolute;left:calc(-1*clamp(14px,3vw,26px) - 7px);top:9px;width:10px;height:10px;border-radius:50%;background:var(--rule-2);border:2px solid var(--paper)}
+.bloque.hito::before{background:var(--amber)}
+.bloque .dia{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;color:var(--amber-text);margin-bottom:6px;display:block}
+.bloque .dia b{color:var(--ink-3);font-weight:400}
+.bloque .titulo{font-family:var(--disp);font-size:1.06rem;font-stretch:106%;font-weight:700;margin-bottom:6px}
+.bloque > p{color:var(--ink-2);font-size:.95rem;max-width:62ch}
+
+/* mensajes */
+.msg{border-radius:3px;padding:13px 16px;max-width:92%;font-size:.94rem;line-height:1.55;white-space:pre-line;position:relative}
+.msg .de{font-family:var(--mono);font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;display:block;margin-bottom:7px}
+.msg.cliente{background:var(--panel);border:1px solid var(--rule);color:var(--ink-2)}
+.msg.cliente .de{color:var(--ink-3)}
+.msg.tu{background:var(--deep);border:1px solid var(--deep-rule);color:var(--on-deep);margin-left:auto}
+.msg.tu .de{color:var(--amber)}
+.msg.tu strong{color:#fff}
+
+/* modo ensayo */
+.tapa{border:1px dashed var(--rule-2);background:var(--panel-2);border-radius:3px;padding:16px;text-align:center;margin-left:auto;max-width:92%}
+.tapa p{font-family:var(--mono);font-size:.72rem;color:var(--ink-3);margin-bottom:11px;line-height:1.6}
+.tapa button{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;border:1px solid var(--amber);background:transparent;color:var(--amber-text);cursor:pointer;border-radius:2px;font-weight:600}
+.tapa button:hover{background:var(--amber);color:#1B1200}
+
+/* nota del director */
+.nota{border-left:3px solid var(--amber);background:var(--amber-soft);padding:13px 17px;border-radius:0 3px 3px 0;font-size:.91rem;color:var(--ink);line-height:1.55}
+.nota .et{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-text);display:block;margin-bottom:6px;font-weight:600}
+
+/* acción */
+.accion{border:1px solid var(--rule);background:var(--panel);border-radius:3px;padding:14px 17px}
+.accion .et{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:8px}
+.accion ul{margin:9px 0 0;padding:0;list-style:none;display:grid;gap:7px}
+.accion li{font-size:.9rem;color:var(--ink-2);padding-left:17px;position:relative;line-height:1.5}
+.accion li::before{content:"";position:absolute;left:0;top:.66em;width:9px;height:1px;background:var(--amber)}
+.accion p{font-size:.93rem;color:var(--ink-2)}
+
+/* momento crítico */
+.critico{border:2px solid var(--amber);border-radius:3px;padding:0;overflow:hidden;background:var(--panel)}
+.critico .cab{background:var(--amber);color:#1B1200;font-family:var(--mono);font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;padding:7px 15px}
+.critico .cuerpo{padding:15px 17px}
+.critico .cuerpo p{font-size:.94rem;color:var(--ink-2)}
+.critico .cuerpo p+p{margin-top:11px}
+
+/* resultado */
+.resultado{border:1px solid var(--rule-2);border-radius:3px;overflow:hidden;margin-top:34px;background:var(--panel)}
+.resultado .cab{background:var(--deep);color:var(--on-deep);padding:18px 22px}
+.resultado .cab .et{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:6px}
+.resultado .cab h3{color:var(--on-deep);font-size:1.2rem}
+.rgrid{display:grid;grid-template-columns:1fr 1fr}
+.rgrid > div{padding:17px 20px;border-bottom:1px solid var(--rule)}
+.rgrid > div:nth-child(odd){border-right:1px solid var(--rule)}
+.rgrid .k{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:6px}
+.rgrid .v{font-family:var(--mono);font-weight:600;font-size:1.28rem;letter-spacing:-.02em;font-variant-numeric:tabular-nums;display:block;line-height:1.15}
+.rgrid .v.ok{color:var(--good)}
+.rgrid .v.am{color:var(--amber-text)}
+.rgrid small{font-size:.8rem;color:var(--ink-3);display:block;margin-top:5px;font-family:var(--body);line-height:1.45}
+.resultado .pie{padding:17px 22px;background:var(--panel-2);font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.resultado .pie strong{color:var(--ink)}
+
+/* hallazgo */
+.hallazgo{border:1px solid var(--bad);background:var(--bad-soft);border-radius:3px;padding:16px 19px;margin:26px 0}
+.hallazgo .et{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--bad);display:block;margin-bottom:8px;font-weight:700}
+.hallazgo p{font-size:.93rem;color:var(--ink);line-height:1.6}
+.hallazgo p+p{margin-top:10px}
+
+footer{border-top:1px solid var(--rule);margin-top:52px;padding-top:22px;font-family:var(--mono);font-size:.7rem;color:var(--ink-3);line-height:1.9}
+
+@media (max-width:660px){
+  .casos{grid-template-columns:1fr 1fr}
+  .rgrid{grid-template-columns:1fr}
+  .rgrid > div:nth-child(odd){border-right:0}
+  .msg,.tapa{max-width:100%}
+  .ficha dl{grid-template-columns:1fr}
+  .ficha dt{border-right:0;padding-bottom:2px;border-bottom:0}
+  .ficha dd{padding-top:2px}
+}
+</style>
+
+<div class="doc">
+
+<header class="head">
+  <p class="kicker">ANVAR IA · Ensayo de cliente</p>
+  <h1>Cuatro clientes, de principio a fin</h1>
+  <p>Cómo llega, qué le dices, qué compra, qué haces durante el servicio y con qué se queda al final. Con los mensajes literales, lo que estás pensando en cada momento y los números reales de cada caso. Enciende el <strong>modo ensayo</strong> para tapar tus respuestas y practicar antes de ver qué dirías.</p>
+</header>
+
+<div class="mando">
+  <div class="casos" id="casos" role="group" aria-label="Elegir caso"></div>
+  <div class="ensayo">
+    <button type="button" id="btnEnsayo" aria-pressed="false">Modo ensayo</button>
+    <span id="estadoEnsayo">Tus respuestas están a la vista</span>
+  </div>
+</div>
+
+<div id="caso"></div>
+
+<footer>
+  ANVAR IA · ensayo de cliente · los cuatro casos son compuestos, construidos con
+  la escalera de servicios y los tiempos reales de tus proyectos<br>
+  Andrés Vargas — ANVAR TECH SpA
+</footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var UF = 40000;
+  var CLP = new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 });
+  function $(s, c) { return (c || document).querySelector(s); }
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function neg(s) { return esc(s).replace(/\*([^*]+)\*/g, '<strong>$1</strong>'); }
+
+  var CASOS = [
+    /* ============================================================ 1 */
+    {
+      et: 'Persona', nb: 'Camila, contadora',
+      titulo: 'Camila · contadora independiente',
+      bajada: 'El camino completo de la escalera de personas: llega midiéndose sola, compra chico, y el piloto lo pide ella.',
+      ficha: {
+        'Perfil': '34 años, contadora independiente, 14 clientes pyme. Trabaja sola.',
+        'Canal': 'Google → página de asesoría personal → hizo el diagnóstico',
+        'Dolor': 'Informe mensual para cada cliente: 40 min × 14 = 9,3 h al mes',
+        'Compra': 'Sesión Despegue y, a las dos semanas, el Plan Piloto'
+      },
+      linea: [
+        { hito: 1, dia: 'D+0', hora: '22:40', titulo: 'Se mide sola, de noche', p: 'Buscó en Google cómo usar IA para trabajo contable, cayó en tu página de asesoría personal y terminó el diagnóstico de seis preguntas. Aprieta "Mandarle esto a Andrés".' },
+        { msg: 'cliente', de: 'Camila · WhatsApp', t: 'Hola Andrés, hice el diagnóstico en tu página.\n\nÍndice: 61/100 (en adopción)\nPotencial a ganar: 83%\nBase y orden: 50%\nTracción para partir: 50%\nMe recomendó: Sesión Despegue\n\nQuiero conversarlo.' },
+        { nota: 'Lo que estás viendo', t: 'Este es el mejor cliente que te va a llegar: *se midió solo antes de hablar contigo*. Ya sabe que tiene un problema, ya sabe de qué tamaño, y ya le dijeron qué le corresponde. Tu trabajo acá es casi solo no arruinarlo.' },
+        { dia: 'D+1', hora: '09:15', titulo: 'Tu respuesta' },
+        { msg: 'tu', de: 'Tú', t: 'Hola Camila, buenos días. Vi tu diagnóstico: 61 de 100, con el potencial alto y la base a medio ordenar.\n\nEso me dice que hay bastantes horas que recuperar, pero que primero hay que poner orden en dónde vive tu información.\n\n¿Me cuentas cuál es la tarea concreta que te está comiendo el tiempo? Con eso te digo derecho si te sirve una sesión de 90 minutos o si hay algo más grande.' },
+        { nota: 'La regla', t: '*No mandes el precio en el primer mensaje.* Primero que te cuente. Si abres con el valor, la conversación pasa a ser sobre plata antes de que exista un problema definido — y ahí cualquier precio parece caro.' },
+        { dia: 'D+1', hora: '09:40' },
+        { msg: 'cliente', de: 'Camila', t: 'Hola! Soy contadora independiente, tengo 14 clientes pyme. Todos los meses les armo un informe de situación: ventas, gastos, IVA, lo que deben. Saco los datos de planillas distintas y los pego en un Word.\n\nMe toma como 40 minutos cada uno y son 14. Se me va un día y medio del mes solo en eso.' },
+        { nota: 'Anota el número', t: '40 min × 14 = *9,3 horas al mes*. Ella acaba de darte la medición sin que se la pidieras. Ese número vuelve al final, cuando midan el después: escríbelo ahora.' },
+        { dia: 'D+1', hora: '09:52', titulo: 'El precio y el cierre con fecha' },
+        { msg: 'tu', de: 'Tú', t: 'Eso es una tarea perfecta para resolver: cambian los datos pero no cambia la estructura.\n\nTe propongo partir por una sesión de 90 minutos, $49.000. Salimos de ahí con tu asistente configurado con tu forma de escribir y tus formatos, y con ese informe armándose a partir de tus planillas. Si te sirve, después vemos si vale la pena automatizarlo del todo.\n\n¿Te acomoda el sábado a las 10?' },
+        { nota: 'Dos cosas en un mensaje', t: 'El precio dicho *completo y de corrido*, sin pedir disculpas y sin adornos. Y el cierre con una fecha concreta, no un "cuando puedas" — eso es lo que convierte una conversación en una sesión agendada.' },
+        { dia: 'D+2', accion: 'Antes de la sesión', p: 'Confirma y paga el mismo día. Le mandas el formulario de cinco preguntas.', ul: ['Formulario enviado 24 h antes (operacion/01)', '20 minutos tuyos decidiendo los tres flujos', 'Flujo 1: su asistente con contexto de contadora', 'Flujo 2: el informe mensual desde su planilla', 'Flujo 3: redactar un correo de cobranza difícil'] },
+        { hito: 1, dia: 'D+6', hora: '10:00', titulo: 'La sesión, 90 minutos', p: 'Encuadre, asistente, su tarea más pesada, el flujo que sorprende, los tres errores y el cierre. Ella maneja el teclado todo el rato; tú solo cuando hay que configurar algo.' },
+        { accion: 'Ese mismo día, antes de las 18:00', ul: ['La grabación de la sesión', 'Una hoja con los tres flujos y sus prompts', 'Los tres errores a cuidar, escritos', 'Su tarea de la semana: usar el flujo del informe tres veces'] },
+        { hito: 1, dia: 'D+13', titulo: 'El mensaje del día 7', p: 'Un solo mensaje, corto. Este es el que produce el testimonio y, muchas veces, la venta del piloto.' },
+        { msg: 'tu', de: 'Tú', t: 'Hola Camila, ¿alcanzaste a usar el flujo del informe?' },
+        { msg: 'cliente', de: 'Camila', t: 'Sí!! Hice 4 informes el lunes en una hora. Antes me habrían tomado casi 3.\n\nPero todavía tengo que copiar los datos de la planilla a mano y eso es lo que más me demora igual.' },
+        { critico: 'El momento', p: ['Acaba de decirte exactamente qué venderle, y lo dijo ella. No lo empujes: nómbralo una vez y déjalo ahí.', 'Si insistes, se siente presionada y pierdes las dos cosas. Si lo nombras bien, te compra sola.'] },
+        { msg: 'tu', de: 'Tú', t: 'Eso es justo lo que se puede automatizar del todo: que lea la planilla y arme el informe sin que copies nada.\n\nEso es el Plan Piloto: cuatro semanas, $229.000. Si quieres lo conversamos, y si prefieres seguir así también está bien — ya te ahorraste dos tercios del tiempo.' },
+        { dia: 'D+15', accion: 'Entra al piloto', ul: ['Semana 1 · Despegue, y eligen juntos la tarea a automatizar', 'Semana 2 · Cinco horas tuyas construyendo. Entregas y la usa contigo mirando', 'Semana 3 · Ajuste. Primera pregunta: qué usó y qué no', 'Semana 4 · Autonomía. Biblioteca de prompts, plan de tres meses y le enseñas a resolver sola'] },
+        { nota: 'La prueba del piloto', t: 'En la semana 4 ella tiene que resolver *algo nuevo sin preguntarte*, delante tuyo. Si eso nunca pasa, entregaste un servicio pero no una capacidad — y en tres meses te va a estar escribiendo por cada duda.' }
+      ],
+      resultado: {
+        et: 'Resultado a los 45 días',
+        h: 'De 9,3 horas al mes a 2,1',
+        grid: [
+          ['Por informe', '40 → 9 min', 'ok', 'Medido con los mismos 14 informes'],
+          ['Al mes', 'recupera 7,2 h', 'ok', '86 horas al año'],
+          ['Lo que eso vale para ella', '$1.036.800', 'ok', 'Al año, a $12.000 su hora'],
+          ['Lo que pagó', '$278.000', 'am', 'Sesión + piloto, IVA incluido'],
+          ['Tus horas', '12 h', '', '2 de la sesión + 10 del piloto'],
+          ['Te queda por hora', '$23.200', 'am', 'En línea con el resto de la escalera']
+        ],
+        pie: 'Ella recupera <strong>3,7 veces</strong> lo que pagó, el primer año. Pero el valor real de esta clienta no son los $278.000: a los dos meses te recomendó con dos colegas contadoras. <strong>Un contador conoce a veinte contadores</strong>, y todos tienen exactamente el mismo problema. Por eso el testimonio en video se pide en la semana 4, justo cuando resolvió algo sola y está orgullosa.'
+      }
+    },
+
+    /* ============================================================ 2 */
+    {
+      et: 'Empresa', nb: 'Constructora',
+      titulo: 'Constructora mediana · 40 personas',
+      bajada: 'El camino principal de empresas: prospección, llamada, diagnóstico, piloto y acompañamiento. Con el escéptico incluido.',
+      ficha: {
+        'Perfil': '40 personas, 3 obras activas. Contacto: Rodrigo, jefe de administración y finanzas.',
+        'Canal': 'Prospección directa — un conocido tuyo trabaja ahí',
+        'Dolor': 'Los estados de pago mensuales a los mandantes',
+        'Compra': 'Diagnóstico, piloto y después acompañamiento mensual'
+      },
+      linea: [
+        { hito: 1, dia: 'D+0', titulo: 'No escribes a la empresa: escribes a tu conocido' },
+        { msg: 'tu', de: 'Tú → tu conocido', t: 'Hola Pancho, ¿cómo estás? Oye, una consulta corta.\n\nEstoy trabajando con empresas automatizando procesos que hoy se hacen a mano. Me acordé de ustedes porque me habías comentado lo pesados que son los estados de pago.\n\nHice algo parecido: una app que genera ocho documentos legales que antes se llenaban a mano, pasó de 45 minutos a 4.\n\n¿Quién ve ese tema ahí? No para venderle nada todavía, solo para mostrarle cómo quedó lo mío y que él me diga si les sirve.' },
+        { nota: 'Por qué funciona', t: 'Estás pidiendo *una presentación, no una reunión*. Es un favor chico y se dice que sí sin pensarlo. Pedir directo "una reunión de 30 minutos con el gerente" es un favor grande y activa la defensa.' },
+        { dia: 'D+3', titulo: 'Ya presentado, escribes a Rodrigo' },
+        { msg: 'tu', de: 'Tú → Rodrigo', t: 'Hola Rodrigo, me pasó su contacto el Pancho.\n\nSoy Andrés Vargas, de ANVAR TECH. Automatizo procesos con inteligencia artificial, pero con un enfoque distinto al habitual: primero mido el proceso en horas y pesos, y si no da el número se lo digo y no seguimos.\n\nLe dejo un ejemplo concreto: una aplicación que genera ocho documentos oficiales que antes se llenaban a mano, de 45 minutos a 4.\n\n¿Le sirve que conversemos 30 minutos esta semana? Sin costo y sin compromiso.' },
+        { hito: 1, dia: 'D+7', titulo: 'La llamada de 30 minutos', p: 'Diagnosticar sí, resolver no. Si le resuelves el problema acá, no te compra.' },
+        { accion: 'Minutos 5 a 15 · las seis preguntas', ul: ['¿Cuánto se repite? → "Los estados de pago, todos los meses, uno por obra"', '¿Si falta quien lo hace? → "Se atrasa el cobro. Y eso es plata parada"', '¿Dónde vive la información? → "Excel y el sistema de la obra"', '¿Saben cuánto cuesta? → "Como 6 horas cada uno, calculo"', '¿Usan IA? → "No"', '¿Quién decide? → "Yo, hasta cierto monto"'] },
+        { nota: 'La pregunta que más te sirve', t: '"¿Qué pasó la última vez que intentaron mejorar algo?" Rodrigo contesta: *"contratamos un software que nadie terminó de usar"*. Eso te acaba de decir que el riesgo acá no es técnico, es de adopción. Anótalo: va a cambiar cómo armas el piloto.' },
+        { dia: 'D+7', hora: 'min 15', titulo: 'Le devuelves el problema ordenado' },
+        { msg: 'tu', de: 'Tú', t: 'Déjame ver si entendí. Todos los meses arman tres estados de pago, uno por obra. Cada uno le toma unas 6 horas al jefe de terreno, que es la persona que menos debería estar en un Excel. Son 18 horas al mes, y si se atrasa, se atrasa el cobro.\n\n¿Es así?' },
+        { nota: 'Por qué repetírselo', t: 'Cuando diga "sí, exacto", pasaron dos cosas: confirmó que entendiste, y *escuchó su propio problema dicho en horas y en plata*. Recién ahí hablas tú.' },
+        { dia: 'D+7', hora: 'min 22', titulo: 'El precio, y después te callas' },
+        { msg: 'tu', de: 'Tú', t: 'Lo que yo haría es un diagnóstico de una semana. Me siento al lado de quien arma el estado de pago, lo cronometro, lo valorizo en pesos, y le entrego por escrito las tres cosas que conviene automatizar, cuánto ahorra cada una y qué NO conviene tocar.\n\nSon UF 12, más IVA. Y si después avanzamos a implementar, se le descuenta completo.' },
+        { nota: 'El silencio', t: 'Dicho eso, *cállate*. El silencio incómodo lo tiene que llenar él, no tú. Si lo llenas tú, lo vas a llenar bajando el precio o justificándote, y las dos cosas te debilitan.' },
+        { dia: 'D+10', accion: 'Antes de entrar', ul: ['Acuerdo firmado con el alcance por escrito y fechas', 'Confidencialidad firmada antes de ver un solo dato', 'Rodrigo manda un correo al equipo: no es una evaluación de desempeño', 'Te dan el costo-hora: $20.000 el jefe de terreno'] },
+        { nota: 'Por qué el correo al equipo importa', t: 'Si el jefe de terreno cree que lo están evaluando, te va a mostrar el proceso *como debería ser*, no como es. Y ahí tu medición no vale nada.' },
+        { hito: 1, dia: 'D+14 a D+18', titulo: 'La semana del diagnóstico', p: 'Dos días en terreno, cronómetro a la vista, cinco estados de pago reales. Incluido uno que salió mal.' },
+        { critico: 'Lo que aparece midiendo', p: ['El tiempo real no es 6 horas: es *7,5*. Nadie contaba las idas y vueltas cuando el mandante devuelve el estado de pago con observaciones.', 'Ese punto y medio de diferencia por estado son 4,5 horas más al mes que nadie sabía que estaba perdiendo. Y aparece solo si estás ahí con el reloj.', 'Por eso el diagnóstico se cobra: es la parte que ningún proveedor quiere hacer.'] },
+        { dia: 'D+18', titulo: 'Presentas el informe, no lo mandas', accion: 'Los siete capítulos', ul: ['El proceso hoy: 7,5 h por estado, 3 al mes, $450.000 al mes en horas', 'Tres oportunidades ordenadas por retorno', 'Capítulo 4: lo que NO conviene automatizar', 'Plan, medición acordada y supuestos a la vista'] },
+        { critico: 'El capítulo que cierra la venta', p: ['En el capítulo 4 escribes que *no* conviene automatizar la conciliación bancaria todavía, porque los datos llegan sucios desde tres bancos distintos y habría que ordenarlos primero.', 'Rodrigo te va a decir después que eso fue lo que lo convenció. Nadie que le haya cotizado antes le dijo qué no hacer.'] },
+        { dia: 'D+25', accion: 'Aprueban el piloto', p: 'Firman. Y por lo que dijo en la llamada —"un software que nadie usó"— el piloto se arma con la adopción como prioridad, no con la tecnología.' },
+        { hito: 1, dia: 'D+27', titulo: 'El escéptico', p: 'Marcelo, jefe de terreno, 22 años en la empresa. En la reunión de arranque dice: "esto no va a funcionar con nuestras obras, cada una es distinta".' },
+        { nota: 'Qué haces con él', t: '*Lo haces usuario del piloto.* No lo convences discutiendo: lo sientas a probarlo y le pides que le busque los defectos. Si convences a Marcelo, convenciste a toda la empresa — y si tiene razón, te salvó el proyecto.' },
+        { dia: 'D+30 a D+50', accion: 'Las cuatro semanas del piloto', ul: ['Semana 1 · Diseño y acuerdo de medición firmado antes de construir', 'Semana 2 · Construcción. Demo de 20 min a mitad de semana, aunque esté a medias', 'Semana 3 · Marcelo lo usa con casos reales, tú sin tocar el teclado', 'Semana 4 · Capacitación, medición con el mismo método, acta firmada'] },
+        { hito: 1, dia: 'D+55', titulo: 'El acta de resultado', p: 'Firmada por los dos, con el antes y el después medidos igual. Y en el mismo momento pides la autorización de referencia y el video.' }
+      ],
+      resultado: {
+        et: 'Resultado a los 55 días',
+        h: 'De 7,5 horas por estado de pago a 1,8',
+        grid: [
+          ['Por estado de pago', '7,5 → 1,8 h', 'ok', 'Cronometrado con el mismo método'],
+          ['Al mes', '17,1 h liberadas', 'ok', 'De un jefe de terreno, no de un administrativo'],
+          ['Lo que eso vale', '$4.104.000', 'ok', 'Al año, a $20.000 la hora'],
+          ['Lo que facturaste', 'UF 40', 'am', '$1.600.000 netos · diagnóstico + piloto'],
+          ['Tus horas', '70 h', '', '20 del diagnóstico + 50 del piloto'],
+          ['Te queda por hora', '$22.900', 'am', 'Consistente con el resto']
+        ],
+        pie: 'Se paga solo en <strong>4,7 meses</strong>. El año 1 recuperan 2,6 veces lo invertido; del año 2 en adelante son $4.100.000 anuales sin volver a pagar nada. Al firmar el acta ofreces el acompañamiento —<strong>UF 8 al mes, 8 horas tuyas, $40.000 la hora</strong>— y Rodrigo dice que sí, porque acaba de ver el número. <strong>Ofrecerlo dos meses después habría sido un no.</strong>'
+      }
+    },
+
+    /* ============================================================ 3 */
+    {
+      et: 'El no', nb: 'Distribuidora',
+      titulo: 'Distribuidora de insumos · el cliente al que le dices que no',
+      bajada: 'El caso más difícil de practicar solo, y el que más plata te termina dando. Aquí dejas ir UF 28 en la primera llamada.',
+      ficha: {
+        'Perfil': '12 personas. Contacto: Paulina, gerente. Entusiasmada con la IA.',
+        'Canal': 'Formulario del sitio → "Automatizar un proceso puntual"',
+        'Dolor': 'La toma de pedidos, que hace una sola persona',
+        'Compra': 'Hoy, nada de lo que pidió. A los cuatro meses, todo.'
+      },
+      linea: [
+        { hito: 1, dia: 'D+0', titulo: 'Llega entusiasmada' },
+        { msg: 'cliente', de: 'Paulina · formulario', t: 'Queremos implementar IA en la empresa. Vimos que se puede hacer de todo y no queremos quedarnos atrás, la competencia ya está usando.\n\n¿Cuánto costaría un proyecto?' },
+        { nota: 'Bandera amarilla', t: 'Entusiasmo sin un proceso nombrado. No es que no sirva — es que *todavía no hay proyecto, hay ganas*. Tu trabajo en la llamada es averiguar si abajo del entusiasmo hay algo medible.' },
+        { hito: 1, dia: 'D+2', titulo: 'La llamada de 30 minutos', p: 'La dejas hablar cinco minutos y después van las seis preguntas.' },
+        { accion: 'Lo que va apareciendo', ul: ['¿Cuánto se repite? → "La toma de pedidos, todo el día"', '¿Si falta quien lo hace? → "Se cae. La Jessica es la única que sabe"', '¿Dónde vive la información? → "En un cuaderno y en el WhatsApp de la Jessica"', '¿Saben cuánto cuesta? → "No, nunca lo medimos"', '¿Usan IA? → "No"', '¿Quién decide? → "Yo"'] },
+        { critico: 'La tercera respuesta lo decide todo', p: ['*Un cuaderno y el WhatsApp de una persona.* No hay proceso escrito, no hay datos estructurados, y todo el conocimiento vive en la cabeza de la Jessica.', 'Haces la cuenta igual: unas 3 horas al día, 22 días, son 66 horas al mes. La oportunidad es enorme.', 'Y justamente por eso no puedes tomarla todavía.'] },
+        { dia: 'D+2', hora: 'min 22', titulo: 'El no' },
+        { msg: 'tu', de: 'Tú', t: 'Te voy a decir algo que va contra mi interés: hoy no te haría un proyecto de automatización.\n\nNo porque no haya oportunidad. La hay y es grande, calculo más de 60 horas al mes. Es porque los datos están en un cuaderno y en el WhatsApp de una persona, y el proceso no está escrito en ninguna parte.\n\nSi automatizo eso ahora te construyo algo que se va a caer en tres meses, y vas a quedar con la sensación de que la IA no sirve. Y no es que no sirva: es que estaría automatizando un desorden.' },
+        { nota: 'Lo que acaba de pasar', t: 'Dejaste ir UF 28 en una frase. Es el momento más difícil del oficio y no se practica en ninguna parte. *Fíjate en lo que viene.*' },
+        { dia: 'D+2', hora: 'min 25', titulo: 'Pero no la dejas sin nada' },
+        { msg: 'tu', de: 'Tú', t: 'Lo que sí haría primero: escribir cómo se toma un pedido, de principio a fin, y pasar eso a una planilla ordenada. Eso no necesita IA y probablemente lo pueden hacer ustedes en dos semanas.\n\nY lo que sí te puede servir ahora es el taller de cuatro horas para el equipo. No automatiza nada, pero cada persona sale con una tarea suya resuelta, y de paso van a tener que escribir cómo hacen las cosas — que es justo lo que les falta. Son UF 14.\n\nCuando la planilla esté lista, me llamas y ahí sí conversamos el piloto.' },
+        { nota: 'La jugada', t: 'No bajaste el precio: *bajaste el alcance*. Le vendiste lo que sí le sirve hoy, y de paso le pusiste el camino para poder venderle lo grande después.' },
+        { dia: 'D+9', accion: 'Contrata el taller', p: 'Paulina lo pensó una semana. UF 14, para las 12 personas del equipo.' },
+        { hito: 1, dia: 'D+20', titulo: 'El taller, y lo que pasa sin buscarlo' },
+        { critico: 'La coincidencia que no es coincidencia', p: ['En el Taller 1, cada persona trabaja sobre una tarea propia. La Jessica elige la toma de pedidos.', 'Para poder pedirle algo útil a la IA, *tiene que escribir cómo lo hace* — paso por paso, incluidas las excepciones. Se demora 40 minutos.', 'En esos 40 minutos se resolvió el bloqueo que hacía inviable el proyecto. Y no lo resolviste tú: lo resolvió ella, con su nombre encima. Por eso no lo va a abandonar.'] },
+        { dia: 'D+22', accion: 'Informe de cierre a Paulina', p: 'Media página. Y una línea que vale por todo el taller: "ahora sí existe el proceso escrito que faltaba; el piloto pasó a ser viable".' },
+        { hito: 1, dia: 'D+75', titulo: 'Te llama ella' },
+        { msg: 'cliente', de: 'Paulina', t: 'Andrés! Ya tenemos la planilla ordenada y el procedimiento escrito, la Jessica lo terminó. ¿Partimos con lo que habíamos hablado?' },
+        { dia: 'D+90 a D+130', accion: 'Ahora sí', ul: ['Diagnóstico · UF 12, una semana', 'Piloto · UF 28 adicionales, cuatro semanas', 'Sobre un proceso escrito y datos ordenados: el proyecto funciona'] }
+      ],
+      resultado: {
+        et: 'Lo que costó decir que no',
+        h: 'Cuatro meses de espera y UF 26 más de las que ibas a facturar',
+        grid: [
+          ['Si le vendías el proyecto ese día', 'UF 28', '', 'Y un sistema que se cae en tres meses'],
+          ['Lo que facturaste diciendo que no', 'UF 54', 'ok', 'Taller + diagnóstico + piloto'],
+          ['En pesos', '$2.160.000', 'ok', 'Netos, contra $1.120.000'],
+          ['Costo del no', '4 meses', 'am', 'De espera, no de trabajo'],
+          ['Lo que además ganaste', 'la historia', 'ok', 'Paulina la cuenta cada vez que te recomienda'],
+          ['Lo que te ahorraste', 'un fracaso', 'ok', 'Con tu nombre encima']
+        ],
+        pie: 'Decir que no no es generosidad: <strong>es el mejor negocio disponible</strong>. Un proyecto que se cae te cuesta el cliente, la referencia y la reputación, que es lo único que tienes cuando trabajas solo. Y fíjate en el detalle: <strong>tú no arreglaste el problema de fondo, lo arregló el taller</strong> — porque para usar IA hay que escribir cómo se hace el trabajo, y escribirlo era exactamente lo que faltaba.'
+      }
+    },
+
+    /* ============================================================ 4 */
+    {
+      et: 'Puerta de entrada', nb: 'Clínica dental',
+      titulo: 'Clínica dental · 3 sucursales',
+      bajada: 'Cómo un taller de UF 14 se convierte en UF 82 y un acompañamiento mensual. La pausa del café hace más que cualquier reunión comercial.',
+      ficha: {
+        'Perfil': '45 personas, 3 sucursales. Contacto: Francisca, subgerenta de operaciones.',
+        'Canal': 'Perfil de Google de ANVAR TECH → página de capacitación',
+        'Dolor': 'Ninguno declarado. Solo quiere capacitar al equipo administrativo.',
+        'Compra': 'Un taller. Y después, sin que lo pidas, todo lo demás.'
+      },
+      linea: [
+        { hito: 1, dia: 'D+0', titulo: 'Llega sin problema que resolver', p: 'No viene buscando automatizar nada. Viene porque el equipo está usando IA a su manera y quiere ordenarlo.' },
+        { msg: 'cliente', de: 'Francisca · formulario', t: 'Hola, quiero capacitar a mi equipo administrativo en IA. Son 12 personas. Algunas ya usan ChatGPT por su cuenta y me preocupa un poco que suban información de pacientes sin saber.\n\n¿Hacen algo así?' },
+        { nota: 'Lo que te está diciendo', t: 'Su miedo real no es que el equipo no sepa usar IA: *es que la estén usando mal con datos de pacientes*. Eso no lo dice en el formulario pero es lo que va a comprar. El taller tiene un bloque completo de eso.' },
+        { dia: 'D+3', accion: 'Cotizas el taller', ul: ['UF 14, cuatro horas, hasta 15 personas, en sus oficinas', 'Le adelantas que la empresa queda con una política escrita de qué se puede subir y qué no', 'Aprueban en dos días'] },
+        { dia: 'D+8', accion: 'El correo previo', p: 'Le pides que cada participante llegue con una tarea suya que se repita. Y a Francisca, por separado, qué información no puede salir de la clínica.' },
+        { nota: 'Sin esto el taller se cae', t: 'Si nadie trae una tarea, las cuatro horas se convierten en una charla y pierdes la sala. Lleva cinco tareas típicas del rubro preparadas para los que llegan con las manos vacías.' },
+        { hito: 1, dia: 'D+14', titulo: 'El taller' },
+        { accion: 'Las cuatro horas', ul: ['0:00–0:30 · Qué es y qué no es, con demos, cero teoría', '0:30–1:30 · Taller 1, cada uno con su tarea. Circulas por la sala', '1:45–2:45 · Taller 2, con material real de la clínica', '2:45–3:30 · Errores, verificación y qué no subir', '3:30–4:00 · Cada uno cuenta en 30 segundos qué resolvió'] },
+        { hito: 1, dia: 'D+14', hora: '1:30', titulo: 'La pausa' },
+        { critico: 'Lo que pasa en 15 minutos de café', p: ['Se te acerca Francisca con un café en la mano:', '"Oye, y esto que hiciste recién con las fichas… ¿se podría hacer con los presupuestos que le mandamos a los pacientes? Hacemos como 200 al mes y cada uno toma 15 minutos."', '*200 × 15 min = 50 horas al mes.* Nadie lo había nombrado nunca, porque está repartido entre cuatro personas y ninguna lo ve completo.'] },
+        { nota: 'La regla de la pausa', t: 'No mires el teléfono. *De la pausa salen los proyectos.* Estás adentro de la empresa, en confianza, y la gente te cuenta lo que jamás aparecería en una reunión comercial. Ninguna prospección te pone en esa silla.' },
+        { dia: 'D+16', accion: 'El informe de cierre', ul: ['Cuántos asistieron y qué resolvió cada uno', 'La política de uso responsable, lista para adoptar', 'Plan de 30 días con tres acciones', 'Y al final: lo que observaste sobre los presupuestos, con el número'] },
+        { nota: 'Ese último punto', t: 'Es el que convierte un taller en un proyecto. No lo vendas en el informe: *nómbralo con el número y deja que pregunten ellos*. Francisca va a preguntar.' },
+        { dia: 'D+24', accion: 'Diagnóstico', p: 'UF 12. Una semana midiendo el proceso de presupuestos, sentado al lado de las cuatro personas que lo hacen.' },
+        { dia: 'D+60', accion: 'Piloto', p: 'UF 28 adicionales. Cuatro semanas. El presupuesto se arma solo desde la ficha del paciente y alguien lo revisa antes de enviarlo.' },
+        { dia: 'D+90', accion: 'Acompañamiento', p: 'UF 8 al mes, ofrecido al firmar el acta.' },
+        { hito: 1, dia: 'D+120', titulo: 'Las otras dos sucursales', p: 'Te piden el mismo taller para los equipos de las otras dos. UF 14 cada uno — pero ahora te toma 5 horas en vez de 10, porque el material ya está adaptado a la clínica.' }
+      ],
+      resultado: {
+        et: 'Resultado al año 1',
+        h: 'Un taller de UF 14 se convirtió en UF 82 y un ingreso mensual',
+        grid: [
+          ['Lo que entró primero', 'UF 14', '', 'Un taller, sin problema declarado'],
+          ['Lo que terminó siendo', 'UF 82', 'ok', 'Taller + diagnóstico + piloto + 2 talleres'],
+          ['Más, todos los meses', 'UF 8', 'ok', 'Acompañamiento, 8 horas tuyas'],
+          ['El taller repetido', '$112.000/h', 'ok', 'La 2ª y 3ª vez te toman 5 h, no 10'],
+          ['Lo que ellos ganan', '$4.440.000', 'ok', 'Al año, 37 h al mes liberadas'],
+          ['De dónde salió todo', 'una pausa', 'am', '15 minutos de café']
+        ],
+        pie: 'Por eso la capacitación es <strong>tu mejor negocio y tu mejor puerta</strong>, las dos cosas a la vez. Por hora es el servicio que más te deja, porque se prepara una vez y se dicta muchas. Y te sienta adentro de la empresa cuatro horas, viendo cómo trabajan de verdad, que es una posición que ninguna reunión comercial te da. <strong>Cuando no sepas por dónde entrar a una empresa, ofrece el taller.</strong>'
+      }
+    }
+  ];
+
+  var actual = 0, ensayo = false;
+
+  /* ---------------------------------------------------- selector de casos */
+  var cont = $('#casos');
+  CASOS.forEach(function (c, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(i === 0));
+    b.innerHTML = '<span class="et"></span><span class="nb"></span>';
+    $('.et', b).textContent = c.et;
+    $('.nb', b).textContent = c.nb;
+    b.addEventListener('click', function () {
+      actual = i;
+      Array.prototype.forEach.call(cont.children, function (o, k) {
+        o.setAttribute('aria-pressed', String(k === i));
+      });
+      pintar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    cont.appendChild(b);
+  });
+
+  /* ------------------------------------------------------- modo ensayo */
+  var btn = $('#btnEnsayo'), estado = $('#estadoEnsayo');
+  btn.addEventListener('click', function () {
+    ensayo = !ensayo;
+    btn.setAttribute('aria-pressed', String(ensayo));
+    estado.textContent = ensayo
+      ? 'Tapadas: piensa qué dirías y después revela'
+      : 'Tus respuestas están a la vista';
+    pintar();
+  });
+
+  /* ------------------------------------------------------------ pintar */
+  function bloqueMsg(b) {
+    var d = document.createElement('div');
+    d.className = 'msg ' + (b.msg === 'tu' ? 'tu' : 'cliente');
+    d.innerHTML = '<span class="de"></span>' + neg(b.t);
+    $('.de', d).textContent = b.de;
+    return d;
+  }
+
+  function pintar() {
+    var c = CASOS[actual];
+    var raiz = $('#caso');
+    raiz.innerHTML = '';
+
+    /* ficha */
+    var f = document.createElement('div');
+    f.className = 'ficha';
+    var filas = '';
+    Object.keys(c.ficha).forEach(function (k) {
+      filas += '<dt>' + esc(k) + '</dt><dd>' + esc(c.ficha[k]) + '</dd>';
+    });
+    f.innerHTML = '<div class="top"><span class="et"></span><h2></h2><p></p></div><dl>' + filas + '</dl>';
+    $('.top .et', f).textContent = 'Caso ' + (actual + 1) + ' de ' + CASOS.length + ' · ' + c.et;
+    $('.top h2', f).textContent = c.titulo;
+    $('.top p', f).textContent = c.bajada;
+    raiz.appendChild(f);
+
+    /* línea de tiempo */
+    var linea = document.createElement('div');
+    linea.className = 'linea';
+
+    c.linea.forEach(function (b) {
+      var el = document.createElement('div');
+      el.className = 'bloque' + (b.hito ? ' hito' : '');
+
+      if (b.dia) {
+        var d = document.createElement('span');
+        d.className = 'dia';
+        d.innerHTML = esc(b.dia) + (b.hora ? ' <b>· ' + esc(b.hora) + '</b>' : '');
+        el.appendChild(d);
+      }
+      if (b.titulo) {
+        var t = document.createElement('div');
+        t.className = 'titulo';
+        t.textContent = b.titulo;
+        el.appendChild(t);
+      }
+      if (b.p && !b.accion && !b.critico) {
+        var p = document.createElement('p');
+        p.innerHTML = neg(b.p);
+        el.appendChild(p);
+      }
+
+      if (b.msg) {
+        if (b.msg === 'tu' && ensayo) {
+          var tapa = document.createElement('div');
+          tapa.className = 'tapa';
+          tapa.innerHTML = '<p>¿Qué le contestarías acá?<br>Piénsalo completo antes de mirar.</p><button type="button">Ver lo que dirías</button>';
+          $('button', tapa).addEventListener('click', function () {
+            tapa.replaceWith(bloqueMsg(b));
+          });
+          el.appendChild(tapa);
+        } else {
+          el.appendChild(bloqueMsg(b));
+        }
+      }
+
+      if (b.nota) {
+        var n = document.createElement('div');
+        n.className = 'nota';
+        n.innerHTML = '<span class="et"></span>' + neg(b.t);
+        $('.et', n).textContent = b.nota;
+        el.appendChild(n);
+      }
+
+      if (b.accion) {
+        var a = document.createElement('div');
+        a.className = 'accion';
+        a.innerHTML = '<span class="et"></span>';
+        $('.et', a).textContent = b.accion;
+        if (b.p) { var ap = document.createElement('p'); ap.innerHTML = neg(b.p); a.appendChild(ap); }
+        if (b.ul) {
+          var ul = document.createElement('ul');
+          b.ul.forEach(function (x) { var li = document.createElement('li'); li.innerHTML = neg(x); ul.appendChild(li); });
+          a.appendChild(ul);
+        }
+        el.appendChild(a);
+      }
+
+      if (b.critico) {
+        var k = document.createElement('div');
+        k.className = 'critico';
+        k.innerHTML = '<div class="cab"></div><div class="cuerpo"></div>';
+        $('.cab', k).textContent = b.critico;
+        b.p.forEach(function (x) { var pp = document.createElement('p'); pp.innerHTML = neg(x); $('.cuerpo', k).appendChild(pp); });
+        el.appendChild(k);
+      }
+
+      linea.appendChild(el);
+    });
+    raiz.appendChild(linea);
+
+    /* resultado */
+    var r = c.resultado;
+    var res = document.createElement('div');
+    res.className = 'resultado';
+    var celdas = '';
+    r.grid.forEach(function (g) {
+      celdas += '<div><span class="k">' + esc(g[0]) + '</span><span class="v ' + (g[2] || '') + '">' + esc(g[1]) + '</span><small>' + esc(g[3]) + '</small></div>';
+    });
+    res.innerHTML = '<div class="cab"><span class="et"></span><h3></h3></div><div class="rgrid">' + celdas + '</div><div class="pie">' + r.pie + '</div>';
+    $('.cab .et', res).textContent = r.et;
+    $('.cab h3', res).textContent = r.h;
+    raiz.appendChild(res);
+
+    /* hallazgo, solo en el caso de la constructora */
+    if (actual === 1) {
+      var h = document.createElement('div');
+      h.className = 'hallazgo';
+      h.innerHTML = '<span class="et"></span>' +
+        '<p>Armando este caso me topé con algo en tu escalera de precios. Si el diagnóstico de UF 12 se descuenta <em>completo</em> de un piloto de UF 28, el cliente termina pagando UF 28 por 70 horas tuyas: <strong>$16.000 la hora</strong>, muy por debajo de los ~$24.000 del resto de tus servicios.</p>' +
+        '<p>Acá usé la corrección: <strong>el piloto vale UF 40, y las UF 12 del diagnóstico se descuentan</strong>, así que pagan UF 28 adicionales. Mismo descuento, mismo mensaje comercial, total UF 40 — y te quedan $22.900 la hora.</p>' +
+        '<p>En el sitio hoy dice "desde UF 28". Habría que cambiarlo a <strong>"desde UF 40, o UF 28 si ya hiciste el diagnóstico"</strong>. Es una línea, pero es tu decisión.</p>';
+      $('.et', h).textContent = 'Hallazgo · revisar antes del primer cliente';
+      raiz.appendChild(h);
+    }
+  }
+
+  pintar();
+})();
+</script>
