@@ -164,6 +164,8 @@ header{position:sticky;top:0;z-index:60;background:var(--paper);border-bottom:1p
 .svc-row ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
 .svc-row li{font-size:.88rem;color:var(--ink-2);padding-left:17px;position:relative;line-height:1.45}
 .svc-row li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:1px;background:var(--amber)}
+.svc-row .mas{display:inline-block;margin-top:11px;font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--amber-text);border-bottom:1px solid transparent;transition:border-color .2s}
+.svc-row .mas:hover{border-bottom-color:var(--amber)}
 .svc-row .price{text-align:right}
 .svc-row .price .p{font-family:var(--mono);font-weight:600;font-size:1.18rem;letter-spacing:-.01em;display:block;font-variant-numeric:tabular-nums}
 .svc-row .price .u{font-family:var(--mono);font-size:.67rem;color:var(--ink-3);display:block;margin-top:5px;letter-spacing:.05em}
