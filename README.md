@@ -111,7 +111,6 @@ ya redactado, y el diagnóstico usa su lectura local.
 
 ## Qué cambiar antes de publicar
 
-- **Tu foto** en la sección "Quién está detrás" (hoy hay un monograma "AV").
 - **El nombre y el dominio** — hoy dice ANVAR IA y apunta a `ia.anvartech.cl`.
 - **Los precios** — están en `index.html` (secciones Servicios y Planes) y los
   textos de recomendación en `app.js`.
@@ -156,7 +155,7 @@ python -c "import json;json.load(open('vercel.json',encoding='utf-8'));print('JS
   defínelo primero en el bloque claro o desaparece en un tema.
 - El conmutador Personas / Empresas funciona con las clases `only-per` y
   `only-emp`. Cualquier bloque nuevo que dependa del público usa una de las dos.
-- La calculadora asume 44 semanas hábiles y un piloto de UF 28. Están arriba de
+- La calculadora asume 44 semanas hábiles y un piloto de UF 40, con el diagnóstico incluido. Están arriba de
   `app.js` en las constantes `SEMANAS`, `UF` y `PILOTO`.
 - `artifact-anvar-ia.html` se regenera juntando los tres archivos de `/public`;
   si editas el sitio, ese archivo queda desactualizado hasta que lo rehagas.

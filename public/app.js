@@ -12,7 +12,7 @@
   var CLP = new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 });
   var UF = 40000;              // valor de referencia de la UF
   var SEMANAS = 44;            // semanas hábiles al año
-  var PILOTO = 28 * UF;        // piloto base: UF 28
+  var PILOTO = 40 * UF;        // piloto completo: UF 40, incluye el diagnóstico
 
   function $(s, c) { return (c || document).querySelector(s); }
   function $$(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
@@ -316,7 +316,7 @@
     var idx = Math.round((ej.potencial + ej.base + ej.traccion) / 3);
     var esEmp = seg === 'empresas';
     var rec = (ej.potencial >= 60 && ej.base >= 50 && ej.traccion >= 50)
-      ? (esEmp ? { n: 'Piloto en producción', d: 'Un proceso andando en 3 a 4 semanas, medido antes y después.', p: 'desde UF 28' }
+      ? (esEmp ? { n: 'Piloto en producción', d: 'Un proceso andando en 3 a 4 semanas, medido antes y después.', p: 'desde UF 40' }
                : { n: 'Plan Piloto Personal', d: 'Cuatro semanas para cambiar de verdad cómo trabajas.', p: '$229.000' })
       : (ej.potencial < 40)
         ? (esEmp ? { n: 'Capacitación in-company', d: 'Taller de 4 horas donde cada persona sale con una tarea suya resuelta.', p: 'UF 14' }
