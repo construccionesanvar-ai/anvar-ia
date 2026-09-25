@@ -91,7 +91,7 @@ function tarjeta(ref) {
     const r = recurso(ref);
     href = r.ruta; etiqueta = TIPOS[r.tipo]; titulo = r.tituloCorto; texto = r.descripcion;
   }
-  return `<li><a href="${esc(href)}" data-track="content_cta_click" data-track-label="relacionado-${esc(href.replace(/^\//, '').replace(/\//g, '-') || 'inicio')}"><span class="rel-tipo">${esc(etiqueta)}</span><span class="rel-tit">${esc(titulo)}</span><span class="rel-txt">${esc(texto)}</span><span class="rel-ir" aria-hidden="true">${icono('flecha')}</span></a></li>`;
+  return `<li><a href="${esc(href)}" data-track="content_cta_click" data-track-label="relacionado-${esc(href.replace(/^\//, '').replace(/\//g, '-') || 'inicio')}"><span class="rel-tipo">${esc(etiqueta)}</span> <span class="rel-tit">${esc(titulo)}</span> <span class="rel-txt">${esc(texto)}</span> <span class="rel-ir" aria-hidden="true">${icono('flecha')}</span></a></li>`;
 }
 
 /**

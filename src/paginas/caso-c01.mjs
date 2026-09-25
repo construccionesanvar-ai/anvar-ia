@@ -83,7 +83,7 @@ const SECCIONES = [
     </table>
     </div>` },
   { id: 'resultado', titulo: 'Resultado', html: `
-    <p class="caso-resultado caso-resultado--grande"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span><span>${esc(c.resultado.texto)}: de 45 a 4 minutos</span></p>
+    <p class="caso-resultado caso-resultado--grande"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span> <span>${esc(c.resultado.texto)}: de 45 a 4 minutos</span></p>
     <p>Se midió el tiempo total por procedimiento, antes y después de usar la herramienta. Son ${ahorroMin} minutos menos en cada procedimiento, y la herramienta se usa en la operación diaria.</p>` },
   { id: 'limitaciones', titulo: 'Limitaciones', html: `
     <ul>

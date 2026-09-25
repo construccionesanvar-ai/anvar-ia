@@ -6,7 +6,8 @@ import assert from 'node:assert/strict';
 import { SITIO, CALCULADORA } from '../src/config.mjs';
 import { SERVICIOS } from '../src/datos/oferta.mjs';
 import { testimonios, detalleCaso, precio } from '../src/componentes/secciones.mjs';
-import { calcular, textoRetorno } from '../src/componentes/herramientas.mjs';
+import { calculadora, calcularRoi, opcionesInversion, herramientas } from '../src/componentes/herramientas.mjs';
+import { pesos } from '../src/calculo.mjs';
 import { evaluar, documento } from '../src/componentes/base.mjs';
 import { paginaIndustria } from '../src/paginas/industria.mjs';
 import { CASOS } from '../src/datos/casos.mjs';
@@ -32,29 +33,34 @@ test('testimonios: uno público muestra nombre, empresa y caso relacionado', () 
   assert.match(html, /\/casos#documentos-legales/);
 });
 
-test('calculadora: ejemplo por defecto', () => {
-  const r = calcular(CALCULADORA.defecto);
-  assert.equal(r.horasAno, 5 * 6 * CALCULADORA.semanas);
-  assert.equal(r.recuperadas, Math.round(r.horasAno * 0.6));
-  assert.equal(r.valor, r.recuperadas * 9000);
-  assert.equal(r.referencia.nombre, 'un piloto');
-  assert.match(textoRetorno(r), /^Como referencia, con este valor un piloto \(desde UF 40 \+ IVA\) se pagaría en \d/);
+test('calculadora: el HTML inicial muestra el ejemplo calculado con la fuente única', () => {
+  const r = calcularRoi(CALCULADORA.defecto);
+  const html = calculadora({ compartir: true, formulas: '#como-se-calcula' });
+  assert.ok(html.includes(`id="c-valor">${pesos(r.ahorroBruto)}<`), 'valor inicial');
+  assert.match(html, /id="c-payback">2,8 meses</);
+  assert.match(html, /id="c-roi1">335%</);
+  assert.match(html, /name="c-inv" value="piloto" checked/);
+  assert.match(html, /UF de referencia \(\$41\.000 al 24\/09\/2026\)/, 'la UF de referencia va con su fecha');
+  assert.match(html, /href="#como-se-calcula">Cómo calculamos esto/);
+  assert.match(html, /Estimación referencial basada en los valores ingresados/);
+  assert.doesNotMatch(html, /Infinity|NaN|vas a ahorrar/);
 });
 
-test('calculadora: valores extremos y umbral Express/piloto', () => {
-  const min = calcular({ personas: 1, horas: 1, costo: 3000, auto: 20 });
-  assert.equal(min.referencia.nombre, 'una Automatización Express');
-  assert.match(textoRetorno(min), /no se justifica/);
-  const max = calcular({ personas: 50, horas: 25, costo: 40000, auto: 90 });
-  assert.ok(Number.isFinite(max.valor) && max.valor > 0);
-  assert.match(textoRetorno(max), /menos de un mes/);
-  const cero = { horasAno: 0, recuperadas: 0, restantes: 0, valor: 0, referencia: { nombre: 'x', precio: 1, etiqueta: 'x' }, meses: Infinity };
-  assert.match(textoRetorno(cero), /no se justifica/);
-  // El texto de la Express dice "desde": su precio es el piso, no el de cualquier automatización.
-  const bajo = calcular({ personas: 2, horas: 3, costo: 8000, auto: 50 });
-  assert.equal(bajo.referencia.nombre, 'una Automatización Express');
-  assert.match(textoRetorno(bajo), /desde \$199\.900 \+ IVA/);
-  assert.ok(bajo.valor < CALCULADORA.umbralExpress);
+test('calculadora: las opciones de inversión salen de la fuente única de precios', () => {
+  const o = opcionesInversion(40000);
+  assert.equal(o.express.monto, SERVICIOS.express.precio.valor);
+  assert.equal(o.piloto.monto, SERVICIOS.piloto.precio.valor * 40000);
+  assert.equal(calcularRoi({ ...CALCULADORA.defecto, inversion: 'otro', monto: 500000 }).inversion, 500000);
+  assert.equal(calcularRoi({ ...CALCULADORA.defecto, inversion: 'express' }).inversion, SERVICIOS.express.precio.valor);
+});
+
+test('portada: herramientas como tarjetas con enlace a su página, sin la experiencia completa', () => {
+  const html = herramientas();
+  assert.match(html, /href="\/calculadora-roi-automatizacion" data-track="home_roi_tool_click"/);
+  assert.match(html, /href="\/diagnostico-automatizacion" data-track="home_diagnostic_tool_click"/);
+  assert.doesNotMatch(html, /id="c-personas"|id="diag-cuerpo"/);
+  assert.match(html, /id="calculadora"/, 'se mantiene el ancla para enlaces antiguos');
+  assert.match(html, /id="autodiagnostico"/);
 });
 
 test('evaluar: sin agenda configurada no promete "Agendar"', () => {
@@ -104,4 +110,17 @@ test('industria: la plantilla falla si falta contenido y funciona si está compl
   assert.match(html, /H1 retail/);
   assert.match(html, /C-01/);
   assert.ok(SERVICIOS.express);
+});
+
+test('casos con video: miniatura → reproducir, con WebM, MP4, subtítulos y poster diferido', () => {
+  const c = { ...CASOS[0], media: { principal: { tipo: 'video', src: '/casos/x.mp4', webm: '/casos/x.webm', subtitulos: '/casos/x.vtt', poster: '/casos/x.webp', alt: 'Demo', ancho: 1280, alto: 720, duracion: '0:24' } } };
+  fijarPagina({ ruta: '/casos', fuente: 'case-study' });
+  const html = detalleCaso(/** @type {any} */ (c));
+  assert.match(html, /<a class="video-miniatura" href="\/casos\/x\.mp4" data-video=/, 'sin JavaScript abre el MP4');
+  assert.match(html, /<img src="\/casos\/x\.webp" alt="Demo" width="1280" height="720" loading="lazy"/);
+  assert.doesNotMatch(html, /<video/, 'no se crea el reproductor hasta el clic');
+  const datos = JSON.parse(html.match(/data-video="([^"]+)"/)[1].replace(/&quot;/g, '"'));
+  assert.deepEqual(datos.fuentes.map((f) => f.tipo), ['video/webm', 'video/mp4']);
+  assert.equal(datos.subtitulos, '/casos/x.vtt');
+  assert.match(html, /Ver video <span class="medio-dur">\(0:24\)<\/span>/);
 });

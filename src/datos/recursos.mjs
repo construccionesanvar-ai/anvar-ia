@@ -13,7 +13,7 @@ import { SITIO } from '../config.mjs';
 export const AUTOR = {
   nombre: SITIO.fundador.nombre,
   cargo: SITIO.fundador.cargo,
-  url: '/#nosotros',
+  url: '/equipo/andres-vargas',
   bio: 'Viene de operaciones de retail y prevención de pérdidas. Construyó el sistema documental del caso C-01, que se usa en operación diaria, y lidera cada proyecto de ANVAR TECH.',
 };
 

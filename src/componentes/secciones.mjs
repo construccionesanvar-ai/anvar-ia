@@ -29,7 +29,7 @@ function detallePrecio(s, t) {
 export function precio(id, clase = 'precio') {
   const s = SERVICIOS[id];
   const t = precioTexto(s.precio);
-  return `<p class="${clase}"><span class="precio-v">${esc(t.principal)}</span>${detallePrecio(s, t)}${s.precio.nota ? `<span class="precio-n">${esc(s.precio.nota)}</span>` : ''}</p>`;
+  return `<p class="${clase}"><span class="precio-v">${esc(t.principal)}</span> ${detallePrecio(s, t)}${s.precio.nota ? ` <span class="precio-n">${esc(s.precio.nota)}</span>` : ''}</p>`;
 }
 
 /** Precio en una línea, para fichas: "UF 12 ≈ $492.000 + IVA". Devuelve HTML. */
@@ -54,9 +54,9 @@ export function tarjetaPrueba(c) {
     <p class="prueba-cat">${esc(c.categoria)}</p>
     <p class="prueba-tit">${esc(c.titulo)}</p>
     <div class="antes-despues" role="group" aria-label="${esc(ad.texto)}">
-      <div><span class="ad-l">Antes</span><span class="ad-v">${esc(ad.antes)}</span></div>
+      <div><span class="ad-l">Antes</span> <span class="ad-v">${esc(ad.antes)}</span></div>
       <span class="ad-flecha" aria-hidden="true">→</span>
-      <div><span class="ad-l">Después</span><span class="ad-v ad-v--ok">${esc(ad.despues)}</span></div>
+      <div><span class="ad-l">Después</span> <span class="ad-v ad-v--ok">${esc(ad.despues)}</span></div>
     </div>
     <div class="barra" aria-hidden="true"><i class="barra-${esc(ad.pct)}"></i></div>
     <p class="prueba-res"><b>${esc(c.resultado.valor)}</b> ${esc(c.resultado.texto)}</p>
@@ -75,7 +75,7 @@ export function heroInicio() {
   return `<section class="hero" aria-labelledby="hero-tit">
   <div class="contenedor hero-grid">
     <div class="hero-txt">
-      <p class="sobretitulo">${esc(SITIO.empresa.nombre)} · Automatización e inteligencia operacional · Chile</p>
+      <p class="sobretitulo">${esc(SITIO.marca)} · Automatización e inteligencia operacional · Chile</p>
       <h1 id="hero-tit">Automatizamos el trabajo repetitivo de tu empresa.</h1>
       <p class="lead">Conectamos IA, software y las herramientas que ya usas —Excel, Word, PDF, correo, WhatsApp— para que tu equipo deje de copiar, pegar y digitar.</p>
       <p class="hero-metodo">Partimos por un proceso. Lo medimos antes y después. <b>Si no genera valor, no escalamos.</b></p>
@@ -103,7 +103,7 @@ export function tiraMetricas() {
       ${METRICAS.map((m) => {
         const c = caso(m.caso);
         const v = c.metricas[m.metrica].valor;
-        return `<li><a href="${esc(urlCaso(c))}" data-track="case_cta_click" data-track-label="metrica-${esc(c.id)}"><span class="metrica-v">${esc(v)}</span><span class="metrica-t">${esc(m.texto)}</span><span class="metrica-f">${esc(c.codigo)} · ${esc(ETIQUETAS[c.etiqueta])}</span></a></li>`;
+        return `<li><a href="${esc(urlCaso(c))}" data-track="case_cta_click" data-track-label="metrica-${esc(c.id)}"><span class="metrica-v">${esc(v)}</span> <span class="metrica-t">${esc(m.texto)}</span> <span class="metrica-f">${esc(c.codigo)} · ${esc(ETIQUETAS[c.etiqueta])}</span></a></li>`;
       }).join('')}
     </ul>
     <p class="metricas-nota">Resultados de proyectos propios y de un cliente confidencial, con la etiqueta de cada uno. Así medimos también cada proyecto nuevo.</p>
@@ -144,15 +144,21 @@ export function problemas() {
 function medio(m, { lazy = true } = {}) {
   const leyenda = m.leyenda ? `<figcaption>${esc(m.leyenda)}${m.duracion ? ` <span class="medio-dur">${esc(m.duracion)}</span>` : ''}</figcaption>` : '';
   if (m.tipo === 'video') {
-    // Sin sonido, en bucle y con controles: se puede pausar. preload="none" no carga nada hasta que se pide.
-    return `<figure class="medio medio--video"><video controls muted loop playsinline preload="none"${attrs({ poster: m.poster, width: m.ancho, height: m.alto, 'aria-label': m.alt })}><source src="${esc(m.src)}" type="video/mp4"></video>${leyenda}</figure>`;
+    // Miniatura → reproducir: la página carga solo el poster (diferido). El
+    // video se crea al hacer clic (herramienta en app.js), con WebM si existe,
+    // MP4 y subtítulos. Sin JavaScript, el enlace abre el MP4 directamente.
+    const fuentes = [m.webm ? { src: m.webm, tipo: 'video/webm' } : null, { src: m.src, tipo: 'video/mp4' }].filter(Boolean);
+    const datos = JSON.stringify({ fuentes, subtitulos: m.subtitulos ?? null, ancho: m.ancho, alto: m.alto, alt: m.alt });
+    return `<figure class="medio medio--video"><a class="video-miniatura" href="${esc(m.src)}"${attrs({ 'data-video': datos })}>` +
+      `<img${attrs({ src: m.poster, alt: m.alt, width: m.ancho, height: m.alto, loading: lazy ? 'lazy' : null, decoding: 'async' })}>` +
+      ` <span class="video-play">${icono('play')}<span>Ver video${m.duracion ? ` <span class="medio-dur">(${esc(m.duracion)})</span>` : ''}</span></span></a>${leyenda}</figure>`;
   }
   return `<figure class="medio medio--${esc(m.tipo)}"><img${attrs({ src: m.src, alt: m.alt, width: m.ancho, height: m.alto, loading: lazy ? 'lazy' : null, decoding: 'async' })}>${leyenda}</figure>`;
 }
 
 /** Diagrama del flujo del caso, en HTML: sirve de evidencia visual cuando aún no hay video. */
 export function flujoCaso(c, clase = '') {
-  return `<ol class="flujo-caso${clase ? ' ' + clase : ''}" aria-label="Cómo funciona el caso ${esc(c.codigo)}">${c.flujo.map(([t, d]) => `<li><span class="flujo-caso-t">${esc(t)}</span><span class="flujo-caso-d">${esc(d)}</span></li>`).join('')}</ol>`;
+  return `<ol class="flujo-caso${clase ? ' ' + clase : ''}" aria-label="Cómo funciona el caso ${esc(c.codigo)}">${c.flujo.map(([t, d]) => `<li><span class="flujo-caso-t">${esc(t)}</span> <span class="flujo-caso-d">${esc(d)}</span></li>`).join('')}</ol>`;
 }
 
 /** Evidencia visual completa del caso (para /casos): principal, galería y demostración. */
@@ -184,7 +190,7 @@ export function tarjetaCaso(c) {
     <div class="ad-bloque"><span class="label">Antes</span><p>${esc(c.antes)}</p></div>
     <div class="ad-bloque ad-bloque--despues"><span class="label">Después</span><p>${esc(c.despues)}</p></div>
   </div>
-  <p class="caso-resultado"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span><span>${esc(c.resultado.texto)}</span></p>
+  <p class="caso-resultado"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span> <span>${esc(c.resultado.texto)}</span></p>
   <a class="enlace-flecha" href="${esc(c.paginaCaso ?? urlCaso(c))}" data-track="case_cta_click" data-track-label="${esc(c.id)}"><span>Ver caso completo<span class="sr"> ${esc(c.codigo)}</span></span>${icono('flecha')}</a>
 </article>`;
 }
@@ -205,7 +211,7 @@ export function casosInicio() {
 /** Ficha completa de un caso, para /casos. */
 export function detalleCaso(c) {
   const metricas = c.metricas.length
-    ? `<ul class="metricas-caso">${c.metricas.map((m) => `<li><span class="metrica-v">${esc(m.valor)}</span><span class="metrica-t">${esc(m.texto)}</span>${m.nota ? `<span class="metrica-nota">${esc(m.nota)}</span>` : ''}</li>`).join('')}</ul>`
+    ? `<ul class="metricas-caso">${c.metricas.map((m) => `<li><span class="metrica-v">${esc(m.valor)}</span> <span class="metrica-t">${esc(m.texto)}</span>${m.nota ? `<span class="metrica-nota">${esc(m.nota)}</span>` : ''}</li>`).join('')}</ul>`
     : '';
   const s = SERVICIOS[c.servicio];
   const wspCaso = urlWsp(conRef(mensajeCaso(c.codigo), PAGINA.fuente));
@@ -222,7 +228,7 @@ export function detalleCaso(c) {
     <div class="detalle-bloque"><h3 class="label">Antes</h3><p>${esc(c.antes)}</p></div>
     <div class="detalle-bloque detalle-bloque--despues"><h3 class="label">Después</h3><p>${esc(c.despues)}</p></div>
   </div>
-  <p class="caso-resultado caso-resultado--grande"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span><span>${esc(c.resultado.texto)}</span></p>
+  <p class="caso-resultado caso-resultado--grande"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span> <span>${esc(c.resultado.texto)}</span></p>
   ${metricas}
   <div class="detalle-grid detalle-grid--2">
     <div class="detalle-bloque"><h3 class="label">Qué se construyó</h3><ul class="lista">${c.construido.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -233,7 +239,7 @@ export function detalleCaso(c) {
   ${c.guia ? `<p class="detalle-mas"><a class="enlace-flecha" href="${esc(c.guia.url)}" data-track="content_cta_click" data-track-label="guia-${esc(c.id)}"><span>${esc(c.guia.texto)}</span>${icono('flecha')}</a></p>` : ''}
   <div class="detalle-pie">
     <p>¿Un proceso parecido en tu empresa? Lo más cercano es <a href="${esc(s.url)}" data-track="service_click" data-track-label="caso-${esc(s.id)}">${esc(s.nombre)}</a>.</p>
-    <a class="btn btn--secundario" href="${esc(wspCaso)}" data-wsp="caso" data-track="case_cta_click" data-track-label="wsp-${esc(c.id)}" target="_blank" rel="noopener">${icono('whatsapp')}<span>Tengo un proceso parecido</span><span class="sr"> al caso ${esc(c.codigo)}</span></a>
+    <a class="btn btn--secundario" href="${esc(wspCaso)}" data-wsp="caso" data-track-label="wsp-${esc(c.id)}" target="_blank" rel="noopener">${icono('whatsapp')}<span>Tengo un proceso parecido</span> <span class="sr"> al caso ${esc(c.codigo)}</span></a>
   </div>
 </article>`;
 }
@@ -249,8 +255,8 @@ export function testimonios({ caso: idCaso = null, titulo = 'Lo que dicen quiene
   if (!lista.length) return '';
   const tarjeta = (t) => {
     const quien = t.confidencial
-      ? `<span class="testimonio-nombre">${esc(t.cargo)}</span><span class="testimonio-org">Cliente confidencial · ${esc(t.industria)}</span>`
-      : `<span class="testimonio-nombre">${esc(t.nombre)}</span><span class="testimonio-org">${esc(t.cargo)} · ${esc(t.empresa)} · ${esc(t.industria)}</span>`;
+      ? `<span class="testimonio-nombre">${esc(t.cargo)}</span> <span class="testimonio-org">Cliente confidencial · ${esc(t.industria)}</span>`
+      : `<span class="testimonio-nombre">${esc(t.nombre)}</span> <span class="testimonio-org">${esc(t.cargo)} · ${esc(t.empresa)} · ${esc(t.industria)}</span>`;
     const foto = !t.confidencial && t.foto ? `<img class="testimonio-foto" src="${esc(t.foto)}" alt="" width="56" height="56" loading="lazy" decoding="async">` : '';
     const logo = !t.confidencial && t.logo ? `<img class="testimonio-logo" src="${esc(t.logo)}" alt="${esc(t.empresa)}" height="28" loading="lazy" decoding="async">` : '';
     const c = t.caso ? caso(t.caso) : null;
@@ -365,7 +371,7 @@ export function flujoDatos() {
     ['Decisiones', 'Qué pedir, qué ajustar, qué revisar'],
   ];
   return `<ol class="flujo" aria-label="Del dato a la decisión">
-  ${pasos.map(([t, d], i) => `<li class="flujo-paso${i === pasos.length - 1 ? ' flujo-paso--fin' : ''}"><span class="flujo-t">${esc(t)}</span><span class="flujo-d">${esc(d)}</span></li>`).join('')}
+  ${pasos.map(([t, d], i) => `<li class="flujo-paso${i === pasos.length - 1 ? ' flujo-paso--fin' : ''}"><span class="flujo-t">${esc(t)}</span> <span class="flujo-d">${esc(d)}</span></li>`).join('')}
 </ol>`;
 }
 
@@ -429,9 +435,9 @@ export function nosotros() {
     <div class="nosotros">
       <div class="ficha">
         ${retrato()}
-        <div class="ficha-nombre"><b>${esc(f.nombre)}</b><span>${esc(f.cargo)}</span></div>
+        <div class="ficha-nombre"><b>${esc(f.nombre)}</b> <span>${esc(f.cargo)}</span></div>
         <dl class="ficha-datos">
-          <div><dt>Empresa</dt><dd>${esc(e.nombre)} · RUT ${esc(e.rut)}</dd></div>
+          <div><dt>Empresa</dt><dd>${esc(SITIO.marca)}, marca de ${esc(e.razonSocial)} · RUT ${esc(e.rut)}</dd></div>
           <div><dt>Formación</dt><dd>${esc(f.formacion)}</dd></div>
           <div><dt>Experiencia</dt><dd>${esc(f.experiencia)}</dd></div>
           <div><dt>Atención</dt><dd>${esc(e.atencion)}</dd></div>
@@ -445,7 +451,7 @@ export function nosotros() {
         </ul>
         <p>ANVAR TECH nace de construir soluciones para problemas propios: un sistema documental que hoy se usa en operación diaria, un negocio que cotiza y cobra en línea, planos de ingeniería iterados sobre el archivo real. Ese mismo criterio es el que aplicamos en tu empresa.</p>
         <blockquote class="cita"><p>Si no podemos mostrarte la hora que te ahorramos, el trabajo no está terminado.</p><footer>— ${esc(f.nombre)}</footer></blockquote>
-        <p class="nota">Cada proyecto lo lidera directamente el fundador. Por eso trabajamos con pocos proyectos en paralelo y te damos la fecha real de inicio antes de cotizar.</p>
+        <p class="nota">Cada proyecto lo lidera directamente el fundador. Por eso trabajamos con pocos proyectos en paralelo y te damos la fecha real de inicio antes de cotizar. <a href="${esc(f.perfil)}">Perfil de ${esc(f.nombre)}</a>.</p>
       </div>
     </div>
   </div>
@@ -585,7 +591,7 @@ export function otrosServicios(actual) {
     <ul class="otros">
       ${ids.map((id) => {
         const s = SERVICIOS[id];
-        return `<li><a href="${esc(s.url)}" data-track="service_click" data-track-label="otros-${esc(id)}"><span class="otros-t">${esc(s.nombre)}</span><span class="otros-d">${esc(s.resumen)}</span><span class="otros-p">${esc(precioCorto(id))}</span></a></li>`;
+        return `<li><a href="${esc(s.url)}" data-track="service_click" data-track-label="otros-${esc(id)}"><span class="otros-t">${esc(s.nombre)}</span> <span class="otros-d">${esc(s.resumen)}</span> <span class="otros-p">${esc(precioCorto(id))}</span></a></li>`;
       }).join('')}
     </ul>
   </div>

@@ -4,7 +4,9 @@
 //
 // Qué hace:
 //  1. Valida que existan los archivos de casos y testimonios (si falta uno, falla).
-//  2. Calcula un hash de styles.css y app.js y lo pone en las URLs (?v=hash),
+//  2. Genera public/calculo.js desde src/calculo.mjs (fórmulas de las
+//     herramientas: una sola fuente para el servidor, el navegador y las pruebas).
+//  3. Calcula un hash de styles.css y de cada JS y lo pone en las URLs (?v=hash),
 //     así cada cambio llega a los navegadores sin tocar la caché a mano.
 //  3. Renderiza cada página de src/paginas a public/*.html.
 //  4. Escribe sitemap.xml (conserva la fecha de las páginas que no cambiaron)
@@ -27,7 +29,7 @@ import { RECURSOS, AUTOR } from '../src/datos/recursos.mjs';
 import { SOLUCIONES } from '../src/datos/soluciones.mjs';
 import { fijarPagina } from '../src/contexto.mjs';
 import { documento } from '../src/componentes/base.mjs';
-import { referenciasCalculadora } from '../src/componentes/herramientas.mjs';
+import { opcionesInversion } from '../src/componentes/herramientas.mjs';
 import { organizacion } from '../src/paginas/ld.mjs';
 
 import inicio from '../src/paginas/inicio.mjs';
@@ -38,6 +40,7 @@ import diagnostico from '../src/paginas/diagnostico.mjs';
 import automatizacion from '../src/paginas/automatizacion.mjs';
 import capacitacion from '../src/paginas/capacitacion.mjs';
 import personal from '../src/paginas/personal.mjs';
+import equipoAndres from '../src/paginas/equipo-andres.mjs';
 import calculadora from '../src/paginas/calculadora.mjs';
 import autodiagnostico from '../src/paginas/autodiagnostico.mjs';
 import puntoPedido from '../src/paginas/punto-pedido.mjs';
@@ -74,7 +77,7 @@ export const PAGINAS = [
   pymes, documental, excel, cotizaciones, autocad,
   // Contenido: caso largo, índice y guías
   casoC01, recursosIndice, plantillaRoi, cuantoCuesta, comoDetectar, noAutomatizar, iaVsTradicional,
-  personal, privacidad,
+  personal, equipoAndres, privacidad,
   ...publicadas().map(paginaIndustria),
   noEncontrada,
 ];
@@ -101,6 +104,9 @@ export function archivosDeclarados() {
       if (!x) continue;
       lista.push({ archivo: x.src, donde: `caso ${c.codigo}` });
       if (x.poster) lista.push({ archivo: x.poster, donde: `caso ${c.codigo} (poster)` });
+      if (x.webm) lista.push({ archivo: x.webm, donde: `caso ${c.codigo} (WebM)` });
+      if (x.subtitulos) lista.push({ archivo: x.subtitulos, donde: `caso ${c.codigo} (subtítulos)` });
+      if (x.tipo === 'video' && !x.poster) lista.push({ archivo: '(falta poster)', donde: `caso ${c.codigo}: un video necesita poster` });
     }
   }
   for (const t of TESTIMONIOS) {
@@ -117,28 +123,54 @@ function validarArchivos() {
   }
 }
 
-/** Lo que el JavaScript del navegador necesita saber. Sin secretos. */
-function configCliente() {
+/**
+ * Lo que el JavaScript del navegador necesita saber. Sin secretos. Los datos
+ * de cada herramienta van solo en las páginas que la tienen.
+ * @param {{ diagnostico: boolean, calculadora: boolean }} h
+ */
+function configCliente(h) {
   const serv = (id) => ({ id, nombre: SERVICIOS[id].nombre, precio: precioTexto(SERVICIOS[id].precio).principal, url: SERVICIOS[id].url });
-  const refs = referenciasCalculadora();
-  return {
-    wsp: SITIO.contacto.whatsapp,
-    mensajes: MENSAJES,
-    agenda: SITIO.agenda.url,
-    uf: SITIO.uf,
-    calc: {
-      semanas: CALCULADORA.semanas,
-      umbral: CALCULADORA.umbralExpress,
-      mesesMax: CALCULADORA.mesesMaximos,
-      express: refs.express,
-      piloto: { nombre: refs.piloto.nombre, etiqueta: refs.piloto.etiqueta, uf: SERVICIOS.piloto.precio.valor },
-    },
-    diagnostico: {
+  /** @type {Record<string, unknown>} */
+  const c = { wsp: SITIO.contacto.whatsapp, mensajes: MENSAJES, agenda: SITIO.agenda.url };
+  if (h.calculadora) {
+    const ops = opcionesInversion();
+    const op = (o) => ({ moneda: o.moneda, valor: o.valor, etiqueta: o.etiqueta });
+    c.calc = { semanas: CALCULADORA.semanas, mesesMax: CALCULADORA.mesesMaximos, ufRef: { valor: SITIO.uf.valor, fecha: SITIO.uf.fecha }, opciones: { express: op(ops.express), piloto: op(ops.piloto) } };
+  }
+  if (h.diagnostico) {
+    c.diagnostico = {
       categorias: DIAGNOSTICO.categorias,
       preguntas: DIAGNOSTICO.preguntas,
       servicios: Object.fromEntries(['express', 'diagnostico', 'piloto', 'capacitacion', 'intelligence'].map((id) => [id, serv(id)])),
-    },
-  };
+    };
+  }
+  return c;
+}
+
+/** Herramientas presentes en el cuerpo de una página (deciden qué JS y qué datos llevan). */
+export function herramientasEn(cuerpo) {
+  const diagnostico = cuerpo.includes('id="diag-cuerpo"');
+  const calculadora = cuerpo.includes('id="c-personas"');
+  const puntoPedido = cuerpo.includes('id="pp-form"');
+  return { diagnostico, calculadora, puntoPedido, alguna: diagnostico || calculadora || puntoPedido, calculo: calculadora || puntoPedido };
+}
+
+/**
+ * src/calculo.mjs → public/calculo.js: el mismo código, como script clásico
+ * que expone window.ANVAR_CALCULO. Falla si el módulo empieza a importar algo.
+ */
+function generarCalculo() {
+  const fuente = readFileSync(join(RAIZ, 'src', 'calculo.mjs'), 'utf8');
+  if (/^\s*import\s/m.test(fuente)) throw new Error('src/calculo.mjs no puede importar nada: se copia tal cual al navegador.');
+  const nombres = [...fuente.matchAll(/^export (?:const|function) ([A-Za-z_]\w*)/gm)].map((m) => m[1]);
+  const cuerpo = fuente.replace(/^\/\/ @ts-check\n/, '').replace(/^export (const|function) /gm, '$1 ');
+  return `/* GENERADO por scripts/build.mjs desde src/calculo.mjs. No editar: edita src/calculo.mjs. */
+window.ANVAR_CALCULO = (function () {
+  'use strict';
+${cuerpo.trim().split('\n').map((l) => (l ? '  ' + l : l)).join('\n')}
+  return { ${nombres.join(', ')} };
+})();
+`;
 }
 
 /** RSS 2.0 con las guías y casos largos (lo que tiene sentido seguir). */
@@ -177,7 +209,7 @@ function llms() {
   const enlace = (nombre, ruta, texto) => `- [${nombre}](${absoluta(ruta)}): ${texto}`;
   return `# ${SITIO.marca} · ${SITIO.linea}
 
-> Empresa chilena (${SITIO.empresa.nombre}, RUT ${SITIO.empresa.rut}) que automatiza procesos de empresas con software, datos e IA aplicada a operaciones. Trabaja sobre las herramientas que el cliente ya usa (Excel, Word, PDF, correo, WhatsApp, ERP, AutoCAD) y mide cada proceso antes y después. Atención presencial en la Región Metropolitana y remota en todo Chile. Contacto: ${SITIO.contacto.email}, WhatsApp +${SITIO.contacto.whatsapp}.
+> ${SITIO.marca} (marca de ${SITIO.empresa.razonSocial}, RUT ${SITIO.empresa.rut}) automatiza procesos de empresas con software, datos e IA aplicada a operaciones. Trabaja sobre las herramientas que el cliente ya usa (Excel, Word, PDF, correo, WhatsApp, ERP, AutoCAD) y mide cada proceso antes y después. Atención presencial en la Región Metropolitana y remota en todo Chile. Contacto: ${SITIO.contacto.email}, WhatsApp +${SITIO.contacto.whatsapp}.
 
 Los casos publicados llevan una etiqueta que dice si son proyecto propio, cliente, cliente confidencial o demostración. Las cifras tienen su alcance declarado. Precios netos, para empresas.
 
@@ -212,8 +244,9 @@ function sitemapAnterior() {
 
 export function construir({ silencioso = false } = {}) {
   validarArchivos();
-  const hashes = { css: hash('styles.css'), js: hash('app.js') };
-  const cliente = configCliente();
+  const calculo = generarCalculo();
+  if (!existsSync(join(PUBLIC, 'calculo.js')) || readFileSync(join(PUBLIC, 'calculo.js'), 'utf8') !== calculo) writeFileSync(join(PUBLIC, 'calculo.js'), calculo, 'utf8');
+  const hashes = { css: hash('styles.css'), js: hash('app.js'), herramientas: hash('herramientas.js'), calculo: hash('calculo.js') };
   const hoy = new Date().toISOString().slice(0, 10);
   const anteriores = sitemapAnterior();
   /** @type {{ loc: string, lastmod: string, prioridad: string }[]} */
@@ -222,12 +255,15 @@ export function construir({ silencioso = false } = {}) {
 
   for (const p of PAGINAS) {
     fijarPagina({ ruta: p.ruta, fuente: p.fuente });
+    const cuerpo = p.cuerpo();
+    const herr = herramientasEn(cuerpo);
     const html = documento({
       ruta: p.ruta,
       titulo: p.titulo,
       ogTitulo: p.ogTitulo,
       descripcion: p.descripcion,
-      cuerpo: p.cuerpo(),
+      cuerpo,
+      herramientas: herr,
       jsonld: p.noindex ? [] : [organizacion(), ...(p.jsonld ?? [])],
       noindex: p.noindex,
       contextoWsp: p.contextoWsp,
@@ -235,7 +271,7 @@ export function construir({ silencioso = false } = {}) {
       ogImagen: imagenOg(p),
       articulo: p.articulo,
       hashes,
-      cliente,
+      cliente: configCliente(herr),
     });
     const destino = join(PUBLIC, p.archivo);
     mkdirSync(dirname(destino), { recursive: true });
@@ -272,7 +308,7 @@ ${urls.map((u) => `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${u.lastmod}</
     const ruta = join(PUBLIC, f);
     if (existsSync(ruta)) { unlinkSync(ruta); if (!silencioso) console.log(`  ${f.padEnd(34)} eliminado (ya no se usa)`); }
   }
-  if (!silencioso) console.log(`\n  ${urls.length} páginas en sitemap.xml · css ${hashes.css} · js ${hashes.js}`);
+  if (!silencioso) console.log(`\n  ${urls.length} páginas en sitemap.xml · css ${hashes.css} · js ${hashes.js} · herramientas ${hashes.herramientas} · calculo ${hashes.calculo}`);
   return { urls, hashes };
 }
 

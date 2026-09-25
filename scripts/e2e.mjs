@@ -4,7 +4,7 @@
 // Requiere Playwright instalado (npm i -D playwright && npx playwright install chromium).
 // Revisa los flujos críticos, que ninguna página se desborde de 320 a 1440 px,
 // y que no haya errores en la consola. Deja capturas en .e2e/ para revisar a ojo.
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -12,9 +12,11 @@ import { execSync } from 'node:child_process';
 
 import { iniciar } from './servidor.mjs';
 import { PAGINAS } from './build.mjs';
-import { calcular, puntoPedido, PP_DEFECTO } from '../src/componentes/herramientas.mjs';
+import { calcularRoi, puntoPedido, PP_DEFECTO } from '../src/componentes/herramientas.mjs';
+import { roi, pesos as pesosK, textoPayback, porcentaje } from '../src/calculo.mjs';
 import { SOLUCIONES } from '../src/datos/soluciones.mjs';
 import { SITIO, CALCULADORA } from '../src/config.mjs';
+import { SERVICIOS } from '../src/datos/oferta.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CAPTURAS = join(RAIZ, '.e2e');
@@ -107,7 +109,7 @@ await prueba('Inicio → Automatización Express', async () => {
 
 await prueba('Autodiagnóstico → resultado → WhatsApp con el resultado y ref: diagnostic', async () => {
   const ctx = await contexto(390, 844);
-  const { p } = await pagina(ctx, '/');
+  const { p } = await pagina(ctx, '/diagnostico-automatizacion');
   for (let i = 0; i < 7; i++) await p.locator('#diag-cuerpo .opcion').nth(i === 0 ? 0 : 2).click();
   await p.locator('#diag-resultado').waitFor();
   const a = p.locator('#diag-resultado a', { hasText: 'Conversar este resultado por WhatsApp' });
@@ -128,9 +130,11 @@ await prueba('Autodiagnóstico → resultado → WhatsApp con el resultado y ref
   const ev = await eventos(p);
   exigir(ev.filter((x) => x === 'diagnostic_start').length === 1, 'diagnostic_start ≠ 1');
   exigir(ev.filter((x) => x === 'diagnostic_complete').length === 1, 'diagnostic_complete ≠ 1');
-  exigir(ev.includes('diagnostic_whatsapp_click') && ev.includes('whatsapp_lead'), 'no midió el clic a WhatsApp');
-  const lead = await evento(p, 'whatsapp_lead');
-  exigir(lead && lead.landing === '/' && lead.canal === 'directo', 'whatsapp_lead sin atribución: ' + JSON.stringify(lead));
+  exigir(ev.filter((x) => x === 'diagnostic_lead').length === 1, 'el clic a WhatsApp debe medirse UNA vez como diagnostic_lead: ' + ev.join(','));
+  exigir(!ev.includes('whatsapp_lead') && !ev.includes('diagnostic_whatsapp_click'), 'el clic generó eventos duplicados: ' + ev.join(','));
+  exigir(ev.includes('diagnostic_view'), 'sin diagnostic_view');
+  const lead = await evento(p, 'diagnostic_lead');
+  exigir(lead && lead.landing === '/diagnostico-automatizacion' && lead.canal === 'directo' && lead.via === 'whatsapp', 'diagnostic_lead sin atribución: ' + JSON.stringify(lead));
   // Volver y reiniciar no duplican eventos
   await p.locator('#diag-volver').click();
   await p.locator('#diag-cuerpo .opcion').nth(1).click();
@@ -139,9 +143,9 @@ await prueba('Autodiagnóstico → resultado → WhatsApp con el resultado y ref
   await ctx.close();
 });
 
-await prueba('Calculadora: mismo cálculo que el build, reinicio y valores extremos', async () => {
+await prueba('Calculadora de ROI: mismo cálculo que el módulo único, inversión editable y casos límite', async () => {
   const ctx = await contexto();
-  const { p } = await pagina(ctx, '/');
+  const { p } = await pagina(ctx, '/calculadora-roi-automatizacion');
   const fijar = async (v) => p.evaluate((v) => {
     for (const [id, val] of Object.entries(v)) {
       const el = /** @type {HTMLInputElement} */ (document.getElementById(id));
@@ -150,37 +154,81 @@ await prueba('Calculadora: mismo cálculo que el build, reinicio y valores extre
       el.dispatchEvent(new Event('change', { bubbles: true }));
     }
   }, v);
-  for (const caso of [{ personas: 12, horas: 9, costo: 11500, auto: 45 }, { personas: 1, horas: 1, costo: 3000, auto: 20 }, { personas: 50, horas: 25, costo: 40000, auto: 90 }]) {
+  const elegir = async (valor) => { await p.locator(`input[name="c-inv"][value="${valor}"]`).check(); };
+  const leer = async (id) => (await p.locator('#' + id).textContent()) || '';
+  // Con la UF de referencia (la API está caída en la prueba), el piloto usa ese valor.
+  const esperado = (e, inversion, mensual = 0) => roi({ personas: e.personas, horasSemana: e.horas, costoHora: e.costo, pctAutomatizable: e.auto, inversion, costoMensual: mensual, semanas: CALCULADORA.semanas });
+  for (const caso of [{ personas: 12, horas: 9, costo: 11500, auto: 45 }, { personas: 1, horas: 1, costo: 3000, auto: 5 }, { personas: 50, horas: 25, costo: 40000, auto: 100 }]) {
     await fijar({ 'c-personas': caso.personas, 'c-horas': caso.horas, 'c-costo': caso.costo, 'c-auto': caso.auto });
-    const esperado = '$' + new Intl.NumberFormat('es-CL').format(calcular(caso).valor);
-    const visto = await p.locator('#c-valor').textContent();
-    exigir(visto === esperado, `valor ${visto} ≠ ${esperado}`);
+    const r = esperado(caso, SERVICIOS.piloto.precio.valor * SITIO.uf.valor);
+    exigir(await leer('c-valor') === pesosK(r.ahorroBruto), `ahorro ${await leer('c-valor')} ≠ ${pesosK(r.ahorroBruto)}`);
+    exigir(await leer('c-payback') === textoPayback(r), `payback ${await leer('c-payback')} ≠ ${textoPayback(r)}`);
+    exigir(await leer('c-roi3') === porcentaje(r.roi3), 'ROI 3 años distinto');
   }
-  exigir((await p.locator('#c-estado').textContent()) === 'Tu estimación', 'no marcó la estimación como propia');
+  exigir(await leer('c-estado') === 'Tu estimación', 'no marcó la estimación como propia');
+  // Express, otro monto y costo mensual
+  const e = { personas: 5, horas: 6, costo: 9000, auto: 60 };
+  await fijar({ 'c-personas': 5, 'c-horas': 6, 'c-costo': 9000, 'c-auto': 60 });
+  await elegir('express');
+  exigir(await leer('c-inv') === pesosK(SERVICIOS.express.precio.valor), 'inversión Express');
+  await p.fill('#c-monto', '3000000');
+  exigir(await p.locator('input[name="c-inv"][value="otro"]').isChecked(), 'escribir un monto no eligió "Otro monto"');
+  await p.fill('#c-mensual', '150000');
+  await p.locator('#c-mensual').blur();
+  const r2 = esperado(e, 3000000, 150000);
+  exigir(await leer('c-neto1') === pesosK(r2.ahorroNetoAno1) && await leer('c-payback') === textoPayback(r2), `otro monto/mensual: ${await leer('c-neto1')} · ${await leer('c-payback')}`);
+  exigir(await p.locator('#c-mensual').inputValue() === '150.000', 'el monto no se formateó con miles');
+  // Casos límite: sin recuperación y sin inversión, sin Infinity ni NaN
+  await p.fill('#c-mensual', '900000'); await p.locator('#c-mensual').blur();
+  exigir(await leer('c-payback') === 'Sin recuperación', 'mantención alta: ' + await leer('c-payback'));
+  await p.fill('#c-mensual', '0'); await p.fill('#c-monto', ''); await p.locator('#c-monto').blur();
+  exigir(await leer('c-payback') === 'No aplica' && await leer('c-roi1') === 'No aplica', 'inversión 0: ' + await leer('c-payback'));
+  const todo = (await p.locator('.calc-resultado').textContent()) || '';
+  exigir(!/Infinity|NaN|−0\b|-0\b/.test(todo), 'aparece Infinity, NaN o -0: ' + todo.slice(0, 120));
+  // Reinicio
   await p.locator('#c-reiniciar').click();
-  exigir((await p.locator('#c-estado').textContent()) === 'Ejemplo ilustrativo', 'reinicio no volvió al ejemplo');
-  exigir((await p.locator('#c-valor').textContent()) === '$' + new Intl.NumberFormat('es-CL').format(calcular(CALCULADORA.defecto).valor), 'reinicio no restauró valores');
+  exigir(await leer('c-estado') === 'Ejemplo ilustrativo', 'reinicio no volvió al ejemplo');
+  exigir(await leer('c-valor') === pesosK(calcularRoi(CALCULADORA.defecto).ahorroBruto), 'reinicio no restauró valores');
+  exigir(await p.locator('input[name="c-inv"][value="piloto"]').isChecked(), 'reinicio no restauró la inversión');
   const ev = await eventos(p);
   exigir(ev.filter((x) => x === 'calculator_start').length === 1 && ev.filter((x) => x === 'calculator_complete').length === 1, 'eventos de calculadora duplicados o faltantes: ' + ev.join(','));
+  exigir(ev.includes('calculator_view'), 'sin calculator_view');
   exigir((await evento(p, 'calculator_complete'))?.herramienta === 'roi', 'calculator_complete sin herramienta');
   exigir(await p.locator('text=Estimación referencial basada en los valores ingresados').count() === 1, 'falta el aviso de estimación');
   await ctx.close();
 });
 
-await prueba('UF del día: /api/uf actualiza los pesos; si falla quedan los de referencia', async () => {
+await prueba('Portada: herramientas en tarjetas, sin la experiencia completa ni su JavaScript', async () => {
+  const ctx = await contexto();
+  const { p } = await pagina(ctx, '/');
+  exigir(await p.locator('#c-personas, #diag-cuerpo').count() === 0, 'la portada todavía trae una herramienta completa');
+  exigir(await p.locator('script[src^="/herramientas.js"], script[src^="/calculo.js"]').count() === 0, 'la portada carga JS de herramientas');
+  await p.evaluate(() => document.addEventListener('click', (e) => e.preventDefault()));
+  await p.locator('#herramientas a', { hasText: 'Calcular ROI' }).click();
+  await p.locator('#herramientas a', { hasText: 'Hacer diagnóstico' }).click();
+  const ev = await eventos(p);
+  exigir(ev.includes('home_roi_tool_click') && ev.includes('home_diagnostic_tool_click'), 'no midió las tarjetas: ' + ev.join(','));
+  exigir(await p.locator('#calculadora, #autodiagnostico').count() === 2, 'se perdieron las anclas antiguas');
+  await ctx.close();
+});
+
+await prueba('UF del día: /api/uf pone los pesos con su fecha; si falla no se muestra un valor viejo', async () => {
   const ctx = await contexto();
   await ctx.route('**/api/uf', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ valor: 40000, fecha: '2026-09-25', fuente: 'prueba' }) }));
   const { p } = await pagina(ctx, '/diagnostico-ia-empresas');
   await p.waitForFunction(() => /480\.000/.test(document.querySelector('[data-uf="12"]')?.textContent || ''), null, { timeout: 8000 });
-  exigir(/valor del 25\/09\/2026/.test(await p.locator('[data-uf-nota]').first().textContent() || ''), 'la nota no muestra la fecha del día');
+  exigir(/UF del 25\/09\/2026/.test(await p.locator('[data-uf-nota]').first().textContent() || ''), 'la nota no muestra la fecha del día');
   await ctx.close();
   const ctx2 = await contexto();
   await ctx2.route('**/api/uf', (r) => r.fulfill({ status: 503, body: '{}' }));
   const { p: p2 } = await pagina(ctx2, '/diagnostico-ia-empresas');
-  await p2.waitForTimeout(2500);
+  await p2.waitForFunction(() => /no disponible/.test(document.querySelector('[data-uf-nota]')?.textContent || ''), null, { timeout: 8000 });
   const txt = await p2.locator('[data-uf="12"]').first().textContent() || '';
-  exigir(txt.includes('+ IVA'), 'sin IVA tras el fallo: ' + txt);
+  exigir(txt === '+ IVA', 'tras el fallo debe quedar solo "+ IVA": ' + txt);
+  exigir(!/41\.000|≈/.test(await p2.locator('main').textContent() || ''), 'se muestra una equivalencia vieja');
   await ctx2.close();
+  // En el HTML (sin JavaScript) no hay pesos derivados de la UF.
+  exigir(!readFileSync(join(RAIZ, 'public', 'diagnostico-ia-empresas.html'), 'utf8').includes('≈'), 'el HTML trae una equivalencia en pesos fija');
 });
 
 await prueba('Formulario: errores accesibles, envío, y respaldo por WhatsApp si falla', async () => {
@@ -240,6 +288,16 @@ await prueba('Casos: CTA por caso abre WhatsApp con el código del caso', async 
   exigir(await p.locator('#documentos-legales .alcance', { hasText: 'una boleta real' }).count() === 1, 'C-01 sin alcance de la cifra');
   exigir(await p.locator('#planos-autocad .alcance', { hasText: 'no un ahorro' }).count() === 1, 'C-03 sin alcance de la cifra');
   exigir(await p.locator('#testimonios').count() === 0, 'no debe haber sección de testimonios vacía');
+  // Un clic = un evento: case_lead, sin case_cta_click ni whatsapp_lead extra.
+  await p.evaluate(() => document.addEventListener('click', (e) => e.preventDefault()));
+  await p.locator('#documentos-legales a', { hasText: 'Tengo un proceso parecido' }).click();
+  const ev = await eventos(p);
+  exigir(ev.filter((x) => /_lead$|case_cta_click/.test(x)).join(',') === 'case_lead', 'eventos del clic: ' + ev.join(','));
+  // Métricas con espacios reales en el DOM (no solo por CSS).
+  const res = (await p.locator('#documentos-legales .caso-resultado').textContent()) || '';
+  exigir(/−91% de tiempo/.test(res.replace(/\s+/g, ' ')), 'resultado pegado en el DOM: ' + res);
+  const met = (await p.locator('#documentos-legales .metricas-caso li').nth(1).textContent()) || '';
+  exigir(/^8 documentos/.test(met.trim().replace(/\s+/g, ' ')), 'métrica pegada en el DOM: ' + met);
   await ctx.close();
 });
 
@@ -260,6 +318,11 @@ await prueba('Menú móvil: abre, cierra con Escape y devuelve el foco', async (
 await prueba('FAQ, pie, privacidad y 404', async () => {
   const ctx = await contexto();
   const { p } = await pagina(ctx, '/');
+  // Honeypot: invisible, sin texto, fuera del orden de tabulación y oculto para lectores de pantalla.
+  exigir(!/No completar/.test(await p.locator('form').first().textContent() || ''), 'el honeypot tiene texto visible para extractores');
+  exigir(await p.locator('.trampa[aria-hidden="true"][inert] input[tabindex="-1"][autocomplete="off"]').count() === 1, 'honeypot sin aria-hidden/inert/tabindex');
+  exigir(await p.locator('#f-web').isVisible() === false || (await p.locator('#f-web').boundingBox())?.x < 0, 'el honeypot se ve');
+  exigir(/ANVAR Construcciones SpA/.test(await p.locator('footer.pie').textContent() || ''), 'el pie no dice la razón social');
   const segunda = p.locator('#preguntas details').nth(1);
   await segunda.locator('summary').click();
   exigir(await segunda.evaluate((d) => /** @type {HTMLDetailsElement} */ (d).open), 'la FAQ no abrió');
@@ -334,14 +397,15 @@ await prueba('Atribución: organic_landing_view una vez por visita, con canal UT
 await prueba('Calculadora de ROI: valores desde la URL (acotados) y enlace para compartir', async () => {
   const ctx = await contexto();
   await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: BASE });
-  const { p } = await pagina(ctx, '/calculadora-roi-automatizacion?personas=8&horas=12&costo=15000&auto=50');
-  const esperado = '$' + miles(calcular({ personas: 8, horas: 12, costo: 15000, auto: 50 }).valor);
-  exigir((await p.locator('#c-valor').textContent()) === esperado, `valor desde URL ${await p.locator('#c-valor').textContent()} ≠ ${esperado}`);
+  const { p } = await pagina(ctx, '/calculadora-roi-automatizacion?personas=8&horas=12&costo=15000&auto=50&inv=otro&monto=2500000&mensual=100000');
+  const r = calcularRoi({ personas: 8, horas: 12, costo: 15000, auto: 50, inversion: 'otro', monto: 2500000, mensual: 100000 });
+  exigir((await p.locator('#c-valor').textContent()) === pesosK(r.ahorroBruto), `valor desde URL ${await p.locator('#c-valor').textContent()} ≠ ${pesosK(r.ahorroBruto)}`);
+  exigir((await p.locator('#c-neto1').textContent()) === pesosK(r.ahorroNetoAno1), 'inversión/mensual desde URL');
   exigir((await p.locator('#c-estado').textContent()) === 'Tu estimación', 'valores de la URL no se marcaron como propios');
   await p.locator('#c-compartir').click();
   await p.locator('#c-compartir-msg').filter({ hasText: /Enlace copiado|barra de direcciones/ }).waitFor({ timeout: 3000 });
   const copiado = await p.evaluate(() => navigator.clipboard.readText()).catch(() => p.evaluate(() => location.href));
-  exigir(/personas=8&horas=12&costo=15000&auto=50/.test(copiado), 'enlace compartido sin valores: ' + copiado);
+  exigir(/personas=8&horas=12&costo=15000&auto=50&inv=otro&monto=2500000&mensual=100000/.test(copiado), 'enlace compartido sin valores: ' + copiado);
   const { p: p2 } = await pagina(ctx, '/calculadora-roi-automatizacion?personas=9999&horas=-4&costo=abc');
   const [pers, horas] = await p2.evaluate(() => [/** @type {HTMLInputElement} */ (document.getElementById('c-personas')).value, /** @type {HTMLInputElement} */ (document.getElementById('c-horas')).value]);
   const maxPers = await p2.locator('#c-personas').getAttribute('max');

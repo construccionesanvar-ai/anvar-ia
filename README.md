@@ -90,34 +90,78 @@ operacion/                material comercial interno (plantillas)
 | Qué se dice sobre propiedad intelectual | `PROPIEDAD` en `src/datos/contenido.mjs` (una sola política para todo el sitio; coincide con la cláusula 7 de `operacion/05-acuerdo-de-servicio.md`) |
 | Preguntas frecuentes | `src/datos/faq.mjs` |
 | Preguntas del autodiagnóstico | `DIAGNOSTICO` en `src/datos/contenido.mjs` (`wsp` marca las respuestas que viajan en el WhatsApp) |
-| WhatsApp, correo, nombre de la empresa, RUT | `SITIO` en `src/config.mjs` |
-| UF de referencia | `SITIO.uf` en `src/config.mjs` |
+| **Razón social, RUT**, relación marca → sociedad | `SITIO.empresa` en `src/config.mjs` (ver "Identidad empresarial") |
+| WhatsApp, correo | `SITIO.contacto` en `src/config.mjs` |
+| UF de referencia de la calculadora | `SITIO.uf` en `src/config.mjs` (ver "Precios y UF") |
+| **Fórmulas** de la calculadora de ROI y del punto de pedido | `src/calculo.mjs` (única fuente; el build genera `public/calculo.js`) |
+| Ejemplo y supuestos de la calculadora | `CALCULADORA` en `src/config.mjs` |
+| Autor (perfil, bio, perfiles públicos) | `SITIO.fundador` en `src/config.mjs` y `AUTOR` en `src/datos/recursos.mjs` |
 | Link de agenda | `SITIO.agenda.url` en `src/config.mjs` |
 | Política de privacidad | `src/paginas/privacidad.mjs` + `SITIO.privacidad.actualizada` |
 | Menú principal | `NAVEGACION` en `src/datos/contenido.mjs` |
-| Una página nueva | copia una de `src/paginas/`, regístrala en `PAGINAS` de `scripts/build.mjs` |
+| Una página nueva | copia una de `src/paginas/`, regístrala en `PAGINAS` de `scripts/build.mjs`. **Hasta mediados de octubre de 2026 no se crean páginas nuevas**: ver `docs/SEO_MEASUREMENT_CHECKLIST.md` |
 
 Después de cualquier cambio: `npm test`, revisar en `npm run dev` y commit.
+
+## Identidad empresarial
+
+**ANVAR TECH es una marca de ANVAR Construcciones SpA (RUT 77.982.517-5).** Esa sociedad presta
+los servicios, emite las facturas, firma contratos y acuerdos de confidencialidad y es la
+responsable de los datos personales. Fuente: el repositorio de anvartech.cl (`CLAUDE.md`, "Datos
+del negocio") y el propio anvartech.cl, que factura con esa razón social y ese RUT.
+
+- Todo sale de `SITIO.empresa` en `src/config.mjs`: pie ("Razón social", "RUT" y la frase
+  "ANVAR TECH es una marca de…"), privacidad (responsable), JSON-LD (`legalName`, `taxID`) y llms.txt.
+- La marca visible sigue siendo ANVAR TECH. No se usa "ANVAR TECH SpA": no existe una sociedad
+  con ese nombre.
+- Las plantillas de `operacion/` (acuerdo de servicio, informe, acta) repiten estos datos a mano:
+  si cambia la sociedad, actualízalas también.
+- No se publica la dirección exacta (domicilio legal en Quinta Normal): el sitio dice "Región Metropolitana".
 
 ## Precios y UF
 
 Los proyectos y mensualidades de empresa se cotizan y facturan **en UF**; los
 servicios de entrada (Automatización Express) y de personas, en pesos.
 
-La equivalencia en pesos de los precios en UF funciona así:
+**El HTML nunca trae una equivalencia en pesos fija** de un precio en UF: una cifra así envejece
+al día siguiente. Funciona así:
 
-1. El HTML trae la **UF de referencia** de `SITIO.uf` con su fecha ("con UF de $41.000 al 24/09/2026").
+1. El HTML muestra el precio en UF y "+ IVA" (por ejemplo, "UF 12 + IVA").
 2. Después de cargar, el navegador pide `/api/uf` (CMF si existe `CMF_API_KEY`, si no mindicador.cl;
-   caché de 6 horas en la CDN) y reemplaza los pesos y la fecha por los del día.
-   La carga de la página **nunca** espera esa llamada.
-3. Si `/api/uf` falla y la referencia tiene más de `SITIO.uf.vigenciaDias` días (45), se muestra
-   **solo el precio en UF**. El build hace lo mismo si la referencia está vencida. `npm run check`
-   avisa cuando se acerca el vencimiento.
+   timeout de 4 s por fuente; caché de 6 horas en la CDN) y agrega "≈ $X + IVA" con la **fecha del
+   valor** a la vista ("Equivalencia en pesos con la UF del 25/09/2026"). La carga de la página
+   **nunca** espera esa llamada.
+3. Si `/api/uf` falla, queda solo el precio en UF y la nota dice "Equivalencia en pesos no
+   disponible temporalmente". No se muestra ningún valor viejo.
+
+`SITIO.uf` (valor y fecha de referencia) se usa **solo** en la calculadora de ROI, para el cálculo
+inicial de la opción "Piloto", siempre rotulado "con UF de referencia ($41.000 al 24/09/2026)", y
+se reemplaza por la UF del día apenas llega. `npm run check` avisa si esa referencia tiene más de
+60 días. Toda conversión UF → pesos pasa por `opcionesInversion()` (servidor) o por la UF del día
+que expone `app.js` (navegador): no hay valores de UF copiados en otros archivos.
 
 En los datos estructurados los precios en UF se declaran en `CLF` (código ISO de la UF), así no se desactualizan.
 
 Automatización Express y ANVAR Intelligence tienen `hipotesis: true`: precios
 aprobados pero aún sin validar con clientes. `npm run check` lo recuerda.
+
+## Calculadora de ROI
+
+Vive en `/calculadora-roi-automatizacion` (la portada solo enlaza). Entradas: personas, horas a la
+semana, costo por hora, % automatizable, **inversión a comparar** (Automatización Express, Piloto
+o "Otro monto") y **costo mensual** opcional. Resultados: horas manuales al año, costo anual actual,
+horas recuperables, ahorro bruto anual, inversión, costos recurrentes, ahorro neto del año 1,
+payback, ROI año 1 y ROI a 3 años. Las fórmulas están a la vista en la página y en `src/calculo.mjs`.
+
+- **Una sola fuente:** `src/calculo.mjs` (sin imports). El build la usa para el HTML inicial y
+  genera `public/calculo.js` para el navegador; `tests/organico.test.mjs` comprueba que el archivo
+  generado esté al día y dé el mismo resultado.
+- **Casos límite:** sin ahorro o sin inversión → "No aplica"; costos recurrentes ≥ ahorro →
+  "Sin recuperación"; payback > 36 meses → "Más de 36 meses". Nunca Infinity, NaN ni -0
+  (`tests/calculo.test.mjs`, 11 pruebas con casos calculados a mano).
+- **Plantilla Excel** (`scripts/plantillas/roi.py`): mismas fórmulas y mismas etiquetas; con el
+  ejemplo (5 personas, 6 h/semana, $9.000, 60 %, $1.640.000) da exactamente lo mismo que la web
+  (payback 2,76 meses, ROI 335 %, ROI 3 años 1.204 %).
 
 ## Agenda de 20 minutos
 
@@ -194,56 +238,65 @@ El sitio carga `/_vercel/insights/script.js` (sin cookies) y envía eventos con
 `window.va` desde una sola función, `medir()` en `public/app.js`. `page_view` lo
 registra Vercel solo. Los eventos propios requieren un plan de Vercel que los incluya.
 
-| Evento | Cuándo | Datos |
-|---|---|---|
-| `organic_landing_view` | Primera página de cada visita (1 vez por pestaña) | `landing`, `canal`, `campana` |
-| `hero_cta_click` | CTA principal del hero, cabecera, menú o resultado | `etiqueta` |
-| `content_cta_click` | CTA dentro de una guía, landing o herramienta; tarjetas "Relacionado" | `etiqueta` |
-| `case_cta_click` | Clic en un caso, métrica, caso largo o "Tengo un proceso parecido" | `etiqueta` |
-| `cases_view` | La sección de casos entra en pantalla (1 vez) | — |
-| `service_click` | Clic hacia la página de un servicio | `etiqueta` |
-| `calculator_start` / `_complete` | Primer uso / primer resultado (1 vez por herramienta) | `herramienta` (`roi` o `punto-pedido`), `tramo` o `nivel` |
-| `diagnostic_start` / `_complete` | Primera respuesta / resultado mostrado (1 vez por visita) | `indice`, `recomendacion`, `categoria` |
-| `diagnostic_whatsapp_click` | "Conversar este resultado por WhatsApp" | `etiqueta` |
-| `template_download` | Descarga de la plantilla Excel de ROI | `etiqueta` |
-| `whatsapp_lead` | **Cualquier** enlace a WhatsApp (incluye el anterior) | `contexto`, `etiqueta` + atribución |
-| `calendar_click` | Botón de agenda real (solo con `SITIO.agenda.url`) | `etiqueta` |
-| `email_click` | Enlace al correo | `etiqueta` |
-| `form_start` / `service_lead` / `form_error` | Primer uso del formulario (1 vez) / enviado / falló | `tipo` + atribución, o `motivo` |
+**Regla: un clic = un evento.** Un clic en WhatsApp genera solo su evento de lead (no se suma un
+`data-track`). Los eventos "de una vez" (`start`, `complete`, `view`) no se repiten en la visita.
 
-Todos llevan `pagina` y `fuente`. Los de lead (`whatsapp_lead`, `service_lead`) llevan además la
-**atribución de la visita**: `landing` (primera página), `canal` (`google/organic`, `bing/organic`,
-`linkedin/social`, `chatgpt.com/ai`, `directo`, `<dominio>/referral` o `utm_source/utm_medium`) y
-`campana` (`utm_campaign`). Se guarda en `sessionStorage` (se borra al cerrar la pestaña).
-Nunca se envía nombre, correo, teléfono, texto escrito ni la URL completa del referente.
-Los enlaces con UTM se arman con `npm run utm -- <ruta> <fuente> <medio> <campaña>`
-(convenciones en `docs/CONTENT_DISTRIBUTION.md`).
+| Grupo | Evento | Cuándo | Datos |
+|---|---|---|---|
+| Visita | `organic_landing_view` | Primera página de cada visita (1 vez por pestaña) | `landing`, `canal`, `campana` |
+| Visita | `resource_view` | Abre `/recursos` o un recurso | `tipo` |
+| Visita | `case_view` | Abre un caso largo, o ve la sección de casos | `lugar` |
+| Portada | `home_roi_tool_click` / `home_diagnostic_tool_click` | Tarjetas de herramientas | `etiqueta` |
+| Herramientas | `calculator_view` · `calculator_start` · `calculator_complete` | Se ve / primer uso / primer resultado | `herramienta` (`roi`, `punto-pedido`); `inversion`, `estado`, `tramo` o `nivel` |
+| Herramientas | `diagnostic_view` · `diagnostic_start` · `diagnostic_complete` | Se ve / primera respuesta / resultado | `indice`, `recomendacion`, `categoria` |
+| Contenido | `hero_cta_click`, `content_cta_click`, `case_cta_click`, `service_click`, `email_click` | Clics en CTA, guías, casos, servicios, correo | `etiqueta` |
+| Contenido | `template_download` | Descarga de la plantilla Excel | `etiqueta` |
+| Lead | `express_lead` | WhatsApp de Automatización Express | `contexto`, `etiqueta`, `via` + atribución |
+| Lead | `data_lead` | WhatsApp de datos / ANVAR Intelligence | ídem |
+| Lead | `diagnostic_lead` | "Conversar este resultado por WhatsApp" (autodiagnóstico) | ídem |
+| Lead | `case_lead` | "Tengo un proceso parecido" en un caso | ídem |
+| Lead | `whatsapp_lead` | Cualquier otro WhatsApp (general, agenda, piloto…) | ídem |
+| Lead | `service_lead` | Formulario enviado | `tipo` + atribución |
+| Formulario | `form_start` / `form_error` | Primer uso del formulario / falló | `motivo` |
 
-> Hasta 2.1 los eventos se llamaban `whatsapp_click`, `form_submit`, `case_study_click` y
-> `roi_calculator_*`. Al comparar periodos en Vercel, suma el nombre antiguo y el nuevo.
+Todos llevan `pagina` y `fuente`. Los de lead llevan la **atribución de la visita**: `landing`
+(primera página), `canal` (`google/organic`, `bing/organic`, `linkedin/social`, `chatgpt.com/ai`,
+`directo`, `anvartech.cl/referral`, `<dominio>/referral` o `utm_source/utm_medium`) y `campana`
+(`utm_campaign`). Se guarda en `sessionStorage` (se borra al cerrar la pestaña). Nunca se envía
+nombre, correo, teléfono, texto escrito ni la URL completa del referente.
+Enlaces con UTM: `npm run utm -- <ruta> <fuente> <medio> <campaña>` (convenciones en
+`docs/CONTENT_DISTRIBUTION.md`).
+
+> Cambios de nombre. Hasta 2.1: `whatsapp_click`, `form_submit`, `case_study_click`,
+> `roi_calculator_*`. En 2.2: `cases_view` pasó a `case_view` y `diagnostic_whatsapp_click` a
+> `diagnostic_lead`; los WhatsApp de Express, datos y casos pasaron de `whatsapp_lead` a
+> `express_lead`, `data_lead` y `case_lead`. Para totales de leads, suma todos los `*_lead`.
 Para cambiar de proveedor: ajusta `medir()` y el CSP de `vercel.json`.
 
 ## Evidencia visual de los casos
 
-Cada caso muestra hoy su **diagrama de flujo** (texto real, sin marcadores vacíos).
-Para agregar un video de 15–30 s:
+Cada caso muestra hoy su **diagrama de flujo** (texto real, sin marcadores vacíos). Qué grabar y
+cómo: `docs/CASE_VIDEO_SHOTLIST.md`. Para publicar un video:
 
-1. Graba la pantalla (sin datos reales del cliente; en C-03 usa un plano de ejemplo).
-2. Exporta MP4 H.264, 1280 px de ancho, sin audio, ≤ 4 MB, y una imagen de portada WebP.
-3. Déjalos en `public/casos/` y completa `media` del caso en `src/datos/casos.mjs`:
+1. Exporta MP4 H.264 (obligatorio) y, si puedes, WebM (VP9, más liviano); 1280 px de ancho,
+   20–30 s, sin audio, ≤ 4 MB. Un poster WebP (obligatorio) y, si hay texto hablado, subtítulos `.vtt`.
+2. Déjalos en `public/casos/` y completa `media` del caso en `src/datos/casos.mjs`:
    ```js
    media: {
-     principal: { tipo: 'video', src: '/casos/c01-demo.mp4', poster: '/casos/c01-poster.webp',
+     principal: { tipo: 'video', src: '/casos/c01-demo.mp4', webm: '/casos/c01-demo.webm',
+                  poster: '/casos/c01-poster.webp', subtitulos: '/casos/c01-demo.vtt',
                   alt: 'Se ingresan los datos una vez y se generan los ocho documentos',
-                  ancho: 1280, alto: 720, duracion: '0:24' },
+                  ancho: 1280, alto: 720, duracion: '0:24', leyenda: 'Datos de prueba' },
      galeria: [{ tipo: 'captura', src: '/casos/c01-form.webp', alt: '…', ancho: 1200, alto: 750 }],
    }
    ```
-4. `npm test`. Si un archivo no existe, **el build falla**: nunca se publica un reproductor roto.
+3. `npm test`. Si falta un archivo (video, WebM, poster o subtítulos declarados), **el build falla**.
 
-Tipos: `video` (en bucle, sin sonido, con controles, no se descarga hasta que se reproduce),
-`gif`, `imagen`, `captura`, y `demo: { url, texto }` para una demostración en línea.
-`npm run check` lista la evidencia pendiente de cada caso (`evidenciaPendiente`).
+Cómo se muestra: **miniatura → reproducir**. La página carga solo el poster (diferido, con ancho y
+alto para no mover el diseño) y un botón "Ver video (0:24)". El `<video>` con WebM, MP4 y
+subtítulos se crea recién al hacer clic, así varios videos no pesan en la carga (Core Web Vitals).
+Sin JavaScript, el enlace abre el MP4. También: `gif`, `imagen`, `captura` (carga diferida) y
+`demo: { url, texto }`. `npm run check` lista la evidencia pendiente (`evidenciaPendiente`).
 
 ## Testimonios
 
@@ -277,7 +330,7 @@ y `SITIO.privacidad.actualizada`.
 
 ## SEO técnico
 
-- `robots.txt`, `sitemap.xml` (24 URL), `feed.xml` (RSS de guías y caso largo), `llms.txt` y la
+- `robots.txt`, `sitemap.xml` (25 URL), `feed.xml` (RSS de guías y caso largo), `llms.txt` y la
   clave de IndexNow se generan en cada build. El sitemap conserva `lastmod` si la página no cambió
   y nunca incluye páginas `noindex` (404).
 - Cada página: título y descripción únicos, canonical absoluta sin barra final, Open Graph con imagen
@@ -319,7 +372,7 @@ y `SITIO.privacidad.actualizada`.
    propiedad `https://ia.anvartech.cl/` (prefijo de URL) aparece verificada. Si prefieres una propiedad
    de dominio (`anvartech.cl`), verifícala por DNS.
 2. **Sitemap**: Indexación → Sitemaps → enviar `https://ia.anvartech.cl/sitemap.xml`. Debe quedar
-   "Correcto" con 24 URLs descubiertas.
+   "Correcto" con 25 URLs descubiertas.
 3. **Inspección de URL** y **Solicitar indexación**, en este orden:
    `https://ia.anvartech.cl/`, `/automatizacion-express`, `/casos`, `/diagnostico-ia-empresas`,
    `/inteligencia-datos`, `/automatizacion-procesos-ia`, `/asesoria-ia-personal`, `/privacidad`,
@@ -339,8 +392,10 @@ y `SITIO.privacidad.actualizada`.
 
 - Tipografías servidas desde `/fuentes` (subconjunto latino, woff2, `font-display: swap`) y
   precargadas las dos del primer render. Sin Google Fonts ni scripts de terceros.
-- Retrato en WebP/JPEG con `srcset`, `loading="lazy"`; videos de casos con `preload="none"`.
-- Un CSS y un JS (`defer`), con `?v=hash` para invalidar caché solo cuando cambian.
+- Retrato en WebP/JPEG con `srcset`, `loading="lazy"`; videos de casos como miniatura → reproducir.
+- Un CSS y JS con `defer` y `?v=hash`: `app.js` (común, ~6 KB comprimido) en todas las páginas;
+  `herramientas.js` y `calculo.js` **solo** en las páginas que tienen una herramienta. La config
+  del navegador (`#config`) lleva los datos de cada herramienta solo donde se usa.
 - La UF y la lectura por IA se piden después de cargar: nunca bloquean el render.
 
 ## Caché: por qué css y js NO son inmutables
@@ -382,10 +437,11 @@ Cada `git push` a `main` publica solo en Vercel (proyecto `anvar-ia`, equipo
 ANVAR TECH): Vercel corre `npm install` y `npm run build`. Lo que Vercel no corre
 es `npm run check` ni las pruebas: hazlo tú antes del push (`npm run qa`).
 
-Después de cada push a `main` corren dos workflows de GitHub Actions (pestaña Actions):
+Flujo habitual: rama → pull request → merge a `main` → Vercel publica en ~15 s. Después de cada
+push a `main` corren dos workflows de GitHub Actions (pestaña Actions):
 
 - **Verificación post-deploy** (`scripts/smoke.mjs`): espera a que `ia.anvartech.cl` sirva
-  exactamente el HTML del commit y revisa contra la web pública las 24 páginas, redirecciones,
+  exactamente el HTML del commit y revisa contra la web pública todas las páginas del sitemap, redirecciones,
   cabeceras de seguridad, imágenes OG, CSS/JS, la descarga XLSX, robots, sitemap, feed,
   llms.txt, la clave de IndexNow y el 404. Si falla, GitHub avisa por correo.
 - **IndexNow**: avisa a Bing y compañía solo las páginas que cambiaron (ver SEO técnico).

@@ -73,7 +73,17 @@ visitas y leads en Vercel Analytics, 404 con salidas útiles, redirecciones de a
 |---|---|---|
 | Sitemap y solicitudes de indexación en Google | Dueño de Search Console | `docs/SEARCH_CONSOLE_SETUP.md` |
 | Alta en Bing Webmaster Tools | Cuenta Microsoft de la empresa | `docs/BING_WEBMASTER_SETUP.md` |
-| Perfil de Google Business | Dueño de la empresa | `docs/GOOGLE_BUSINESS_PROFILE.md` |
+| Perfil de Google Business: revisar si ya existe uno de "ANVAR Tech" antes de crear (un perfil por negocio) | Dueño de la empresa | `docs/GOOGLE_BUSINESS_PROFILE.md` |
 | Perfiles sociales en `sameAs` | Pegar URL reales en `SITIO.redes` | `src/config.mjs` |
-| Grabar videos reales de C-01 y C-03 | Equipo | `docs/CONTENT_DISTRIBUTION.md` |
+| Grabar videos reales de C-01 y C-03 | Equipo | `docs/CASE_VIDEO_SHOTLIST.md` |
+| Perfiles públicos verificables del autor (LinkedIn u otro) | Pegar URL en `SITIO.fundador.perfiles` | `src/config.mjs` |
 | Verificar que el plan de Vercel registre eventos propios | Dueño del proyecto en Vercel | README → Analítica |
+
+## Consolidación (2026-09-25, versión 2.3)
+
+Después del lanzamiento se hizo una ronda de corrección, sin páginas nuevas de contenido:
+identidad empresarial única (ANVAR Construcciones SpA, marca ANVAR TECH), portada con las
+herramientas como tarjetas, calculadora de ROI con inversión editable y costo mensual (mismas
+fórmulas que la plantilla Excel, con pruebas), UF sin valores viejos, métricas con texto correcto
+en el DOM, honeypot sin texto, casos preparados para video, perfil del autor y eventos sin
+duplicados. Desde aquí, **fase de medición**: `docs/SEO_MEASUREMENT_CHECKLIST.md`.

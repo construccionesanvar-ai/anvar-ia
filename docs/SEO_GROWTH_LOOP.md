@@ -17,7 +17,7 @@ Medir → Diagnosticar → Mejorar lo que existe → Crear solo si hay señal �
 Search Console, últimos 28 días vs. los 28 anteriores (filtros en `docs/SEARCH_CONSOLE_SETUP.md`):
 
 - Clics, impresiones, CTR y posición media por página y por grupo de consultas.
-- Páginas indexadas vs. 24 del sitemap.
+- Páginas indexadas vs. 25 del sitemap.
 
 Vercel Analytics, mismo periodo:
 
@@ -78,9 +78,9 @@ Una fila por mes. Sin registro no se sabe qué funcionó.
 
 | Mes | Clics Google | Impresiones | Páginas indexadas | Visitas orgánicas (Vercel) | Leads orgánicos | Qué se cambió | Resultado del cambio anterior |
 |---|---|---|---|---|---|---|---|
-| 2026-10 | | | / 24 | | | | (línea base) |
-| 2026-11 | | | / 24 | | | | |
-| 2026-12 | | | / 24 | | | | |
+| 2026-10 | | | / 25 | | | | (línea base) |
+| 2026-11 | | | / 25 | | | | |
+| 2026-12 | | | / 25 | | | | |
 
 ## Lo que no se hace, aunque "funcione"
 

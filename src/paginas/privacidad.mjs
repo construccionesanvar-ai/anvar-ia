@@ -16,7 +16,6 @@ import { migas, paginaWeb } from './ld.mjs';
  * por definitivos. `npm run check` los lista como avisos en cada ejecución.
  */
 export const PENDIENTES_PRIVACIDAD = [
-  'Responsable del tratamiento: confirmar la razón social que corresponde al RUT 77.982.517-5 (hoy se muestra el nombre de fantasía ANVAR TECH SpA).',
   'Plazo de conservación de contactos que no avanzan (24 meses): es una propuesta, confirmarla.',
   'Revisión por abogado frente a la Ley 19.628 y la Ley 21.719 (nueva ley de datos personales, con entrada en vigencia prevista para diciembre de 2026).',
   'Confirmar el proveedor de la casilla que recibe los formularios (variable NOTIFY_MAIL en Vercel) y nombrarlo en la sección de proveedores si corresponde.',
@@ -29,7 +28,7 @@ const c = SITIO.contacto;
 /** Secciones: [id, título, HTML del cuerpo]. */
 const SECCIONES = [
   ['responsable', 'Quién es responsable de tus datos', `
-    <p>${esc(e.nombre)} (RUT ${esc(e.rut)}), empresa chilena con domicilio en ${esc(e.ciudad)}, es responsable de los datos personales que se recogen en este sitio (${esc(SITIO.dominio.replace('https://', ''))}).</p>
+    <p>${esc(e.razonSocial)} (RUT ${esc(e.rut)}), sociedad chilena con domicilio en la Región Metropolitana, es responsable de los datos personales que se recogen en este sitio (${esc(SITIO.dominio.replace('https://', ''))}). ${esc(SITIO.marca)} es una marca de ${esc(e.razonSocial)}.</p>
     <p>Para cualquier consulta sobre tus datos: <a href="mailto:${esc(c.email)}">${esc(c.email)}</a>.</p>`],
 
   ['datos', 'Qué datos recogemos y cuándo', `
@@ -37,8 +36,9 @@ const SECCIONES = [
       <li><b>Formulario de contacto.</b> Tu nombre, tu WhatsApp o correo, y opcionalmente tu empresa y la descripción del proceso que nos cuentas. También la página desde la que escribiste y la fecha.</li>
       <li><b>WhatsApp.</b> Si haces clic en un botón de WhatsApp, se abre WhatsApp con un mensaje ya escrito que incluye la página de origen (por ejemplo, <i>(ref: express)</i>). Nada se envía hasta que tú lo mandas. Desde ahí, la conversación ocurre en WhatsApp.</li>
       <li><b>Correo electrónico.</b> Lo que nos escribas a ${esc(c.email)}.</li>
-      <li><b>Autodiagnóstico y calculadora.</b> Se calculan en tu navegador y no piden datos personales. Si el resultado del autodiagnóstico se muestra con una lectura escrita por IA, enviamos solo los puntajes, el tipo de problema elegido y el primer paso sugerido, sin datos que te identifiquen. Si eliges "Conversar este resultado por WhatsApp", el mensaje prellenado incluye tu resultado y algunas de tus respuestas; lo ves antes de enviarlo.</li>
-      <li><b>Medición de visitas.</b> Usamos Vercel Web Analytics para contar visitas y clics en botones (por ejemplo, "abrió WhatsApp desde la página de casos"). No usa cookies y no enviamos nombres, correos, teléfonos ni textos que escribas.</li>
+      <li><b>Autodiagnóstico y calculadoras.</b> Se calculan en tu navegador y no piden datos personales. Si usas "Copiar enlace con estos valores", los números de la calculadora quedan en el enlace que copias; no los guardamos. Si el resultado del autodiagnóstico se muestra con una lectura escrita por IA, enviamos solo los puntajes, el tipo de problema elegido y el primer paso sugerido, sin datos que te identifiquen. Si eliges "Conversar este resultado por WhatsApp", el mensaje prellenado incluye tu resultado y algunas de tus respuestas; lo ves antes de enviarlo.</li>
+      <li><b>Medición de visitas.</b> Usamos Vercel Web Analytics para contar visitas y clics en botones (por ejemplo, "abrió WhatsApp desde la página de casos"). No usa cookies y no enviamos nombres, correos, teléfonos ni textos que escribas. Para saber qué contenido genera contactos, el navegador recuerda durante la visita la primera página que abriste y el canal por el que llegaste (por ejemplo, un buscador o una campaña con parámetros UTM, nunca la dirección completa de la página anterior); se guarda en el almacenamiento de sesión del navegador, se borra al cerrar la pestaña y solo acompaña a esos clics, sin identificarte.</li>
+      <li><b>Valor de la UF.</b> Para mostrar la equivalencia en pesos de los precios en UF, el navegador consulta a nuestro servidor el valor del día, que lo obtiene de la CMF o de mindicador.cl. Esa consulta no incluye datos tuyos.</li>
       <li><b>Registros técnicos.</b> Como todo sitio web, el servidor registra datos técnicos de cada solicitud, como la dirección IP y el navegador, para operar y proteger el sitio. También usamos la IP, solo en memoria y por poco tiempo, para frenar envíos abusivos del formulario.</li>
     </ul>`],
 
@@ -70,6 +70,7 @@ const SECCIONES = [
 
   ['cookies', 'Cookies', `
     <p>Este sitio no usa cookies propias ni de terceros para publicidad o seguimiento, y la medición de visitas funciona sin cookies. Por eso no te mostramos un aviso de cookies.</p>
+    <p>Lo único que se guarda en tu navegador es lo descrito en "Medición de visitas": la primera página y el canal de llegada de la visita, en el almacenamiento de sesión, que se borra al cerrar la pestaña.</p>
     <p>Si en el futuro incorporamos alguna herramienta que las use y no sea esencial, te pediremos consentimiento antes de activarla y actualizaremos esta política.</p>`],
 
   ['conservacion', 'Cuánto tiempo los guardamos', `

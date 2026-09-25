@@ -14,7 +14,8 @@
     { "source": "/blog/:path*", "destination": "/recursos", "permanent": true },
     { "source": "/guias", "destination": "/recursos", "permanent": true },
     { "source": "/rss", "destination": "/feed.xml", "permanent": true },
-    { "source": "/rss.xml", "destination": "/feed.xml", "permanent": true }
+    { "source": "/rss.xml", "destination": "/feed.xml", "permanent": true },
+    { "source": "/equipo", "destination": "/equipo/andres-vargas", "permanent": false }
   ],
   "headers": [
     {

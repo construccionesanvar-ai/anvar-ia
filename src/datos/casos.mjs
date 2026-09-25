@@ -4,20 +4,24 @@
 // corresponde y ninguna métrica que no tenga respaldo.
 //
 // ─── Cómo agregar evidencia visual a un caso ────────────────────────────────
+// Guion de lo que hay que grabar: docs/CASE_VIDEO_SHOTLIST.md.
 // 1. Deja el archivo en public/casos/ (ej. public/casos/c01-demo.mp4).
-//    Video: MP4 (H.264), 15–30 s, sin audio o con subtítulos, ≤ 4 MB, 1280 px
-//    de ancho. Prefiere MP4 en bucle antes que GIF (pesa 5–10 veces menos).
-//    Imagen o captura: WebP, 1200 px de ancho.
+//    Video: MP4 (H.264) obligatorio y, opcional, WebM (VP9, más liviano);
+//    20–30 s, sin audio o con subtítulos (.vtt), ≤ 4 MB, 1280 px de ancho.
+//    Poster obligatorio (WebP, primer cuadro útil). Prefiere video antes que
+//    GIF (pesa 5–10 veces menos). Imagen o captura: WebP, 1200 px de ancho.
 // 2. Completa `media` del caso:
 //      media: {
-//        principal: { tipo: 'video', src: '/casos/c01-demo.mp4', poster: '/casos/c01-poster.webp',
+//        principal: { tipo: 'video', src: '/casos/c01-demo.mp4', webm: '/casos/c01-demo.webm',
+//                     poster: '/casos/c01-poster.webp', subtitulos: '/casos/c01-demo.vtt',
 //                     alt: 'Se ingresan los datos una vez y se generan los ocho documentos',
-//                     ancho: 1280, alto: 720, duracion: '0:24' },
+//                     ancho: 1280, alto: 720, duracion: '0:24', leyenda: 'Datos de prueba' },
 //        galeria: [{ tipo: 'captura', src: '/casos/c01-form.webp', alt: '…', ancho: 1200, alto: 750 }],
 //        demo: { url: 'https://…', texto: 'Probar la demostración' },
 //      }
-//    Tipos: 'video' (se reproduce en bucle, sin sonido, con controles),
-//    'gif', 'imagen' y 'captura'.
+//    Tipos: 'video' (la página muestra solo el poster con un botón "Ver video";
+//    el video se descarga recién al hacer clic, así no afecta la carga),
+//    'gif', 'imagen' y 'captura' (con carga diferida).
 // 3. `npm test`. Si un archivo no existe, el build falla: nunca se publica un
 //    espacio vacío ni un reproductor roto. Sin `media`, el caso muestra su
 //    diagrama de flujo (`flujo`), que es texto real y no un marcador.
@@ -34,7 +38,8 @@ export const ETIQUETAS = {
 
 /**
  * @typedef {{ tipo: 'video'|'gif'|'imagen'|'captura', src: string, alt: string,
- *   poster?: string, ancho: number, alto: number, duracion?: string, leyenda?: string }} Medio
+ *   poster?: string, webm?: string, subtitulos?: string,
+ *   ancho: number, alto: number, duracion?: string, leyenda?: string }} Medio
  * @typedef {{ principal?: Medio, galeria?: Medio[], demo?: { url: string, texto: string } }} Media
  * @typedef {{ valor: string, texto: string, nota?: string }} Metrica
  * @typedef {{ visibilidad: 'propio'|'publico'|'confidencial', nombre?: string, industria?: string }} ClienteCaso

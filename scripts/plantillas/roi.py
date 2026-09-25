@@ -43,7 +43,7 @@ ws.column_dimensions['C'].width = 62
 
 ws['A1'] = 'Plantilla de ROI de automatización'
 ws['A1'].font = TITULO
-ws['A2'] = 'ANVAR TECH · IA & Automatización · ia.anvartech.cl · Versión 1.0 (25/09/2026)'
+ws['A2'] = 'ANVAR TECH · IA & Automatización · ia.anvartech.cl · Versión 1.1 (25/09/2026)'
 ws['A2'].font = SUB
 ws['A3'] = 'Ingresa tus datos en las celdas amarillas (texto azul). Todo lo demás se calcula solo. Los valores que trae son un ejemplo.'
 ws['A3'].font = SUB
@@ -92,49 +92,51 @@ entrada(7, 'Veces por semana que cada persona la hace', 10, '0', 'Frecuencia. Ej
 entrada(8, 'Minutos que toma cada vez', 36, '0" min"', 'Mídelo con un reloj en casos reales, incluido uno que salga mal.')
 entrada(9, 'Semanas trabajadas al año', 44, '0', 'Supuesto: 52 semanas menos 3 de feriado legal (15 días hábiles, Código del Trabajo) y unas 5 de feriados, licencias y ausencias.')
 entrada(10, 'Costo empresa por hora ($)', 9000, PESOS, 'Sueldo bruto más aportes del empleador, dividido por las horas trabajadas al mes. Lo tiene quien hace las remuneraciones.')
+resultado(11, 'Horas a la semana por persona', '=B7*B8/60', '0.0" h"', 'Veces por semana × minutos ÷ 60. Es el dato "Horas a la semana, cada una" de la calculadora en línea.')
 
-seccion(12, '2. La automatización')
-entrada(13, 'Parte del tiempo que se automatiza', 0.6, PCT, 'Si no sabes, deja 60%. El resto queda para revisión humana y excepciones.')
-entrada(14, 'Costo de implementación ($, neto)', 1640000, PESOS, 'Lo que cuesta dejarla funcionando. Ejemplo: piloto desde UF 40 + IVA (con UF de $41.000). Una Automatización Express parte en $199.900 + IVA.')
-entrada(15, 'Costo mensual de mantención y licencias ($)', 0, PESOS, 'Soporte, suscripciones o licencias que necesite. 0 si no hay.')
+seccion(13, '2. La automatización')
+entrada(14, 'Parte del tiempo que se automatiza', 0.6, PCT, 'Si no sabes, deja 60%. El resto queda para revisión humana y excepciones.')
+entrada(15, 'Inversión inicial ($, neto)', 1640000, PESOS, 'Tu cotización real, si la tienes. El ejemplo es un piloto desde UF 40 + IVA con UF de $41.000 (24/09/2026); una Automatización Express parte en $199.900 + IVA. Actualiza con la UF del día.')
+entrada(16, 'Costo mensual de operación o soporte ($)', 0, PESOS, 'Licencias, suscripciones o soporte. 0 si no hay.')
 
-seccion(17, '3. Resultados')
-resultado(18, 'Horas al año que hoy toma el proceso', '=B6*B7*B8/60*B9', HORAS, 'Personas × veces por semana × minutos ÷ 60 × semanas.')
-resultado(19, 'Costo anual del proceso hoy', '=B18*B10', PESOS, 'Horas al año × costo por hora.')
-resultado(20, 'Horas que se liberan al año', '=B18*B13', HORAS, 'Horas al año × parte automatizable.', True)
-resultado(21, 'Horas liberadas por persona a la semana', '=IF(B6*B9>0,B20/B6/B9,0)', '0.0" h"', 'Para explicarlo al equipo: cuánto tiempo recupera cada persona.')
-resultado(22, 'Ahorro bruto anual', '=B20*B10', PESOS, 'Valor del tiempo liberado.')
-resultado(23, 'Costo anual de mantención', '=B15*12', PESOS, 'Mantención mensual × 12.')
-resultado(24, 'Ahorro neto anual', '=B22-B23', PESOS, 'Ahorro bruto menos mantención.', True)
-resultado(25, 'Payback (meses para recuperar la inversión)', '=IF(B24>0,B14/(B24/12),"No se recupera")', MESES, 'Implementación ÷ ahorro neto mensual.', True)
-resultado(26, 'ROI a 1 año', '=IF(B14>0,(B24-B14)/B14,0)', PCT, '(Ahorro neto del primer año − implementación) ÷ implementación.')
-resultado(27, 'ROI a 3 años', '=IF(B14>0,(B24*3-B14)/B14,0)', PCT, '(Ahorro neto de tres años − implementación) ÷ implementación.')
+seccion(18, '3. Resultados (mismas fórmulas que la calculadora en línea)')
+resultado(19, 'Horas manuales al año', '=B6*B11*B9', HORAS, 'Personas × horas a la semana × semanas.')
+resultado(20, 'Costo anual actual del proceso', '=B19*B10', PESOS, 'Horas manuales × costo por hora.')
+resultado(21, 'Horas potencialmente recuperadas', '=B19*B14', HORAS, 'Horas manuales × parte automatizable.', True)
+resultado(22, 'Horas recuperadas por persona a la semana', '=IF(B6*B9>0,B21/B6/B9,0)', '0.0" h"', 'Para explicarlo al equipo: cuánto tiempo recupera cada persona.')
+resultado(23, 'Ahorro bruto anual estimado', '=B21*B10', PESOS, 'Valor del tiempo recuperado.')
+resultado(24, 'Costos recurrentes al año', '=B16*12', PESOS, 'Costo mensual × 12.')
+resultado(25, 'Ahorro neto anual', '=B23-B24', PESOS, 'Ahorro bruto menos costos recurrentes.')
+resultado(26, 'Ahorro neto estimado, año 1', '=B25-B15', PESOS, 'Ahorro neto anual menos la inversión inicial.', True)
+resultado(27, 'Payback estimado (meses)', '=IF(B23<=0,"No aplica",IF(B25<=0,"Sin recuperación",IF(B15<=0,"No aplica",B15/(B25/12))))', MESES, 'Inversión ÷ ahorro neto mensual. "Sin recuperación" si los costos recurrentes igualan o superan el ahorro.', True)
+resultado(28, 'ROI año 1', '=IF(B15>0,B26/B15,"No aplica")', PCT, 'Ahorro neto del año 1 ÷ inversión.')
+resultado(29, 'ROI a 3 años', '=IF(B15>0,(B25*3-B15)/B15,"No aplica")', PCT, '(Ahorro neto anual × 3 − inversión) ÷ inversión.')
 
-ws['A29'] = 'Estimación referencial basada en los datos ingresados. El resultado real depende del proceso, la implementación y el contexto operacional. No incluye el costo de errores, reprocesos ni atrasos, que suele ser mayor que el de las horas.'
-ws['A29'].font = SUB
-ws['A29'].alignment = Alignment(wrap_text=True, vertical='top')
-ws.merge_cells('A29:C29')
-ws.row_dimensions[29].height = 42
+ws['A31'] = 'Estimación referencial basada en los datos ingresados. El resultado real depende del proceso, la implementación y el contexto operacional. No incluye el costo de errores, reprocesos ni atrasos, que suele ser mayor que el de las horas.'
+ws['A31'].font = SUB
+ws['A31'].alignment = Alignment(wrap_text=True, vertical='top')
+ws.merge_cells('A31:C31')
+ws.row_dimensions[31].height = 42
 
-ws['A31'] = 'Leyenda'
-ws['A31'].font = NEGRITA
-ws['A32'] = 'Dato que ingresas'
-ws['B32'].fill = AMARILLO
-ws['B32'].value = 'azul'
-ws['B32'].font = AZUL
-ws['A33'] = 'Resultado principal'
-ws['B33'].fill = AMBAR
-ws['A34'] = 'Calculadora en línea y guías: https://ia.anvartech.cl/calculadora-roi-automatizacion'
-ws['A34'].font = SUB
-for f in range(32, 34):
+ws['A33'] = 'Leyenda'
+ws['A33'].font = NEGRITA
+ws['A34'] = 'Dato que ingresas'
+ws['B34'].fill = AMARILLO
+ws['B34'].value = 'azul'
+ws['B34'].font = AZUL
+ws['A35'] = 'Resultado principal'
+ws['B35'].fill = AMBAR
+ws['A36'] = 'Calculadora en línea y guías: https://ia.anvartech.cl/calculadora-roi-automatizacion'
+ws['A36'].font = SUB
+for f in range(34, 36):
     ws[f'A{f}'].font = NEGRO
 
 dv = DataValidation(type='decimal', operator='between', formula1='0', formula2='1', showErrorMessage=True, errorTitle='Porcentaje', error='Ingresa un porcentaje entre 0% y 100%.')
 ws.add_data_validation(dv)
-dv.add('B13')
+dv.add('B14')
 dv2 = DataValidation(type='decimal', operator='greaterThanOrEqual', formula1='0', showErrorMessage=True, errorTitle='Valor', error='Ingresa un número mayor o igual a 0.')
 ws.add_data_validation(dv2)
-for c in ['B6', 'B7', 'B8', 'B9', 'B10', 'B14', 'B15']:
+for c in ['B6', 'B7', 'B8', 'B9', 'B10', 'B15', 'B16']:
     dv2.add(c)
 ws['B9'].comment = Comment('Supuesto de ANVAR TECH, el mismo de la calculadora en línea. Cámbialo si tu equipo trabaja otras semanas.', 'ANVAR TECH')
 ws.freeze_panes = 'A5'

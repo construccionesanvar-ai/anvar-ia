@@ -94,7 +94,7 @@ ${heroServicio({
 <section class="seccion seccion--panel" aria-labelledby="flujo-cot-tit">
   <div class="contenedor">
     <div class="enc"><p class="enc-codigo">El flujo</p><h2 id="flujo-cot-tit">De la solicitud al envío, en siete pasos</h2></div>
-    <ol class="flujo-caso" aria-label="Flujo de una cotización automatizada">${FLUJO.map(([t, d]) => `<li><span class="flujo-caso-t">${esc(t)}</span><span class="flujo-caso-d">${esc(d)}</span></li>`).join('')}</ol>
+    <ol class="flujo-caso" aria-label="Flujo de una cotización automatizada">${FLUJO.map(([t, d]) => `<li><span class="flujo-caso-t">${esc(t)}</span> <span class="flujo-caso-d">${esc(d)}</span></li>`).join('')}</ol>
   </div>
 </section>
 <section class="seccion" aria-label="Cómo automatizar cotizaciones">

@@ -70,7 +70,7 @@ export default guia({
         <li><b>Tiempo de tu equipo.</b> Explicar el proceso, probar y aprender a usarlo. Es poco, pero no es cero.</li>
       </ul>` },
     { id: 'se-paga-sola', titulo: 'Cómo saber si se paga sola', html: `
-      <p>La cuenta de fondo es simple: cuánto cuesta hoy el trabajo que se va a automatizar, comparado con lo que cuesta automatizarlo. La <a href="/calculadora-roi-automatizacion">calculadora de ROI</a> la hace en un minuto con cuatro datos; la <a href="/recursos/plantilla-roi-automatizacion">plantilla Excel</a> agrega la inversión real, la mantención y el ROI a tres años.</p>
+      <p>La cuenta de fondo es simple: cuánto cuesta hoy el trabajo que se va a automatizar, comparado con lo que cuesta automatizarlo. La <a href="/calculadora-roi-automatizacion">calculadora de ROI</a> la hace en un minuto, con la inversión que quieras comparar y el costo mensual si lo hay; la <a href="/recursos/plantilla-roi-automatizacion">plantilla Excel</a> hace lo mismo y permite comparar varios procesos.</p>
       <p>Una referencia práctica: si la inversión se recupera en menos de doce meses, suele ser una decisión fácil. Si pasa de tres años, conviene revisar si hay errores o reprocesos que el cálculo no está viendo, o dejarlo para más adelante.</p>` },
     { id: 'como-cotizamos', titulo: 'Cómo cotizamos nosotros', html: `
       <ol>

@@ -11,6 +11,7 @@ import { SITIO } from '../config.mjs';
  */
 export const FUENTES = {
   home: 'home',
+  team: 'team-profile', //         perfil del autor (/equipo/andres-vargas)
   express: 'express',
   data: 'data',
   diagnosis: 'diagnosis', //        página del servicio de diagnóstico (UF 12)

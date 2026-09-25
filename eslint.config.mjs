@@ -5,7 +5,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 
 export default [
-  { ignores: ['node_modules/', 'servicios/', '**/*.html'] },
+  { ignores: ['node_modules/', 'servicios/', '**/*.html', 'public/calculo.js'] }, // calculo.js: generado desde src/calculo.mjs
   js.configs.recommended,
   {
     files: ['src/**/*.mjs', 'scripts/**/*.mjs', 'tests/**/*.mjs', 'eslint.config.mjs'],
@@ -21,7 +21,7 @@ export default [
     languageOptions: { ecmaVersion: 2023, sourceType: 'module', globals: globals.node },
   },
   {
-    files: ['public/app.js'],
+    files: ['public/app.js', 'public/herramientas.js'],
     languageOptions: { ecmaVersion: 2020, sourceType: 'script', globals: globals.browser },
   },
   {
