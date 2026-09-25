@@ -19,7 +19,7 @@ const kb = Math.max(1, Math.round(statSync(join(RAIZ, 'public', ARCHIVO_PLANTILL
 const SECCIONES = [
   { id: 'que-trae', titulo: 'Qué trae la plantilla', html: `
     <ul>
-      <li><b>Calculadora.</b> Un proceso: personas, veces por semana, minutos por vez, costo por hora, parte automatizable, costo de implementación y mantención. Calcula horas al año, costo anual, horas liberadas, ahorro neto, payback y ROI a uno y tres años.</li>
+      <li><b>Calculadora.</b> Un proceso: personas, veces por semana, minutos por vez, costo por hora, parte automatizable, inversión inicial y costo mensual de operación. Calcula horas manuales al año, costo anual, horas recuperables, ahorro bruto y neto, payback y ROI a uno y tres años, con las mismas fórmulas de la calculadora en línea.</li>
       <li><b>Comparar procesos.</b> Hasta diez procesos en una tabla, para ver cuál libera más tiempo y valor y decidir por dónde partir.</li>
       <li><b>Cómo usarla.</b> Instrucciones, cómo leer cada resultado y qué no incluye el cálculo.</li>
     </ul>
@@ -32,16 +32,19 @@ const SECCIONES = [
       <li><b>Ingresa la inversión real</b> si ya tienes una cotización. Si no, usa una referencia y cámbiala después: el payback se recalcula solo.</li>
     </ol>` },
   { id: 'formulas', titulo: 'Las fórmulas que usa', html: `
-    <pre class="formula">Horas al año        = personas × veces por semana × minutos ÷ 60 × semanas al año
-Costo anual         = horas al año × costo por hora
-Horas liberadas     = horas al año × parte automatizable
-Ahorro neto anual   = horas liberadas × costo por hora − mantención × 12
-Payback (meses)     = implementación ÷ (ahorro neto anual ÷ 12)
-ROI a 1 año         = (ahorro neto anual − implementación) ÷ implementación
-ROI a 3 años        = (ahorro neto anual × 3 − implementación) ÷ implementación</pre>
-    <p>Con el ejemplo que trae (5 personas, 10 veces por semana, 36 minutos cada vez, ${ej('$9.000')} la hora, 60% automatizable y ${ej('$1.640.000')} de implementación), el proceso cuesta ${ej('$11.880.000')} al año, se liberan 792 horas y la inversión se recupera en 2,8 meses. Es el mismo resultado que muestra la <a href="/calculadora-roi-automatizacion">calculadora en línea</a> con esos datos.</p>` },
+    <pre class="formula">Horas a la semana     = veces por semana × minutos ÷ 60
+Horas manuales al año = personas × horas a la semana × semanas al año
+Costo anual actual    = horas manuales × costo por hora
+Horas recuperables    = horas manuales × parte automatizable
+Ahorro bruto anual    = horas recuperables × costo por hora
+Ahorro neto anual     = ahorro bruto − costo mensual × 12
+Ahorro neto año 1     = ahorro neto anual − inversión
+Payback (meses)       = inversión ÷ (ahorro neto anual ÷ 12)
+ROI año 1             = ahorro neto año 1 ÷ inversión
+ROI a 3 años          = (ahorro neto anual × 3 − inversión) ÷ inversión</pre>
+    <p>Con el ejemplo que trae (5 personas, 10 veces por semana, 36 minutos cada vez, ${ej('$9.000')} la hora, 60% automatizable y ${ej('$1.640.000')} de inversión), el proceso cuesta ${ej('$11.880.000')} al año, se liberan 792 horas y la inversión se recupera en 2,8 meses. Es el mismo resultado que muestra la <a href="/calculadora-roi-automatizacion">calculadora en línea</a> con esos datos.</p>` },
   { id: 'plantilla-o-calculadora', titulo: '¿Plantilla o calculadora en línea?', html: `
-    <p>Usa la <a href="/calculadora-roi-automatizacion">calculadora en línea</a> para una respuesta rápida en un minuto. Usa la plantilla cuando necesites <b>presentar el número dentro de tu empresa</b>: agrega la inversión real y la mantención, calcula el ROI y permite comparar varios procesos lado a lado, que es lo que suele pedir quien aprueba el presupuesto.</p>
+    <p>Las dos usan las mismas fórmulas y, con los mismos datos, dan el mismo resultado. Usa la <a href="/calculadora-roi-automatizacion">calculadora en línea</a> para una respuesta rápida en un minuto. Usa la plantilla cuando necesites <b>presentar el número dentro de tu empresa</b> o trabajar sin conexión: mide la duración en minutos por vez y permite comparar varios procesos lado a lado, que es lo que suele pedir quien aprueba el presupuesto.</p>
     <p>Las dos entregan una <b>estimación referencial basada en los datos ingresados</b>. El resultado real depende del proceso, de la implementación y del contexto operacional.</p>` },
 ];
 

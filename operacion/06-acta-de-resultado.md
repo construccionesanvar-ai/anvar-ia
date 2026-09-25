@@ -15,7 +15,7 @@ Una hoja, firmada por ti y por la contraparte.
 ## [NOMBRE DEL PROYECTO] — [EMPRESA]
 
 **Fecha de cierre:** [FECHA]
-**Ejecutor:** Andrés Vargas — ANVAR TECH SpA
+**Ejecutor:** Andrés Vargas — ANVAR TECH (ANVAR Construcciones SpA)
 **Contraparte:** [NOMBRE, CARGO]
 **Período:** [FECHA INICIO] a [FECHA TÉRMINO]
 
@@ -59,7 +59,7 @@ llamar.]
 
 Marque lo que corresponda:
 
-☐ Autorizo a ANVAR TECH SpA a mencionar este proyecto **con el nombre de la
+☐ Autorizo a ANVAR Construcciones SpA (marca ANVAR TECH) a mencionar este proyecto **con el nombre de la
 empresa** y las métricas de esta acta.
 
 ☐ Autorizo la mención **anonimizada** (rubro y métricas, sin nombre).
@@ -75,7 +75,7 @@ Conforme con lo entregado:
 
 _______________________          _______________________
 [NOMBRE, CARGO]                   Andrés Vargas
-[EMPRESA]                         ANVAR TECH SpA
+[EMPRESA]                         ANVAR Construcciones SpA
 
 ---
 

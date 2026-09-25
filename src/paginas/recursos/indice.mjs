@@ -10,7 +10,7 @@ import { listaRecursos } from '../../componentes/articulo.mjs';
 import { migas } from '../ld.mjs';
 import { SITIO } from '../../config.mjs';
 
-const tarjetasSoluciones = () => `<ul class="relacionados relacionados--indice">${SOLUCIONES.map((s) => `<li><a href="${s.ruta}" data-track="content_cta_click" data-track-label="recursos-${s.ruta.slice(1)}"><span class="rel-tipo">Solución</span><span class="rel-tit">${esc(s.nombre)}</span><span class="rel-txt">${esc(s.texto)}</span></a></li>`).join('')}</ul>`;
+const tarjetasSoluciones = () => `<ul class="relacionados relacionados--indice">${SOLUCIONES.map((s) => `<li><a href="${s.ruta}" data-track="content_cta_click" data-track-label="recursos-${s.ruta.slice(1)}"><span class="rel-tipo">Solución</span> <span class="rel-tit">${esc(s.nombre)}</span> <span class="rel-txt">${esc(s.texto)}</span></a></li>`).join('')}</ul>`;
 
 export default {
   ruta: '/recursos',

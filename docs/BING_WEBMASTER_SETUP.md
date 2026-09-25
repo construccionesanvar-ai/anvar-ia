@@ -26,7 +26,7 @@ toma 10 minutos y no requiere tocar el código.
 ## 2. Sitemap
 
 Sitemaps → **Enviar sitemap** → `https://ia.anvartech.cl/sitemap.xml`. Si importaste desde
-Search Console, ya debería aparecer. Estado esperado: "Correcto", 24 URL.
+Search Console, ya debería aparecer. Estado esperado: "Correcto", 25 URL.
 
 ## 3. IndexNow (ya está funcionando en el sitio)
 
@@ -92,7 +92,7 @@ primera semana para confirmar que llegan los avisos.
 | Cuándo | Dónde | Qué debe verse |
 |---|---|---|
 | Día 1 | IndexNow | Las URL del primer envío aparecen como recibidas |
-| Día 7 | Sitemaps | 24 URL descubiertas |
+| Día 7 | Sitemaps | 25 URL descubiertas |
 | Día 14 | Search Performance | Primeras impresiones de las páginas nuevas |
 | Mensual | Site Explorer / Recommendations | Sin errores graves (títulos duplicados, páginas bloqueadas) |
 

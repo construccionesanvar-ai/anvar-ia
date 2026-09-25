@@ -32,9 +32,21 @@ test('punto de pedido: sin variación no hay stock de seguridad; más servicio, 
   assert.equal(puntoPedido({ ...PP_DEFECTO, servicio: 42 }).seguridad, 43);
 });
 
-test('punto de pedido: el navegador usa los mismos Z que el servidor', () => {
-  const app = readFileSync(new URL('../public/app.js', import.meta.url), 'utf8');
-  for (const n of NIVELES_SERVICIO) assert.match(app, new RegExp(`'${n.pct}': ${n.z}`), `app.js sin Z para ${n.pct}%`);
+test('el navegador usa el mismo código de cálculo que el servidor (calculo.js generado)', () => {
+  const js = readFileSync(new URL('../public/calculo.js', import.meta.url), 'utf8');
+  const fuente = readFileSync(new URL('../src/calculo.mjs', import.meta.url), 'utf8');
+  assert.match(js, /^\/\* GENERADO/);
+  // Cada línea de código de la fuente (sin "export") está en el archivo del navegador.
+  for (const l of fuente.split('\n').filter((x) => x.trim() && !x.startsWith('// @ts-check'))) {
+    assert.ok(js.includes(l.replace(/^export /, '').trim()), `calculo.js desactualizado: falta "${l.trim().slice(0, 60)}" (npm run build)`);
+  }
+  // Y lo evalúa igual: mismo resultado con el ejemplo.
+  const ctx = { window: {} };
+  new Function('window', js)(ctx.window);
+  const K = /** @type {any} */ (ctx.window).ANVAR_CALCULO;
+  assert.equal(K.puntoPedido(PP_DEFECTO).punto, puntoPedido(PP_DEFECTO).punto);
+  assert.equal(K.roi({ personas: 5, horasSemana: 6, costoHora: 9000, pctAutomatizable: 60, inversion: 1640000 }).ahorroNetoAno1, 5488000);
+  assert.equal(NIVELES_SERVICIO.length, K.NIVELES_SERVICIO.length);
 });
 
 test('recursos: rutas únicas, con página, fechas ISO y autor real', () => {

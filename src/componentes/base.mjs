@@ -6,7 +6,7 @@ import { NAVEGACION } from '../datos/contenido.mjs';
 import { wsp, urlWsp, conRef, MENSAJES } from '../datos/whatsapp.mjs';
 import { PAGINA } from '../contexto.mjs';
 import { SOLUCIONES } from '../datos/soluciones.mjs';
-import { esc, attrs, absoluta } from '../html.mjs';
+import { esc, attrs, absoluta, separarBloques } from '../html.mjs';
 
 export const ISOTIPO = `<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect width="100" height="100" rx="8" fill="#101A1E"/><path d="M22 76 L50 22 L78 76" fill="none" stroke="#E9EBE4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 56 L66 56" stroke="#F0A92A" stroke-width="9" stroke-linecap="round"/><circle cx="50" cy="22" r="6" fill="#F0A92A"/></svg>`;
 
@@ -15,6 +15,7 @@ const ICONOS = {
   calendario: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>',
   correo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>',
   flecha: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 5.5v13l11-6.5z"/></svg>',
   menu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
 };
 export const icono = (n) => ICONOS[n] ?? '';
@@ -97,8 +98,9 @@ function pie(evaluar) {
       <div class="pie-marca">
         <a class="marca" href="/" aria-label="${esc(SITIO.marca)}, ${esc(SITIO.linea)}: ir al inicio">${ISOTIPO}${marcaTexto()}</a>
         <p>Automatización, software, datos e IA aplicada a las operaciones de empresas. Medimos cada proceso antes y después.</p>
+        <p class="pie-sociedad">${esc(e.relacion)}, la sociedad que presta los servicios y emite las facturas.</p>
         <dl class="pie-legal">
-          <div><dt>Empresa</dt><dd>${esc(e.nombre)}</dd></div>
+          <div><dt>Razón social</dt><dd>${esc(e.razonSocial)}</dd></div>
           <div><dt>RUT</dt><dd>${esc(e.rut)}</dd></div>
           <div><dt>Facturación</dt><dd>Empresa chilena · emitimos factura</dd></div>
           <div><dt>Atención</dt><dd>${esc(e.atencion)}</dd></div>
@@ -135,7 +137,7 @@ function pie(evaluar) {
       ])}
     </div>
     <div class="pie-base">
-      <p>© <span data-anio>2026</span> ${esc(e.nombre)} · <a href="${esc(SITIO.sitioMatriz)}">anvartech.cl</a></p>
+      <p>© <span data-anio>2026</span> ${esc(SITIO.marca)} · ${esc(e.razonSocial)} · <a href="${esc(SITIO.sitioMatriz)}">anvartech.cl</a></p>
       <p><a href="/privacidad">Política de privacidad</a></p>
     </div>
   </div>
@@ -195,7 +197,7 @@ function evaluarBloque(o, accionPrincipal, notaAccion, conWsp) {
       <div class="campo"><label for="f-contacto">WhatsApp o correo</label><input id="f-contacto" name="contacto" type="text" autocomplete="email" maxlength="160" required aria-describedby="f-contacto-ayuda f-contacto-err"><p class="ayuda" id="f-contacto-ayuda">Solo lo usamos para responderte. Ej.: +56 9 1234 5678 o nombre@empresa.cl</p><p class="campo-err" id="f-contacto-err" hidden>Escribe un WhatsApp (8 dígitos o más) o un correo válido.</p></div>
       <div class="campo"><label for="f-tipo">Qué necesitas</label><select id="f-tipo" name="tipo">${opciones}</select></div>
       <div class="campo"><label for="f-mensaje">Qué proceso te está costando tiempo <span class="opc">(opcional)</span></label><textarea id="f-mensaje" name="mensaje" rows="4" maxlength="2000" placeholder="Ejemplo: cada semana armamos el mismo informe de ventas desde tres planillas."></textarea></div>
-      <div class="trampa" aria-hidden="true"><label for="f-web">No completar</label><input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off"></div>
+      <div class="trampa" aria-hidden="true" inert><input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off" data-trampa></div>
       <input type="hidden" name="fuente" value="${esc(PAGINA.fuente)}">
       <input type="hidden" name="t" value="">
       <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
@@ -229,7 +231,8 @@ function evaluarBloque(o, accionPrincipal, notaAccion, conWsp) {
  * @param {{ ruta: string, titulo: string, descripcion: string, cuerpo: string,
  *   jsonld?: object[], noindex?: boolean, contextoWsp?: string, fuente: string,
  *   ogTitulo?: string, ogImagen?: string, articulo?: { publicado: string, actualizado: string },
- *   hashes: { css: string, js: string }, cliente: object }} p
+ *   hashes: { css: string, js: string, herramientas?: string, calculo?: string }, cliente: object,
+ *   herramientas?: { alguna: boolean, calculo: boolean } }} p
  */
 export function documento(p) {
   const url = absoluta(p.ruta);
@@ -243,7 +246,7 @@ export function documento(p) {
   const art = p.articulo
     ? `\n<meta property="article:published_time" content="${esc(p.articulo.publicado)}">\n<meta property="article:modified_time" content="${esc(p.articulo.actualizado)}">\n<meta property="article:author" content="${esc(SITIO.fundador.nombre)}">`
     : '';
-  return `<!DOCTYPE html>
+  return separarBloques(`<!DOCTYPE html>
 <html lang="${SITIO.idioma}">
 <head>
 <meta charset="UTF-8">
@@ -287,9 +290,9 @@ ${p.cuerpo}
 ${pie(tieneEvaluar)}
 <a class="wsp-flotante" href="${esc(wsp(contexto, p.fuente))}" data-wsp="${esc(contexto)}" data-track-label="flotante" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">${icono('whatsapp')}<span>WhatsApp</span></a>
 <script type="application/json" id="config">${JSON.stringify(p.cliente).replace(/</g, '\\u003c')}</script>
-<script defer src="${esc(SITIO.analitica.script)}"></script>
-<script defer src="/app.js?v=${p.hashes.js}"></script>
+<script defer src="${esc(SITIO.analitica.script)}"></script>${p.herramientas?.calculo ? `\n<script defer src="/calculo.js?v=${p.hashes.calculo}"></script>` : ''}
+<script defer src="/app.js?v=${p.hashes.js}"></script>${p.herramientas?.alguna ? `\n<script defer src="/herramientas.js?v=${p.hashes.herramientas}"></script>` : ''}
 </body>
 </html>
-`;
+`);
 }

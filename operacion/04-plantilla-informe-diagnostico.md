@@ -12,7 +12,7 @@ Reemplaza lo que está entre corchetes y borra las notas en cursiva.
 # DIAGNÓSTICO DE AUTOMATIZACIÓN CON IA
 ## [NOMBRE DE LA EMPRESA]
 
-**Preparado por:** Andrés Vargas — ANVAR TECH SpA
+**Preparado por:** Andrés Vargas — ANVAR TECH (ANVAR Construcciones SpA)
 **Fecha:** [FECHA]
 **Levantamiento:** [DÍA] al [DÍA]
 **Contraparte:** [NOMBRE Y CARGO]
@@ -137,5 +137,5 @@ al año]. Automatizarlo hoy costaría [X] y el ahorro real sería marginal.
 
 ---
 
-*Documento preparado por Andrés Vargas — ANVAR TECH SpA · RUT 77.982.517-5*
+*Documento preparado por Andrés Vargas — ANVAR TECH (marca de ANVAR Construcciones SpA) · RUT 77.982.517-5*
 *Información confidencial de [EMPRESA]. Uso interno.*

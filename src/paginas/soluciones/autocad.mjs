@@ -84,7 +84,7 @@ ${heroServicio({
     ${encabezado({ codigo: `Caso real ${c03.codigo}`, titulo: c03.titulo, id: 'c03-tit', bajada: c03.contexto })}
     <p class="caso-meta">${etiqueta(c03)}<span class="caso-estado">${esc(c03.estado)}</span></p>
     ${flujoCaso(c03)}
-    <p class="caso-resultado caso-resultado--grande"><span class="caso-resultado-v">${esc(c03.resultado.valor)}</span><span>${esc(c03.resultado.texto)}</span></p>
+    <p class="caso-resultado caso-resultado--grande"><span class="caso-resultado-v">${esc(c03.resultado.valor)}</span> <span>${esc(c03.resultado.texto)}</span></p>
     <p class="alcance"><b>Alcance de la cifra.</b> ${esc(c03.disclaimer ?? '')}</p>
     <p class="herr-enlaces"><a href="/casos#planos-autocad" data-track="case_cta_click" data-track-label="autocad-caso">Ver el caso con el detalle técnico</a></p>
   </div>

@@ -37,16 +37,6 @@ export function fechaCorta(iso) {
 }
 
 /**
- * ¿La UF de referencia de config.mjs sigue vigente? Pasado `vigenciaDias`
- * el sitio deja de mostrar pesos para los precios en UF.
- * @param {Date} [hoy]
- */
-export function ufVigente(hoy = new Date()) {
-  const desde = new Date(SITIO.uf.fecha + 'T12:00:00-03:00').getTime();
-  return (hoy.getTime() - desde) / 86_400_000 <= SITIO.uf.vigenciaDias;
-}
-
-/**
  * @typedef {{ moneda: 'UF'|'CLP', valor: number, desde?: boolean,
  *   iva: 'mas'|'incluido', periodo?: 'mes'|null, nota?: string }} Precio
  */
@@ -56,34 +46,23 @@ export const textoIva = (p) => (p.iva === 'incluido' ? 'IVA incluido' : '+ IVA')
 
 /**
  * Presentación de un precio en dos partes: la principal y el detalle.
- * Regla del sitio: proyectos y mensualidades de empresa en UF, con su
- * equivalente en pesos solo mientras la UF de referencia esté vigente;
- * servicios de entrada y de personas en pesos.
+ * Regla del sitio: proyectos y mensualidades de empresa en UF; servicios de
+ * entrada y de personas en pesos. El HTML NUNCA trae la equivalencia en pesos
+ * de un precio en UF: una cifra fija envejece al día siguiente. La agrega el
+ * navegador con la UF del día (/api/uf), con su fecha a la vista; si no hay
+ * UF del día, queda solo el precio en UF.
  * @param {Precio} p
- * @param {{ hoy?: Date }} [o]
- * @returns {{ principal: string, detalle: string, clp: number | null }}
+ * @returns {{ principal: string, detalle: string }}
  */
-export function precioTexto(p, o = {}) {
+export function precioTexto(p) {
   const desde = p.desde ? 'desde ' : '';
   const periodo = p.periodo === 'mes' ? ' / mes' : '';
-  if (p.moneda === 'UF') {
-    const vigente = ufVigente(o.hoy);
-    const clp = p.valor * SITIO.uf.valor;
-    return {
-      principal: `${desde}UF ${miles(p.valor)}${periodo}`,
-      detalle: vigente ? `≈ ${pesos(clp)} ${textoIva(p)}` : textoIva(p),
-      clp: vigente ? clp : null,
-    };
-  }
-  return { principal: `${desde}${pesos(p.valor)}${periodo}`, detalle: textoIva(p), clp: p.valor };
+  if (p.moneda === 'UF') return { principal: `${desde}UF ${miles(p.valor)}${periodo}`, detalle: textoIva(p) };
+  return { principal: `${desde}${pesos(p.valor)}${periodo}`, detalle: textoIva(p) };
 }
 
-/** Nota que acompaña a los precios en UF: de dónde sale el valor en pesos. */
-export function notaUf(o = {}) {
-  return ufVigente(o.hoy)
-    ? `Equivalencia en pesos referencial, con UF de ${pesos(SITIO.uf.valor)} al ${fechaCorta(SITIO.uf.fecha)}.`
-    : 'Precios en UF. El valor en pesos se calcula con la UF del día de la factura.';
-}
+/** Nota que acompaña a los precios en UF (el navegador le agrega la UF del día). */
+export const notaUf = () => 'Los precios en UF se facturan con la UF del día de la factura.';
 
 /**
  * Cifra de ejemplo (ilustrativa, no un precio). El QA revisa que todo monto
@@ -97,3 +76,20 @@ export const rutaOg = (ruta) => `/og/${ruta === '/' ? 'inicio' : ruta.replace(/^
 
 /** URL absoluta a partir de una ruta del sitio. */
 export const absoluta = (ruta) => SITIO.dominio + (ruta === '/' ? '/' : ruta);
+
+/**
+ * Elementos de bloque: entre ellos el navegador separa visualmente, pero el
+ * texto del DOM (textContent, lo que leen extractores y buscadores) los pega:
+ * "RUT77.982.517-5", "SolucionesCasos". separarBloques() agrega un salto de
+ * línea en esos bordes. No cambia cómo se ve: entre bloques y dentro de
+ * flex/grid el espacio en blanco no se dibuja.
+ */
+const BLOQUES = 'address|article|aside|blockquote|dd|details|div|dl|dt|figcaption|figure|footer|form|fieldset|h[1-6]|header|legend|li|main|nav|ol|p|section|summary|table|tbody|thead|tfoot|tr|td|th|ul';
+const CIERRE_BLOQUE = new RegExp(`(</(?:${BLOQUES})>)(?=<)`, 'g');
+const ANTES_DE_BLOQUE = new RegExp(`>(?=<(?:${BLOQUES})[\\s>])`, 'g');
+export function separarBloques(html) {
+  // No se toca el interior de <script>, <pre> ni <textarea>: ahí el texto es literal.
+  return html.split(/(<(?:script|pre|textarea)\b[\s\S]*?<\/(?:script|pre|textarea)>)/).map((parte, i) => (i % 2
+    ? parte
+    : parte.replace(CIERRE_BLOQUE, '$1\n').replace(ANTES_DE_BLOQUE, '>\n'))).join('');
+}

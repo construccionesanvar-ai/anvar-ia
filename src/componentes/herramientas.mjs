@@ -1,48 +1,42 @@
 // @ts-check
-// Autodiagnóstico y calculadora. El HTML trae el estado inicial ya resuelto
-// (primera pregunta y ejemplo calculado), así nada aparece vacío ni en cero
-// mientras carga el JavaScript. La fórmula de `calcular()` es la misma de
-// public/app.js; tests/calculadora.test.mjs y el E2E comprueban que coincidan.
+// Autodiagnóstico, calculadora de ROI y punto de pedido: el HTML inicial. Trae
+// el estado ya resuelto (primera pregunta, ejemplo calculado), así nada aparece
+// vacío ni en cero mientras carga el JavaScript. Las fórmulas viven en
+// src/calculo.mjs, que también usa el navegador (public/calculo.js).
 import { SITIO, CALCULADORA } from '../config.mjs';
 import { SERVICIOS } from '../datos/oferta.mjs';
 import { DIAGNOSTICO } from '../datos/contenido.mjs';
-import { esc, pesos, precioTexto } from '../html.mjs';
+import { esc, precioTexto, fechaCorta } from '../html.mjs';
+import { roi, puntoPedido, NIVELES_SERVICIO, textoPayback, lecturaRoi, miles, pesos, porcentaje } from '../calculo.mjs';
 import { encabezado } from './base.mjs';
+
+export { puntoPedido, NIVELES_SERVICIO };
 
 /** Valores de ejemplo de la calculadora. */
 export const CALC_DEFECTO = CALCULADORA.defecto;
 
-/** Referencias de inversión que usa la calculadora (desde la fuente única de precios). */
-export function referenciasCalculadora(uf = SITIO.uf.valor) {
-  const ex = SERVICIOS.express.precio;
-  const pi = SERVICIOS.piloto.precio;
-  return {
-    express: { nombre: 'una Automatización Express', precio: ex.valor, etiqueta: `${precioTexto(ex).principal} + IVA` },
-    piloto: { nombre: 'un piloto', precio: pi.valor * uf, etiqueta: `${precioTexto(pi).principal} + IVA` },
+/**
+ * Montos que la calculadora ofrece comparar, desde la fuente única de precios.
+ * Los precios en UF se pasan a pesos con la UF que se indique (en el
+ * navegador, la del día; en el HTML inicial, la de referencia, con su fecha).
+ */
+export function opcionesInversion(uf = SITIO.uf.valor) {
+  const op = (id) => {
+    const p = SERVICIOS[id].precio;
+    return { id, nombre: SERVICIOS[id].nombre, etiqueta: `${precioTexto(p).principal} + IVA`, moneda: p.moneda, valor: p.valor, monto: p.moneda === 'UF' ? p.valor * uf : p.valor };
   };
+  return { express: op('express'), piloto: op('piloto') };
 }
 
 /**
- * La misma fórmula que usa app.js.
- * @param {{ personas: number, horas: number, costo: number, auto: number }} v
- * @param {{ uf?: number }} [o]
+ * Entradas de la calculadora → resultado (ver src/calculo.mjs).
+ * @param {{ personas: number, horas: number, costo: number, auto: number, inversion: string, monto: number, mensual: number }} d
+ * @param {number} [uf]
  */
-export function calcular({ personas, horas, costo, auto }, o = {}) {
-  const refs = referenciasCalculadora(o.uf);
-  const horasAno = personas * horas * CALCULADORA.semanas;
-  const recuperadas = Math.round(horasAno * (auto / 100));
-  const valor = recuperadas * costo;
-  const mensual = valor / 12;
-  const referencia = valor < CALCULADORA.umbralExpress ? refs.express : refs.piloto;
-  const meses = mensual > 0 ? referencia.precio / mensual : Infinity;
-  return { horasAno, recuperadas, restantes: horasAno - recuperadas, valor, referencia, meses };
-}
-
-/** Frase del retorno. Idéntica a la de app.js. */
-export function textoRetorno(r) {
-  if (!isFinite(r.meses) || r.meses > CALCULADORA.mesesMaximos) return 'Con estos números no se justifica automatizar solo por ahorro de tiempo. Conviene revisar si hay errores o reprocesos que cuesten más.';
-  const m = r.meses < 1 ? 'menos de un mes' : r.meses < 10 ? `${r.meses.toFixed(1).replace('.', ',')} meses` : `${Math.round(r.meses)} meses`;
-  return `Como referencia, con este valor ${r.referencia.nombre} (${r.referencia.etiqueta}) se pagaría en ${m}.`;
+export function calcularRoi(d, uf = SITIO.uf.valor) {
+  const ops = opcionesInversion(uf);
+  const inversion = d.inversion === 'otro' ? d.monto : (ops[d.inversion] ?? ops.piloto).monto;
+  return roi({ personas: d.personas, horasSemana: d.horas, costoHora: d.costo, pctAutomatizable: d.auto, inversion, costoMensual: d.mensual, semanas: CALCULADORA.semanas });
 }
 
 /** Autodiagnóstico interactivo (el HTML trae la primera pregunta). */
@@ -59,7 +53,7 @@ export function diagnostico() {
       <fieldset class="diag-pregunta">
         <legend id="diag-texto">¿Qué te gustaría resolver primero?</legend>
         <div class="opciones" id="diag-opciones">
-          ${cat.map((c, i) => `<button type="button" class="opcion" data-i="${i}" aria-pressed="false"><span class="opcion-k" aria-hidden="true">${'ABCD'[i]}</span><span>${esc(c.opcion)}</span></button>`).join('')}
+          ${cat.map((c, i) => `<button type="button" class="opcion" data-i="${i}" aria-pressed="false"><span class="opcion-k" aria-hidden="true">${'ABCD'[i]}</span> <span>${esc(c.opcion)}</span></button>`).join('')}
         </div>
       </fieldset>
     </div>
@@ -80,63 +74,103 @@ export function diagnostico() {
     <p class="medidor-v" id="medidor-v">— <small>/ 100</small></p>
     <p class="medidor-e" id="medidor-e">Sin responder</p>
     <dl class="ejes">
-      <div><dt>Potencial de automatización</dt><dd><span class="eje-barra"><i id="eje-potencial"></i></span><span id="eje-potencial-v">—</span></dd></div>
-      <div><dt>Base y orden de la información</dt><dd><span class="eje-barra"><i id="eje-base"></i></span><span id="eje-base-v">—</span></dd></div>
-      <div><dt>Capacidad de partir</dt><dd><span class="eje-barra"><i id="eje-traccion"></i></span><span id="eje-traccion-v">—</span></dd></div>
+      <div><dt>Potencial de automatización</dt><dd><span class="eje-barra"><i id="eje-potencial"></i></span> <span id="eje-potencial-v">—</span></dd></div>
+      <div><dt>Base y orden de la información</dt><dd><span class="eje-barra"><i id="eje-base"></i></span> <span id="eje-base-v">—</span></dd></div>
+      <div><dt>Capacidad de partir</dt><dd><span class="eje-barra"><i id="eje-traccion"></i></span> <span id="eje-traccion-v">—</span></dd></div>
     </dl>
     <p class="indicador-nota">Siete preguntas, dos minutos. No pedimos tu correo para mostrarte el resultado. Es una orientación, no una evaluación del proceso.</p>
   </aside>
 </div>`;
 }
 
-/** Calculadora de ahorro (el HTML trae el ejemplo ya calculado). */
-export function calculadora({ compartir = false } = {}) {
+/**
+ * Calculadora de ROI (el HTML trae el ejemplo ya calculado).
+ * @param {{ compartir?: boolean, formulas?: string }} [o] formulas: ancla de la sección que explica el cálculo.
+ */
+export function calculadora({ compartir = false, formulas = '' } = {}) {
   const d = CALC_DEFECTO;
-  const r = calcular(d);
+  const r = calcularRoi(d);
+  const ops = opcionesInversion();
+  const refUf = `≈ ${pesos(ops.piloto.monto)} con UF de referencia (${pesos(SITIO.uf.valor)} al ${fechaCorta(SITIO.uf.fecha)})`;
   const deslizador = (id, etiquetaTxt, min, max, paso, valor, mostrar, hablado, ayuda) => `<div class="control">
-    <div class="control-cab"><label for="${id}">${esc(etiquetaTxt)}</label><output id="${id}-v" for="${id}">${esc(mostrar)}</output></div>
+    <div class="control-cab"><label for="${id}">${esc(etiquetaTxt)}</label> <output id="${id}-v" for="${id}">${esc(mostrar)}</output></div>
     <input type="range" id="${id}" min="${min}" max="${max}" step="${paso}" value="${valor}" data-defecto="${valor}" aria-valuetext="${esc(hablado)}"${ayuda ? ` aria-describedby="${id}-ayuda"` : ''}>
     ${ayuda ? `<p class="ayuda" id="${id}-ayuda">${esc(ayuda)}</p>` : ''}
   </div>`;
-  return `<div class="calc" id="calculadora">
+  const opcion = (valor, titulo, detalle, idDetalle = '') => `<label class="calc-opcion"><input type="radio" name="c-inv" value="${valor}"${d.inversion === valor ? ' checked' : ''} data-defecto="${d.inversion === valor ? '1' : '0'}"> <span class="calc-opcion-t"><b>${esc(titulo)}</b> <span class="calc-opcion-d"${idDetalle ? ` id="${idDetalle}"` : ''}>${esc(detalle)}</span></span></label>`;
+  const monto = (id, etiquetaTxt, valor, ayuda) => `<div class="calc-monto">
+      <label for="${id}">${esc(etiquetaTxt)}</label>
+      <div class="campo-pesos"><span aria-hidden="true">$</span><input id="${id}" type="text" inputmode="numeric" autocomplete="off" value="${valor ? esc(miles(valor)) : ''}" placeholder="0" data-defecto="${valor ? esc(miles(valor)) : ''}" aria-describedby="${id}-ayuda"></div>
+      <p class="ayuda" id="${id}-ayuda">${esc(ayuda)}</p>
+    </div>`;
+  const fila = (id, dt, dd, clase = '') => `<div${clase ? ` class="${clase}"` : ''}><dt>${esc(dt)}</dt> <dd id="${id}">${esc(dd)}</dd></div>`;
+  return `<div class="calc" id="calculadora" data-necesita-uf>
   <div class="calc-controles">
     ${deslizador('c-personas', 'Personas que hacen esta tarea', 1, 50, 1, d.personas, String(d.personas), `${d.personas} personas`)}
     ${deslizador('c-horas', 'Horas a la semana, cada una', 1, 25, 1, d.horas, `${d.horas} h`, `${d.horas} horas a la semana`)}
     ${deslizador('c-costo', 'Costo de la hora de trabajo', 3000, 40000, 500, d.costo, pesos(d.costo), `${pesos(d.costo)} por hora`, 'Sueldo bruto más leyes sociales, dividido por las horas trabajadas.')}
-    ${deslizador('c-auto', 'Parte que se puede automatizar', 20, 90, 5, d.auto, `${d.auto}%`, `${d.auto} por ciento`, 'Si no sabes, deja 60%. En el diagnóstico lo medimos.')}
+    ${deslizador('c-auto', 'Parte que se puede automatizar', 5, 100, 5, d.auto, `${d.auto}%`, `${d.auto} por ciento`, 'Si no sabes, deja 60%. En el diagnóstico lo medimos.')}
+    <fieldset class="calc-inversion">
+      <legend>Inversión a comparar</legend>
+      ${opcion('express', ops.express.nombre, ops.express.etiqueta)}
+      ${opcion('piloto', ops.piloto.nombre, `${ops.piloto.etiqueta} · ${refUf}`, 'c-piloto-d')}
+      ${opcion('otro', 'Otro monto', 'Tu cotización o presupuesto')}
+      ${monto('c-monto', 'Monto de la inversión, neto', d.inversion === 'otro' ? d.monto : 0, 'Al escribir un monto se elige "Otro monto".')}
+    </fieldset>
+    ${monto('c-mensual', 'Costo mensual de operación o soporte (opcional)', d.mensual, 'Licencias, suscripciones o soporte. Si no hay, deja 0.')}
     <button type="button" class="enlace-boton" id="c-reiniciar">Volver al ejemplo</button>
   </div>
   <div class="calc-resultado">
     <p class="calc-estado"><span class="insignia" id="c-estado">Ejemplo ilustrativo</span></p>
-    <p class="label">Valor anual del trabajo que se podría automatizar</p>
-    <p class="calc-valor" id="c-valor">${esc(pesos(r.valor))}</p>
+    <p class="label">Ahorro bruto anual estimado</p>
+    <p class="calc-valor" id="c-valor">${esc(pesos(r.ahorroBruto))}</p>
     <div class="barras" role="img" aria-label="Horas al año antes y después">
-      <div class="barra-fila"><span>Hoy</span><span class="barra-pista"><i class="barra-hoy"></i></span><span id="c-hoy">${esc(r.horasAno.toLocaleString('es-CL'))} h</span></div>
-      <div class="barra-fila"><span>Después</span><span class="barra-pista"><i class="barra-despues" id="c-barra-despues"></i></span><span id="c-despues">${esc(r.restantes.toLocaleString('es-CL'))} h</span></div>
+      <div class="barra-fila"><span>Hoy</span> <span class="barra-pista"><i class="barra-hoy"></i></span> <span id="c-hoy">${esc(miles(r.horasAnuales))} h</span></div>
+      <div class="barra-fila"><span>Después</span> <span class="barra-pista"><i class="barra-despues" id="c-barra-despues"></i></span> <span id="c-despues">${esc(miles(r.horasAnuales - r.horasRecuperadas))} h</span></div>
     </div>
-    <dl class="calc-datos">
-      <div><dt>Horas que se liberan al año</dt><dd id="c-horas-lib">${esc(r.recuperadas.toLocaleString('es-CL'))} h</dd></div>
-      <div><dt>Referencia de inversión</dt><dd id="c-retorno">${esc(textoRetorno(r))}</dd></div>
+    <dl class="calc-datos calc-datos--roi">
+      ${fila('c-horas-ano', 'Horas manuales al año', `${miles(r.horasAnuales)} h`)}
+      ${fila('c-costo-ano', 'Costo anual actual del proceso', pesos(r.costoAnual))}
+      ${fila('c-horas-lib', 'Horas potencialmente recuperadas', `${miles(r.horasRecuperadas)} h`)}
+      ${fila('c-inv', 'Inversión inicial', pesos(r.inversion))}
+      ${fila('c-recurrente', 'Costos recurrentes al año', pesos(r.recurrenteAnual))}
+      ${fila('c-neto1', 'Ahorro neto estimado, año 1', pesos(r.ahorroNetoAno1))}
+      ${fila('c-payback', 'Payback estimado', textoPayback(r, CALCULADORA.mesesMaximos), 'calc-dato-clave')}
+      ${fila('c-roi1', 'ROI año 1', porcentaje(r.roi1))}
+      ${fila('c-roi3', 'ROI a 3 años', porcentaje(r.roi3))}
     </dl>
-    <p class="calc-aviso">Estimación referencial basada en los valores ingresados, no una promesa de ahorro. El resultado real depende del proceso.</p>
+    <p class="calc-lectura" id="c-lectura">${esc(lecturaRoi(r, CALCULADORA.mesesMaximos))}</p>
+    <p class="calc-aviso">Estimación referencial basada en los valores ingresados. El resultado real depende del proceso, alcance e implementación.</p>
     <p class="sr" id="c-anuncio" aria-live="polite" aria-atomic="true"></p>
-    ${compartir ? `<div class="compartir"><button type="button" class="btn btn--secundario" id="c-compartir">Copiar enlace con estos valores</button><span class="compartir-msg" id="c-compartir-msg" role="status" aria-live="polite"></span></div>` : ''}
-    <p class="nota">Supuestos a la vista: ${CALCULADORA.semanas} semanas hábiles al año y valores netos. No incluye errores, reprocesos ni atrasos, que suelen costar más que las horas.</p>
+    ${compartir ? `<div class="compartir"><button type="button" class="btn btn--secundario" id="c-compartir">Copiar enlace con estos valores</button> <span class="compartir-msg" id="c-compartir-msg" role="status" aria-live="polite"></span></div>` : ''}
+    <p class="nota">Supuestos a la vista: ${CALCULADORA.semanas} semanas hábiles al año y montos netos, sin IVA. No incluye el costo de errores, reprocesos ni atrasos.${formulas ? ` <a href="${esc(formulas)}">Cómo calculamos esto</a>.` : ''}</p>
   </div>
 </div>`;
 }
 
+/**
+ * Herramientas en la portada: solo la entrada a cada una. La experiencia
+ * completa vive en su propia URL (una sola página por intención).
+ * Los ids "calculadora" y "autodiagnostico" se mantienen para enlaces antiguos.
+ */
 export function herramientas() {
-  return `<section class="seccion seccion--panel" id="herramientas" aria-labelledby="herramientas-tit" data-sin-precios>
+  const r = calcularRoi(CALC_DEFECTO);
+  const d = CALC_DEFECTO;
+  const tarjeta = ({ id, meta, titulo, texto, ejemplo, href, boton, evento }) => `<li class="herr-card" id="${id}">
+        <p class="herr-card-meta">${esc(meta)}</p>
+        <h3>${esc(titulo)}</h3>
+        <p>${esc(texto)}</p>
+        <p class="herr-card-ej"><span class="label">${esc(ejemplo[0])}</span> ${esc(ejemplo[1])}</p>
+        <a class="btn btn--secundario" href="${esc(href)}" data-track="${evento}" data-track-label="inicio"><span>${esc(boton)}</span></a>
+      </li>`;
+  return `<section class="seccion seccion--panel" id="herramientas" aria-labelledby="herramientas-tit">
   <div class="contenedor">
-    ${encabezado({ codigo: 'Antes de hablar con nosotros', titulo: '¿Vale la pena automatizar tu proceso?', id: 'herramientas-tit', bajada: 'Dos herramientas para responderlo tú mismo: un autodiagnóstico de preparación y una calculadora de ahorro. Ninguna pide tus datos.' })}
-    <h3 class="subtit" id="autodiagnostico">Autodiagnóstico: ¿qué tan preparado está tu proceso?</h3>
-    ${diagnostico()}
-    <p class="herr-enlaces"><a href="/diagnostico-automatizacion" data-track="content_cta_click" data-track-label="inicio-diagnostico">Cómo se calcula el autodiagnóstico y qué hacer con el resultado</a></p>
-    <h3 class="subtit subtit--sep" id="calculadora-tit">Calculadora de ahorro</h3>
-    ${calculadora()}
+    ${encabezado({ codigo: 'Herramientas gratuitas', titulo: '¿Vale la pena automatizar tu proceso?', id: 'herramientas-tit', bajada: 'Dos herramientas para responderlo tú mismo, antes de hablar con nosotros. Ninguna pide tus datos.' })}
+    <ul class="herr-cards">
+      ${tarjeta({ id: 'calculadora', meta: '1 minuto · sin registro', titulo: 'Calculadora ROI de automatización', texto: 'Descubre cuánto cuesta mantener un proceso manual y estima el retorno potencial de automatizarlo.', ejemplo: ['Ejemplo', `${d.personas} personas × ${d.horas} h a la semana → ${miles(r.horasRecuperadas)} h al año que se podrían recuperar`], href: '/calculadora-roi-automatizacion', boton: 'Calcular ROI', evento: 'home_roi_tool_click' })}
+      ${tarjeta({ id: 'autodiagnostico', meta: '2 minutos · sin correo', titulo: 'Diagnóstico de automatización', texto: 'Evalúa qué tan automatizable es un proceso y qué tipo de solución podría tener sentido.', ejemplo: ['Resultado', 'Puntaje de 0 a 100, oportunidades según tus respuestas y un primer paso sugerido'], href: '/diagnostico-automatizacion', boton: 'Hacer diagnóstico', evento: 'home_diagnostic_tool_click' })}
+    </ul>
     <p class="herr-enlaces">
-      <a href="/calculadora-roi-automatizacion" data-track="content_cta_click" data-track-label="inicio-calculadora">La fórmula, paso a paso</a>
       <a href="/recursos/plantilla-roi-automatizacion" data-track="content_cta_click" data-track-label="inicio-plantilla">Plantilla Excel de ROI (gratis)</a>
       <a href="/herramientas/punto-de-pedido" data-track="content_cta_click" data-track-label="inicio-punto-pedido">Calculadora de punto de pedido</a>
       <a href="/recursos" data-track="content_cta_click" data-track-label="inicio-recursos">Todas las guías y herramientas</a>
@@ -147,30 +181,10 @@ export function herramientas() {
 
 /* ---------------------------------------------------- punto de pedido */
 
-/** Valores Z de la distribución normal para cada nivel de servicio. */
-export const NIVELES_SERVICIO = [
-  { pct: 90, z: 1.282 },
-  { pct: 95, z: 1.645 },
-  { pct: 97.5, z: 1.96 },
-  { pct: 99, z: 2.326 },
-];
-
 /** Ejemplo con que parte la calculadora de punto de pedido. */
 export const PP_DEFECTO = { demanda: 20, desvDemanda: 6, plazo: 7, desvPlazo: 1, servicio: 95, stock: null };
 
-/**
- * Stock de seguridad y punto de pedido (misma fórmula que app.js).
- * SS = Z · √(L · σd² + d² · σL²) ; PP = d · L + SS. Se redondean hacia arriba: son unidades.
- * @param {{ demanda: number, desvDemanda: number, plazo: number, desvPlazo: number, servicio: number }} v
- */
-export function puntoPedido({ demanda, desvDemanda, plazo, desvPlazo, servicio }) {
-  const z = (NIVELES_SERVICIO.find((n) => n.pct === servicio) ?? NIVELES_SERVICIO[1]).z;
-  const durantePlazo = demanda * plazo;
-  const seguridad = Math.ceil(z * Math.sqrt(plazo * desvDemanda ** 2 + demanda ** 2 * desvPlazo ** 2));
-  return { z, durantePlazo: Math.ceil(durantePlazo), seguridad, punto: Math.ceil(durantePlazo + seguridad) };
-}
-
-/** Formulario de punto de pedido, con el ejemplo ya calculado. */
+/** Calculadora de punto de pedido (el HTML trae el ejemplo ya calculado). */
 export function calculadoraPuntoPedido() {
   const d = PP_DEFECTO;
   const r = puntoPedido(d);
@@ -187,10 +201,10 @@ export function calculadoraPuntoPedido() {
   <div class="pp-resultado" aria-labelledby="pp-res-tit">
     <p class="label" id="pp-res-tit">Resultado</p>
     <dl class="pp-cifras">
-      <div><dt>Punto de pedido</dt><dd id="pp-punto">${r.punto.toLocaleString('es-CL')}<small>unidades</small></dd></div>
-      <div><dt>Stock de seguridad</dt><dd id="pp-seguridad">${r.seguridad.toLocaleString('es-CL')}<small>unidades</small></dd></div>
+      <div><dt>Punto de pedido</dt><dd id="pp-punto">${miles(r.punto)} <small>unidades</small></dd></div>
+      <div><dt>Stock de seguridad</dt><dd id="pp-seguridad">${miles(r.seguridad)} <small>unidades</small></dd></div>
     </dl>
-    <p class="pp-lectura" id="pp-lectura">Cuando el stock baje de ${r.punto.toLocaleString('es-CL')} unidades, haz el pedido. Esa cifra cubre la demanda esperada durante el plazo (${r.durantePlazo.toLocaleString('es-CL')} unidades) más ${r.seguridad.toLocaleString('es-CL')} de seguridad, con un nivel de servicio de 95%.</p>
+    <p class="pp-lectura" id="pp-lectura">Cuando el stock baje de ${miles(r.punto)} unidades, haz el pedido. Esa cifra cubre la demanda esperada durante el plazo (${miles(r.durantePlazo)} unidades) más ${miles(r.seguridad)} de seguridad, con un nivel de servicio de 95%.</p>
     <p class="pp-error" id="pp-error" role="alert" hidden></p>
     <p class="sr" id="pp-anuncio" aria-live="polite" aria-atomic="true"></p>
   </div>

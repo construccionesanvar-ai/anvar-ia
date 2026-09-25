@@ -64,9 +64,10 @@ const VETADAS = [
 
 // ------------------------------------------------------ precios permitidos
 const UF_VALIDOS = new Set();
-const CLP_VALIDOS = new Set([SITIO.uf.valor]);
+// Solo precios en pesos reales: las equivalencias de la UF no van en el HTML.
+const CLP_VALIDOS = new Set();
 for (const s of Object.values(SERVICIOS)) {
-  if (s.precio.moneda === 'UF') { UF_VALIDOS.add(s.precio.valor); CLP_VALIDOS.add(s.precio.valor * SITIO.uf.valor); }
+  if (s.precio.moneda === 'UF') UF_VALIDOS.add(s.precio.valor);
   else CLP_VALIDOS.add(s.precio.valor);
   for (const m of (s.precio.nota ?? '').matchAll(/UF (\d+)/g)) UF_VALIDOS.add(Number(m[1]));
 }
@@ -96,6 +97,15 @@ for (const f of paginas) {
   const h1 = (h.match(/<h1[\s>]/g) || []).length;
   if (h1 !== 1) err(f, `tiene ${h1} <h1> (debe ser 1)`);
   if (!/<html lang="es/.test(h)) err(f, 'sin lang en <html>');
+
+  // Texto pegado en el DOM: "−91%de tiempo", "8documentos", "$49.000IVA". Se ve
+  // bien por CSS, pero lectores de pantalla, buscadores y extractores lo leen junto.
+  const textoDom = sinScripts(h.replace(/<svg[\s\S]*?<\/svg>/g, '')).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+  for (const m of textoDom.matchAll(/(?:\d|%|\))(?=[a-záéíóúñ]{3,}|IVA)/g)) {
+    const trozo = textoDom.slice(Math.max(0, m.index - 12), m.index + 14).replace(/\s+/g, ' ');
+    if (/\d(?:min|mes|h)\b|\b\d+(?:x|px)\b|v=|\d{3,}[a-f]/.test(trozo)) continue;
+    err(f, `texto pegado en el DOM: "${trozo}" (agrega un espacio real entre los elementos)`);
+  }
 
   // Jerarquía de títulos: nunca saltar un nivel hacia abajo (h1 → h3).
   let previo = 0;
@@ -139,6 +149,10 @@ for (const f of paginas) {
   for (const m of txtPrecios.matchAll(/UF (\d+(?:\.\d{3})*)/g)) if (!UF_VALIDOS.has(numero(m[1]))) err(f, `precio "UF ${m[1]}" que no está en src/datos/oferta.mjs`);
   for (const m of txtPrecios.matchAll(/\$(\d{1,3}(?:\.\d{3})+)/g)) if (!CLP_VALIDOS.has(numero(m[1]))) err(f, `monto "$${m[1]}" que no sale de src/datos/oferta.mjs ni de la UF`);
 
+  // UF: el HTML no trae equivalencias en pesos fijas (envejecen). Solo la
+  // calculadora de ROI, dentro de su sección, usa la UF de referencia con fecha.
+  if (/data-uf="[^"]*"[^>]*>[^<]*≈/.test(h)) err(f, 'precio en UF con equivalencia en pesos fija en el HTML (la pone el navegador con la UF del día)');
+
   // WhatsApp: todo enlace lleva mensaje y origen del lead.
   for (const m of h.matchAll(/href="(https:\/\/wa\.me\/[^"]*)"/g)) {
     if (!m[1].includes(`wa.me/${SITIO.contacto.whatsapp}`)) err(f, 'enlace a WhatsApp con otro número');
@@ -152,7 +166,7 @@ for (const f of paginas) {
   // Accesibilidad básica
   for (const m of h.matchAll(/<img\b[^>]*>/g)) if (!/\salt="/.test(m[0])) err(f, 'imagen sin alt: ' + m[0].slice(0, 60));
   for (const m of h.matchAll(/<(?:input|select|textarea)\b[^>]*\bid="([^"]+)"[^>]*>/g)) {
-    if (/type="(hidden|submit)"/.test(m[0])) continue;
+    if (/type="(hidden|submit)"/.test(m[0]) || /data-trampa/.test(m[0])) continue;
     if (!new RegExp(`<label[^>]*for="${m[1]}"`).test(h)) err(f, `campo #${m[1]} sin <label>`);
   }
   for (const m of h.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) if (!/rel="[^"]*noopener/.test(m[0])) err(f, 'target="_blank" sin rel="noopener": ' + m[0].slice(0, 70));
@@ -285,8 +299,7 @@ if (!publicables().length) aviso('testimonios', 'no hay testimonios autorizados:
 
 // Recordatorios comerciales y legales
 const diasUf = Math.round((Date.now() - new Date(SITIO.uf.fecha + 'T12:00:00-03:00').getTime()) / 86_400_000);
-if (diasUf > SITIO.uf.vigenciaDias) aviso('src/config.mjs', `la UF de referencia (${fechaCorta(SITIO.uf.fecha)}) tiene ${diasUf} días: ya no se muestran pesos si /api/uf falla. Actualízala.`);
-else if (diasUf > SITIO.uf.vigenciaDias - 10) aviso('src/config.mjs', `la UF de referencia vence en ${SITIO.uf.vigenciaDias - diasUf} días`);
+if (diasUf > 60) aviso('src/config.mjs', `la UF de referencia de la calculadora (${fechaCorta(SITIO.uf.fecha)}) tiene ${diasUf} días. Solo se usa si /api/uf falla y siempre con su fecha, pero conviene actualizarla.`);
 for (const s of Object.values(SERVICIOS)) if (s.hipotesis) aviso('precios', `${s.nombre}: precio aún sin validar con clientes (hipotesis: true)`);
 for (const p of PENDIENTES_PRIVACIDAD) aviso('privacidad (validar)', p);
 if (!SITIO.agenda.url) aviso('agenda', 'sin agenda configurada: el sitio ofrece coordinar por WhatsApp (SITIO.agenda.url)');

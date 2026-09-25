@@ -9,13 +9,18 @@ export const SITIO = {
   linea: 'IA & Automatización',
   idioma: 'es-CL',
 
+  // Identidad legal. ANVAR TECH es una MARCA (no una sociedad): la sociedad que
+  // presta los servicios, emite las facturas, firma contratos y NDA y es
+  // responsable de los datos personales es ANVAR Construcciones SpA.
+  // Fuente: repo anvartechcl (CLAUDE.md, "Datos del negocio") y anvartech.cl,
+  // que ya factura con esta razón social y este RUT. Si cambia la sociedad,
+  // se cambia SOLO aquí: pie, privacidad, JSON-LD y llms.txt salen de acá.
+  // Las plantillas de operacion/ repiten estos datos a mano: actualízalas también.
   empresa: {
-    // Nombre que se muestra. Decisión de Andrés (2026-09-24): se usa ANVAR TECH SpA
-    // como nombre de fantasía. El RUT es de ANVAR Construcciones SpA, que es quien
-    // factura; por eso el sitio no rotula este nombre como "razón social" ni lo
-    // declara como legalName en los datos estructurados.
-    nombre: 'ANVAR TECH SpA',
+    razonSocial: 'ANVAR Construcciones SpA',
     rut: '77.982.517-5',
+    /** Frase corta y exacta para explicar la relación marca → sociedad. */
+    relacion: 'ANVAR TECH es una marca de ANVAR Construcciones SpA',
     pais: 'Chile',
     ciudad: 'Santiago',
     atencion: 'Presencial en la Región Metropolitana y remota en todo Chile',
@@ -28,16 +33,18 @@ export const SITIO = {
     respuesta: 'Respondemos antes de 24 horas hábiles',
   },
 
-  // UF de referencia para mostrar equivalencias en pesos. Los precios se
-  // cotizan y se facturan en UF; el peso es solo una guía.
-  //  - En el navegador, /api/uf trae el valor del día y reemplaza este.
-  //  - Si /api/uf falla, se muestra este valor con su fecha.
-  //  - Si este valor tiene más de `vigenciaDias` días, deja de mostrarse:
-  //    queda solo el precio en UF. Actualízalo cuando lo veas viejo.
+  // UF. Los precios de proyectos se cotizan y facturan en UF.
+  //  - Equivalencia en pesos de los precios: SOLO la del día. La pide el
+  //    navegador a /api/uf (CMF o mindicador.cl, cacheada 6 h en la CDN) y la
+  //    muestra con su fecha. Si /api/uf falla, se muestra solo el precio en UF
+  //    y "Equivalencia en pesos no disponible temporalmente". El HTML nunca
+  //    trae un valor en pesos fijo que pueda quedar viejo.
+  //  - Este valor de referencia se usa únicamente para el cálculo inicial de
+  //    la calculadora de ROI (opción "Piloto"), siempre rotulado con su fecha,
+  //    y se reemplaza por la UF del día apenas carga la página.
   uf: {
     valor: 41000,
     fecha: '2026-09-24',
-    vigenciaDias: 45,
   },
 
   // Agenda de la evaluación de 20 minutos. Pega aquí el enlace público de
@@ -87,19 +94,28 @@ export const SITIO = {
     cargo: 'Fundador de ANVAR TECH',
     formacion: 'Ingeniería de Ejecución Industrial (en curso)',
     experiencia: 'Operaciones de retail · prevención de pérdidas',
+    /** Página de perfil (autor de guías y casos). */
+    perfil: '/equipo/andres-vargas',
+    /**
+     * Perfiles públicos verificables (LinkedIn, GitHub…). Van a `sameAs` del
+     * Person y a la página de perfil. Vacío = no se declara ninguno.
+     * @type {{ nombre: string, url: string }[]}
+     */
+    perfiles: [],
   },
 };
 
-/** Supuestos de la calculadora de ahorro (los usa el build y el navegador). */
+/** Supuestos de la calculadora de ROI (los usa el build y el navegador). */
 export const CALCULADORA = {
   /** Semanas hábiles al año. */
   semanas: 44,
-  /** Bajo este valor anual se compara con una Express; sobre él, con un piloto. */
-  umbralExpress: 2_000_000,
-  /** Sobre estos meses de retorno se dice que no se justifica por tiempo. */
+  /** Sobre estos meses de payback se dice que no se recupera dentro del período. */
   mesesMaximos: 36,
-  /** Valores de ejemplo con que parte. */
-  defecto: { personas: 5, horas: 6, costo: 9000, auto: 60 },
+  /**
+   * Valores de ejemplo con que parte. `inversion`: 'express' | 'piloto' | 'otro'
+   * (con 'otro' se usa `monto`). Coinciden con el ejemplo de la plantilla Excel.
+   */
+  defecto: { personas: 5, horas: 6, costo: 9000, auto: 60, inversion: 'piloto', monto: 0, mensual: 0 },
 };
 
 /** Compatibilidad: algunos módulos importan este nombre. */

@@ -14,7 +14,7 @@ antes de que un colaborador toque un proyecto tuyo.
 
 **ACUERDO DE PRESTACIÓN DE SERVICIOS**
 
-Entre **ANVAR TECH SpA**, RUT 77.982.517-5, representada por Andrés Vargas
+Entre **ANVAR Construcciones SpA** (marca ANVAR TECH), RUT 77.982.517-5, representada por Andrés Vargas
 (en adelante "el Prestador"), y **[EMPRESA]**, RUT [X], representada por
 [NOMBRE, CARGO] (en adelante "el Cliente").
 
@@ -73,8 +73,8 @@ escrito con [15] días. Se paga lo ejecutado hasta esa fecha.
 Firman en [CIUDAD], [FECHA], en dos ejemplares.
 
 _______________________          _______________________
-Andrés Vargas                     [NOMBRE]
-ANVAR TECH SpA                    [EMPRESA]
+Andrés Vargas                    [NOMBRE]
+ANVAR Construcciones SpA         [EMPRESA]
 
 ### Anexo 1 — Alcance
 *Lista literal de entregables, con fechas. Sé específico: "informe de 8 a 10
@@ -87,7 +87,7 @@ no lo es.*
 
 **ACUERDO DE COLABORACIÓN POR PROYECTO**
 
-Entre **ANVAR TECH SpA** (en adelante "la Empresa") y **[NOMBRE]**, RUT [X]
+Entre **ANVAR Construcciones SpA** (marca ANVAR TECH, en adelante "la Empresa") y **[NOMBRE]**, RUT [X]
 (en adelante "el Colaborador").
 
 **1. Naturaleza.** Prestación de servicios independiente por proyecto. No existe
@@ -122,8 +122,8 @@ sociedad ni de participación en la Empresa.
 Firman en [CIUDAD], [FECHA].
 
 _______________________          _______________________
-Andrés Vargas                     [NOMBRE]
-ANVAR TECH SpA                    Colaborador
+Andrés Vargas                    [NOMBRE]
+ANVAR Construcciones SpA         Colaborador
 
 > **Por qué el punto 4 y el punto 7 importan tanto:** el 4 evita que dentro de un
 > año haya una discusión sobre de quién es el sistema que le entregaste a un

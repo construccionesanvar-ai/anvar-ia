@@ -6,6 +6,7 @@ import { SERVICIOS } from '../datos/oferta.mjs';
 import { absoluta, precioTexto, plano } from '../html.mjs';
 
 const ORG_ID = SITIO.dominio + '/#organizacion';
+const PERSONA_ID = SITIO.dominio + SITIO.fundador.perfil + '#persona';
 
 export function organizacion() {
   return {
@@ -13,6 +14,8 @@ export function organizacion() {
     '@id': ORG_ID,
     name: SITIO.marca,
     alternateName: `${SITIO.marca} · ${SITIO.linea}`,
+    legalName: SITIO.empresa.razonSocial,
+    taxID: SITIO.empresa.rut,
     url: SITIO.dominio + '/',
     logo: { '@type': 'ImageObject', url: SITIO.dominio + '/logo-512.png', width: 512, height: 512 },
     image: SITIO.dominio + '/og-image.png',
@@ -29,15 +32,16 @@ export function organizacion() {
     }],
     areaServed: { '@type': 'Country', name: 'Chile' },
     address: { '@type': 'PostalAddress', addressLocality: SITIO.empresa.ciudad, addressRegion: 'Región Metropolitana', addressCountry: 'CL' },
-    founder: { '@type': 'Person', name: SITIO.fundador.nombre, jobTitle: SITIO.fundador.cargo },
+    founder: { '@type': 'Person', '@id': PERSONA_ID, name: SITIO.fundador.nombre, url: SITIO.dominio + SITIO.fundador.perfil },
     knowsAbout: ['Automatización de procesos', 'Automatización documental', 'Automatización de Excel', 'Inteligencia de datos', 'Gestión de inventario', 'Integración con AutoCAD', 'Inteligencia artificial aplicada a operaciones'],
     sameAs: [SITIO.sitioMatriz, ...SITIO.redes.map((r) => r.url)],
   };
 }
 
-/** Persona autora de los contenidos (el fundador, real). */
+/** Persona autora de los contenidos (el fundador, real). Una sola entidad, con @id estable. */
 export function autorLd() {
-  return { '@type': 'Person', name: SITIO.fundador.nombre, jobTitle: SITIO.fundador.cargo, url: SITIO.dominio + '/#nosotros', worksFor: { '@id': ORG_ID } };
+  const p = { '@type': 'Person', '@id': PERSONA_ID, name: SITIO.fundador.nombre, jobTitle: SITIO.fundador.cargo, url: SITIO.dominio + SITIO.fundador.perfil, worksFor: { '@id': ORG_ID } };
+  return SITIO.fundador.perfiles.length ? { ...p, sameAs: SITIO.fundador.perfiles.map((x) => x.url) } : p;
 }
 
 /**

@@ -116,15 +116,19 @@ for (const [ruta, tipo, contiene] of [
 
 // Redirecciones (vercel.json) y URL limpias.
 const vercel = JSON.parse(readFileSync(join(RAIZ, 'vercel.json'), 'utf8'));
+/** @type {[string, string, boolean][]} [desde, hacia, permanente] */
 const redirecciones = [
-  ...vercel.redirects.filter((/** @type {{source: string}} */ x) => !x.source.includes(':')).map((/** @type {{source: string, destination: string}} */ x) => [x.source, x.destination]),
-  ['/casos.html', '/casos'],
-  ['/recursos/', '/recursos'],
+  ...vercel.redirects
+    .filter((/** @type {{source: string}} */ x) => !x.source.includes(':'))
+    .map((/** @type {{source: string, destination: string, permanent?: boolean}} */ x) => /** @type {[string, string, boolean]} */ ([x.source, x.destination, x.permanent !== false])),
+  ['/casos.html', '/casos', true],
+  ['/recursos/', '/recursos', true],
 ];
-for (const [desde, hacia] of redirecciones) {
+for (const [desde, hacia, permanente] of redirecciones) {
   const r = await traer(desde);
   const destino = (r.headers.get('location') || '').replace(BASE, '').replace(SITIO.dominio, '');
-  ok([301, 308].includes(r.status) && destino === hacia, `${desde}: esperaba 301/308 → ${hacia}, llegó ${r.status} → ${destino || '(sin location)'}`);
+  const codigos = permanente ? [301, 308] : [302, 307];
+  ok(codigos.includes(r.status) && destino === hacia, `${desde}: esperaba ${codigos.join('/')} → ${hacia}, llegó ${r.status} → ${destino || '(sin location)'}`);
 }
 
 // 404 real, con la página de ayuda.

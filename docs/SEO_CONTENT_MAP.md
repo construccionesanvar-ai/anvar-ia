@@ -35,6 +35,7 @@ ya existe una página para esa búsqueda. Si existe, mejórala.
 | `/recursos/como-detectar-proceso-automatizable` | Saber si conviene automatizar | "cómo saber si un proceso se puede automatizar", "qué procesos automatizar" | Guía | Autodiagnóstico |
 | `/recursos/procesos-que-no-deberias-automatizar` | Cuándo no automatizar | "qué no automatizar", "errores al automatizar procesos" | Guía | Evaluar mi proceso |
 | `/recursos/ia-vs-automatizacion-tradicional` | Elegir entre reglas, RPA e IA | "ia vs rpa", "ia o automatización tradicional" | Guía | Evaluar mi proceso |
+| `/equipo/andres-vargas` | Autoría (E-E-A-T): quién escribe y lidera | "andrés vargas anvar tech" | Perfil | Evaluar mi proceso |
 | `/privacidad` | Legal | — | Legal | — |
 
 ## Pares que se parecen y cómo se separan
@@ -52,7 +53,9 @@ ya existe una página para esa búsqueda. Si existe, mejórala.
 
 - Cada landing enlaza a: su caso o prueba, 1–2 guías y una herramienta.
 - Cada guía enlaza a: la landing de su tema, una herramienta y otra guía.
-- La portada enlaza a las landings desde las tarjetas de problemas.
+- La portada enlaza a las landings desde las tarjetas de problemas y a las herramientas desde dos
+  tarjetas (la experiencia completa vive solo en su URL: una intención, una página).
+- Las guías y el caso largo enlazan al perfil del autor (`/equipo/andres-vargas`).
 - El pie enlaza a servicios, soluciones y recursos gratuitos (todas las páginas).
 - El QA (`npm run check`) falla si una página indexable queda huérfana.
 

@@ -11,7 +11,7 @@ import { TESTIMONIOS, publicables } from '../src/datos/testimonios.mjs';
 import { INDUSTRIAS, faltantes } from '../src/datos/industrias.mjs';
 import { PROPIEDAD } from '../src/datos/contenido.mjs';
 import { FAQ } from '../src/datos/faq.mjs';
-import { precioTexto, notaUf, ufVigente } from '../src/html.mjs';
+import { precioTexto, notaUf } from '../src/html.mjs';
 
 test('cada servicio tiene los campos comerciales completos', () => {
   for (const [clave, s] of Object.entries(SERVICIOS)) {
@@ -26,25 +26,15 @@ test('cada servicio tiene los campos comerciales completos', () => {
   }
 });
 
-test('precio en UF: equivalencia en pesos solo mientras la UF de referencia esté vigente', () => {
-  const p = SERVICIOS.diagnostico.precio;
-  const base = new Date(SITIO.uf.fecha + 'T12:00:00-03:00');
-  const vigente = precioTexto(p, { hoy: base });
-  assert.equal(vigente.principal, 'UF 12');
-  assert.match(vigente.detalle, /^≈ \$[\d.]+ \+ IVA$/);
-  assert.equal(vigente.clp, 12 * SITIO.uf.valor);
-
-  const vieja = new Date(base.getTime() + (SITIO.uf.vigenciaDias + 1) * 86_400_000);
-  assert.equal(ufVigente(vieja), false);
-  const sinPesos = precioTexto(p, { hoy: vieja });
-  assert.equal(sinPesos.detalle, '+ IVA');
-  assert.equal(sinPesos.clp, null);
-  assert.match(notaUf({ hoy: vieja }), /UF del día de la factura/);
-  assert.match(notaUf({ hoy: base }), /al \d{2}\/\d{2}\/\d{4}/);
+test('precio en UF: el HTML nunca trae una equivalencia en pesos fija', () => {
+  const t = precioTexto(SERVICIOS.diagnostico.precio);
+  assert.deepEqual(t, { principal: 'UF 12', detalle: '+ IVA' });
+  assert.match(notaUf(), /UF del día de la factura/);
+  assert.doesNotMatch(notaUf(), /\$/);
 });
 
 test('precio en pesos: desde, IVA y periodo', () => {
-  assert.deepEqual(precioTexto(SERVICIOS.express.precio), { principal: 'desde $199.900', detalle: '+ IVA', clp: 199900 });
+  assert.deepEqual(precioTexto(SERVICIOS.express.precio), { principal: 'desde $199.900', detalle: '+ IVA' });
   assert.equal(precioTexto(SERVICIOS.acompanamiento.precio).principal, '$89.000 / mes');
   assert.equal(precioTexto(SERVICIOS.sesion.precio).detalle, 'IVA incluido');
   assert.equal(precioTexto(SERVICIOS.intelligence.precio).principal, 'desde UF 6 / mes');
