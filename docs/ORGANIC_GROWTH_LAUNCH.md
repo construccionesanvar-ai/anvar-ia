@@ -25,7 +25,8 @@ visitas ni clientes.
 | Guía | `/recursos/procesos-que-no-deberias-automatizar` | 7 casos en que conviene esperar |
 | Guía | `/recursos/ia-vs-automatizacion-tradicional` | Reglas, scripts, RPA o IA |
 
-Además: imágenes para compartir por página, datos estructurados (Article, WebApplication,
+Además: verificación automática de la web pública después de cada deploy
+(`.github/workflows/verificacion.yml`), imágenes para compartir por página, datos estructurados (Article, WebApplication,
 Service, Breadcrumb, FAQ visible), `feed.xml`, `llms.txt`, IndexNow automático, atribución de
 visitas y leads en Vercel Analytics, 404 con salidas útiles, redirecciones de alias comunes.
 
@@ -35,7 +36,7 @@ visitas y leads en Vercel Analytics, 404 con salidas útiles, redirecciones de a
 - [ ] Search Console: enviar el sitemap y solicitar indexación de las 6 primeras URL
       (`docs/SEARCH_CONSOLE_SETUP.md`, paso 3).
 - [ ] Bing Webmaster Tools: importar desde Search Console (`docs/BING_WEBMASTER_SETUP.md`).
-- [ ] GitHub → Actions → IndexNow → Run workflow con "todas" marcado (una sola vez).
+- [x] IndexNow: el workflow envió las 24 URL al publicar (respuesta `202 Accepted`). No repetir.
 - [ ] Compartir una prueba del sitio en redes sociales y revisar que la imagen se vea
       (LinkedIn Post Inspector: https://www.linkedin.com/post-inspector/).
 
@@ -72,7 +73,6 @@ visitas y leads en Vercel Analytics, 404 con salidas útiles, redirecciones de a
 |---|---|---|
 | Sitemap y solicitudes de indexación en Google | Dueño de Search Console | `docs/SEARCH_CONSOLE_SETUP.md` |
 | Alta en Bing Webmaster Tools | Cuenta Microsoft de la empresa | `docs/BING_WEBMASTER_SETUP.md` |
-| Primer envío completo a IndexNow | Quien tenga acceso a GitHub Actions | `docs/BING_WEBMASTER_SETUP.md` |
 | Perfil de Google Business | Dueño de la empresa | `docs/GOOGLE_BUSINESS_PROFILE.md` |
 | Perfiles sociales en `sameAs` | Pegar URL reales en `SITIO.redes` | `src/config.mjs` |
 | Grabar videos reales de C-01 y C-03 | Equipo | `docs/CONTENT_DISTRIBUTION.md` |

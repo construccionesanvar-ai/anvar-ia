@@ -17,7 +17,8 @@
     "deploy": "vercel --prod",
     "og": "node scripts/og.mjs",
     "indexnow": "node scripts/indexnow.mjs",
-    "utm": "node scripts/utm.mjs"
+    "utm": "node scripts/utm.mjs",
+    "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
