@@ -1,21 +1,22 @@
 // @ts-check
 import { SERVICIOS } from '../datos/oferta.mjs';
 import { FAQ } from '../datos/faq.mjs';
-import { precioTexto } from '../html.mjs';
 import { evaluar } from '../componentes/base.mjs';
-import { heroServicio, paraQuien, etapas, bloquePrecio, casosRelacionados, preguntas, otrosServicios } from '../componentes/secciones.mjs';
+import { heroServicio, paraQuien, etapas, bloquePrecio, casosRelacionados, preguntas, otrosServicios, precioLinea } from '../componentes/secciones.mjs';
+import { FUENTES } from '../datos/whatsapp.mjs';
+import { PROPIEDAD } from '../datos/contenido.mjs';
 import { migas, servicio, faq } from './ld.mjs';
 
 const p = SERVICIOS.piloto;
-const pt = precioTexto(p.precio);
 
 export default {
   ruta: '/automatizacion-procesos-ia',
   archivo: 'automatizacion-procesos-ia.html',
   prioridad: '0.8',
   titulo: 'Piloto e implementación de automatización con IA | ANVAR TECH',
-  descripcion: 'Automatizamos procesos en etapas: un piloto medido antes y después, la implementación completa y soporte. El código y la documentación quedan en tu empresa.',
+  descripcion: 'Automatizamos procesos en etapas: un piloto medido antes y después, la implementación completa y soporte, con manual de uso y manual técnico para tu equipo.',
   contextoWsp: 'piloto',
+  fuente: FUENTES.pilot,
   jsonld: [
     migas([['Piloto e implementación', p.url]]),
     servicio({ nombre: 'Automatización de procesos con IA', tipo: 'Automatización de procesos', ruta: p.url, ofertas: ['piloto', 'implementacion', 'soporte'], descripcion: 'Piloto en producción de tres a cuatro semanas medido antes y después, implementación completa integrada con los sistemas del cliente y soporte mensual.' }),
@@ -25,9 +26,9 @@ export default {
 ${heroServicio({
   sobretitulo: 'Piloto e implementación',
   h1: 'Automatización de procesos en etapas, medida antes y después',
-  lead: 'Partimos por un piloto de un proceso, lo usa tu equipo y lo medimos con el mismo método del inicio. *Solo si generó valor* implementamos el resto. El código, las cuentas y la documentación quedan en tu empresa.',
+  lead: 'Partimos por un piloto de un proceso, lo usa tu equipo y lo medimos con el mismo método del inicio. *Solo si generó valor* implementamos el resto, documentado para que tu equipo pueda operarlo.',
   contexto: 'piloto',
-  ficha: [['Piloto', `${pt.principal} ${pt.detalle}`], ['Duración', p.plazo], ['Implementación', precioTexto(SERVICIOS.implementacion.precio).principal], ['Código', 'Queda en tu empresa']],
+  ficha: [['Piloto', precioLinea('piloto')], ['Duración', p.plazo], ['Implementación', precioLinea('implementacion')], ['Documentación', 'Manual de uso y técnico']],
 })}
 
 ${paraQuien({
@@ -57,7 +58,7 @@ ${etapas({
   ],
 })}
 
-${bloquePrecio({ titulo: { id: 'valor-tit', texto: 'Cuánto cuesta' }, ids: ['piloto', 'implementacion', 'soporte'], nota: `Valores netos más IVA, cotizados en UF. El piloto incluye el diagnóstico: si ya lo hiciste, son *UF ${p.precio.valor - SERVICIOS.diagnostico.precio.valor} adicionales*. Las implementaciones se pagan por etapas contra entregables.` })}
+${bloquePrecio({ titulo: { id: 'valor-tit', texto: 'Cuánto cuesta' }, ids: ['piloto', 'implementacion', 'soporte'], nota: `Valores netos más IVA, cotizados en UF. El piloto incluye el diagnóstico: si ya lo hiciste, son *UF ${p.precio.valor - SERVICIOS.diagnostico.precio.valor} adicionales*. Las implementaciones se pagan por etapas contra entregables. ${PROPIEDAD.corta}` })}
 ${casosRelacionados(['documentos-legales', 'venta-en-linea', 'planos-autocad'])}
 ${preguntas(FAQ.automatizacion, { titulo: 'Preguntas sobre piloto e implementación' })}
 ${otrosServicios('piloto')}

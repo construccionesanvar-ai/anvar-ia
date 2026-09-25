@@ -2,9 +2,15 @@
 // Preguntas frecuentes por página. Cada lista alimenta el acordeón visible y
 // los datos estructurados FAQPage de esa misma página, así que nunca difieren.
 import { SERVICIOS } from './oferta.mjs';
+import { PROPIEDAD } from './contenido.mjs';
 import { precioTexto } from '../html.mjs';
 
+// En las respuestas se usa solo el precio en UF (sin pesos): el texto va
+// también a los datos estructurados y no debe desactualizarse.
 const p = (id) => precioTexto(SERVICIOS[id].precio);
+const uf = (id) => `${p(id).principal} + IVA`;
+const plazo = (id) => SERVICIOS[id].plazoCorto;
+const sinPeso = (id) => `${p(id).principal} ${SERVICIOS[id].precio.moneda === 'UF' ? '+ IVA' : p(id).detalle}`;
 
 /** @typedef {{ q: string, a: string }} Pregunta */
 
@@ -12,11 +18,11 @@ const p = (id) => precioTexto(SERVICIOS[id].precio);
 export const FAQ = {
   inicio: [
     { q: '¿Cuánto cuesta empezar?',
-      a: `La conversación de evaluación, de 20 minutos, no tiene costo. Si el proceso es pequeño y está bien delimitado, la Automatización Express parte en ${p('express').principal} ${p('express').detalle}, con alcance y precio fijo acordados antes de partir. Si son varios procesos o no está claro por dónde empezar, el diagnóstico cuesta ${p('diagnostico').principal} + IVA y se descuenta si avanzas al piloto.` },
+      a: `La conversación de evaluación, de 20 minutos, no tiene costo. Si el proceso es pequeño y está bien delimitado, la Automatización Express parte ${sinPeso('express')}, con alcance y precio fijo acordados por escrito antes de partir. Si son varios procesos o no está claro por dónde empezar, el diagnóstico cuesta ${uf('diagnostico')} y se descuenta si avanzas al piloto.` },
     { q: '¿Qué pasa con los datos de mi empresa?',
-      a: 'Firmamos confidencialidad antes de ver cualquier información. Antes de construir te decimos por escrito qué datos salen de tu red —por ejemplo, hacia un modelo de IA— y cuáles no. Si la información no debe salir, se procesa en tus equipos.' },
+      a: 'Firmamos confidencialidad antes de ver cualquier información y pedimos solo los datos que el proceso necesita. Antes de construir te decimos por escrito qué datos salen de tu red —por ejemplo, hacia un modelo de IA— y cuáles no. Si la información no debe salir, buscamos procesarla en tus equipos y, si alguna parte no se puede, te lo decimos antes.' },
     { q: '¿Quién se queda con lo que se construye?',
-      a: 'Lo desarrollado a medida para tu empresa queda en tu poder una vez pagado, y así queda en el contrato. Nuestras herramientas y plantillas previas siguen siendo nuestras, con licencia de uso para tu empresa.' },
+      a: PROPIEDAD.completa },
     { q: '¿Y si la IA se equivoca?',
       a: 'Se equivoca, y por eso diseñamos para eso: datos dudosos marcados para revisión, validaciones que impiden continuar con información incompleta y una persona que aprueba antes de que algo tenga efecto.' },
     { q: '¿Tenemos que cambiar los sistemas que usamos?',
@@ -24,7 +30,7 @@ export const FAQ = {
     { q: '¿Trabajan con empresas chicas?',
       a: 'Sí, y muchas veces rinde más, porque las decisiones son rápidas. Usa la calculadora con tus números: si el ahorro anual es chico, te vamos a recomendar una Automatización Express y no un proyecto más grande.' },
     { q: '¿Cuánto se demora?',
-      a: 'Una Automatización Express suele tomar entre una y dos semanas. Un diagnóstico, una semana. Un piloto, entre tres y cuatro semanas. Te decimos la fecha real de inicio antes de cotizar, porque trabajamos con pocos proyectos en paralelo.' },
+      a: `Una Automatización Express suele tomar ${plazo('express')}. Un diagnóstico, ${plazo('diagnostico')}. Un piloto, ${plazo('piloto')}. Te decimos la fecha real de inicio antes de cotizar, porque trabajamos con pocos proyectos en paralelo.` },
     { q: '¿Emiten factura?',
       a: 'Sí. Los valores para empresas son netos y se les suma IVA. Los proyectos se cotizan en UF para que el valor no se desactualice entre la propuesta y la firma.' },
   ],
@@ -32,12 +38,16 @@ export const FAQ = {
   express: [
     { q: '¿Qué procesos caben en una Automatización Express?',
       a: 'Procesos pequeños, repetitivos y bien delimitados: pasar datos de PDF a Excel, generar documentos desde un formulario, consolidar planillas, armar un informe periódico o clasificar información. No todo cabe: si el proceso toca varios sistemas o nadie lo tiene escrito, te vamos a recomendar un diagnóstico.' },
+    { q: '¿Cualquier automatización cuesta eso?',
+      a: `No. ${p('express').principal.replace('desde', 'Desde')} es el valor del proceso más simple que cabe en este formato. El precio final depende del proceso y queda fijo por escrito antes de partir. Si al revisarlo vemos que no cabe en una Express, te lo decimos y te recomendamos otro camino.` },
     { q: '¿Cómo se define el precio final?',
       a: 'En la primera conversación revisamos el proceso con ejemplos reales. Después te enviamos por escrito el alcance, el precio fijo y el plazo. No partimos ni cobramos nada antes de que lo apruebes.' },
     { q: '¿Qué pasa si después quiero más?',
       a: 'La Express es una forma de conocernos con bajo riesgo. Si funciona y hay más procesos, el camino natural es un diagnóstico para ordenar las siguientes oportunidades.' },
-    { q: '¿Dónde queda funcionando?',
-      a: 'En tus equipos o en cuentas de tu empresa, según el caso. Te entregamos un instructivo de uso y corregimos las fallas de lo entregado durante 30 días.' },
+    { q: '¿Dónde queda funcionando y qué pasa si falla?',
+      a: 'En tus equipos o en cuentas de tu empresa, según el caso. Te entregamos un instructivo de uso y corregimos las fallas de lo entregado durante 30 días. Una falla es que no haga lo que quedó escrito en el alcance; un cambio de lo que se pidió se cotiza aparte.' },
+    { q: '¿Quién se queda con la automatización?',
+      a: PROPIEDAD.completa },
   ],
 
   datos: [
@@ -48,7 +58,9 @@ export const FAQ = {
     { q: '¿Tienen que usar Power BI?',
       a: 'No necesariamente. Usamos la herramienta que tenga más sentido para tu empresa: Power BI si ya lo tienen, u otra alternativa si es más simple de mantener.' },
     { q: '¿Mis datos de ventas y costos quedan expuestos?',
-      a: 'Firmamos confidencialidad antes de verlos y te decimos por escrito dónde se almacenan y qué se procesa fuera de tu empresa. Cuando corresponde, todo queda en tus cuentas.' },
+      a: 'Firmamos confidencialidad antes de verlos y te decimos por escrito dónde se almacenan y qué se procesa fuera de tu empresa. Cuando corresponde, todo queda en cuentas de tu empresa. Los datos siguen siendo tuyos.' },
+    { q: '¿ANVAR Intelligence ya tiene clientes?',
+      a: 'Es un servicio reciente y todavía no tenemos un caso de cliente publicado en datos. Por eso partimos con un alcance acotado y escrito —qué fuentes, qué indicadores, qué alertas—, sin permanencia mínima, y lo ajustamos con los primeros meses de uso.' },
     { q: '¿Pueden predecir la demanda?',
       a: 'Cuando hay suficiente historia y los datos son consistentes, sí se pueden construir pronósticos útiles. Si no la hay, te lo decimos y partimos por lo que sí da resultado: stock crítico, rotación y márgenes.' },
   ],
@@ -74,13 +86,13 @@ export const FAQ = {
     { q: '¿Esto va a dejar a alguien sin trabajo?',
       a: 'Lo que automatizamos es la parte mecánica: digitar, copiar, repetir. La revisión, el criterio y la decisión siguen siendo de las personas. Un piloto planteado como reducción de personal suele fracasar, porque el equipo no lo adopta.' },
     { q: '¿Quién se queda con el código?',
-      a: 'Tu empresa. Lo desarrollado a medida queda en tu poder una vez pagado y así queda en el contrato. Cuando corresponde, todo corre en cuentas de tu empresa y no en las nuestras.' },
+      a: `${PROPIEDAD.completa} Cuando corresponde, todo corre en cuentas de tu empresa y no en las nuestras.` },
     { q: '¿Qué pasa si ANVAR TECH no está disponible más adelante?',
-      a: 'Entregamos un manual técnico escrito para que otra persona pueda tomar el sistema, las cuentas quedan a nombre de tu empresa y el respaldo se prueba restaurándolo. La continuidad no depende de nosotros.' },
+      a: 'Entregamos un manual técnico escrito para que otra persona pueda tomar el sistema, las cuentas quedan a nombre de tu empresa cuando corresponde y el respaldo se prueba restaurándolo. La idea es que la continuidad no dependa solo de nosotros.' },
     { q: '¿Tenemos que cambiar nuestros sistemas?',
       a: 'No. Trabajamos sobre lo que ya usas. Si al final conviene cambiar algo, te lo justificamos con números.' },
     { q: '¿Cómo se paga una implementación?',
-      a: 'Por etapas: un anticipo, pagos contra entregables y el saldo contra recepción. Siempre en UF y con el alcance escrito antes de empezar.' },
+      a: 'Por etapas: un anticipo, pagos contra entregables y el saldo contra recepción. Se cotiza en UF, con el alcance escrito antes de empezar, y se factura con la UF del día.' },
   ],
 
   capacitacion: [

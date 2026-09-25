@@ -1,6 +1,6 @@
 {
   "name": "anvar-ia",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "ANVAR TECH · IA & Automatización — sitio de automatización e inteligencia operacional para empresas.",
   "type": "module",
@@ -10,8 +10,20 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "node scripts/check.mjs",
-    "test": "node scripts/build.mjs && node scripts/check.mjs",
-    "dev": "npm run build && python -m http.server 8123 --directory public",
+    "lint": "eslint .",
+    "typecheck": "tsc -p jsconfig.json",
+    "test:unit": "node --test \"tests/**/*.test.mjs\"",
+    "test": "npm run build && npm run check && npm run test:unit",
+    "e2e": "npm run build && node scripts/e2e.mjs",
+    "qa": "npm run lint && npm run typecheck && npm test && node scripts/e2e.mjs",
+    "dev": "npm run build && node scripts/servidor.mjs",
     "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.6.2",
+    "eslint": "10.11.0",
+    "globals": "17.12.0",
+    "typescript": "7.0.2"
   }
 }

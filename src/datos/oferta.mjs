@@ -9,9 +9,13 @@
 /** @typedef {import('../html.mjs').Precio} Precio */
 
 /**
+ * Un servicio. `precio` trae moneda (unidad), valor, si es "desde", el IVA y
+ * el periodo; `cta` es la acción contextual por WhatsApp (clave de MENSAJES en
+ * src/datos/whatsapp.mjs). `hipotesis` marca precios aún sin validar con clientes.
  * @typedef {{ id: string, nombre: string, publico: 'empresas'|'personas',
- *   precio: Precio, plazo: string, resumen: string, url: string,
- *   incluye: string[], hipotesis?: boolean }} Servicio
+ *   precio: Precio, plazo: string, plazoCorto: string, resumen: string, url: string,
+ *   incluye: string[], noIncluye?: string[], cta: { texto: string, wsp: string },
+ *   hipotesis?: boolean }} Servicio
  */
 
 /** @type {Record<string, Servicio>} */
@@ -22,6 +26,7 @@ export const SERVICIOS = {
     publico: 'empresas',
     precio: { moneda: 'CLP', valor: 199900, desde: true, iva: 'mas' },
     plazo: 'Típicamente 1 a 2 semanas, según alcance',
+    plazoCorto: 'entre una y dos semanas',
     resumen: 'Un proceso pequeño y bien delimitado, resuelto y funcionando en tus herramientas.',
     url: '/automatizacion-express',
     incluye: [
@@ -30,6 +35,13 @@ export const SERVICIOS = {
       'Instructivo de uso y medición del antes y el después',
       'Corrección de fallas de lo entregado durante 30 días',
     ],
+    noIncluye: [
+      'Procesos que cruzan varios sistemas o áreas: eso es un piloto',
+      'Cambios de alcance después de aprobado: se cotizan aparte',
+      'Mantención y mejoras pasados los 30 días: es el soporte mensual',
+      'Licencias o suscripciones de programas de terceros, si el proceso las necesita',
+    ],
+    cta: { texto: 'Solicitar Automatización Express', wsp: 'express' },
     hipotesis: true,
   },
   diagnostico: {
@@ -38,6 +50,7 @@ export const SERVICIOS = {
     publico: 'empresas',
     precio: { moneda: 'UF', valor: 12, iva: 'mas' },
     plazo: '1 semana',
+    plazoCorto: 'una semana',
     resumen: 'Medimos tus procesos en horas y pesos y te decimos qué automatizar primero y qué no tocar.',
     url: '/diagnostico-ia-empresas',
     incluye: [
@@ -47,6 +60,7 @@ export const SERVICIOS = {
       'Informe escrito y reunión de presentación',
       'Se descuenta completo si avanzas al piloto',
     ],
+    cta: { texto: 'Conversar por WhatsApp', wsp: 'diagnostico' },
   },
   piloto: {
     id: 'piloto',
@@ -54,6 +68,7 @@ export const SERVICIOS = {
     publico: 'empresas',
     precio: { moneda: 'UF', valor: 40, desde: true, iva: 'mas', nota: 'UF 28 si ya hiciste el diagnóstico' },
     plazo: '3 a 4 semanas',
+    plazoCorto: 'entre tres y cuatro semanas',
     resumen: 'Un proceso funcionando de verdad, usado por tu equipo y medido antes y después.',
     url: '/automatizacion-procesos-ia',
     incluye: [
@@ -62,6 +77,7 @@ export const SERVICIOS = {
       'Capacitación a quienes lo operan',
       'Acta con la medición antes y después',
     ],
+    cta: { texto: 'Conversar por WhatsApp', wsp: 'piloto' },
   },
   implementacion: {
     id: 'implementacion',
@@ -69,14 +85,16 @@ export const SERVICIOS = {
     publico: 'empresas',
     precio: { moneda: 'UF', valor: 60, desde: true, iva: 'mas' },
     plazo: 'Según alcance',
+    plazoCorto: 'según alcance',
     resumen: 'La solución completa, integrada con tus sistemas, documentada y traspasada a tu equipo.',
     url: '/automatizacion-procesos-ia#implementacion',
     incluye: [
       'Desarrollo e integración con lo que ya usas',
       'Manual de uso, manual técnico y respaldos',
-      'Código y cuentas a nombre de tu empresa',
+      'Entrega de lo desarrollado según el contrato',
       'Se cotiza después de un diagnóstico o piloto',
     ],
+    cta: { texto: 'Conversar por WhatsApp', wsp: 'piloto' },
   },
   soporte: {
     id: 'soporte',
@@ -84,6 +102,7 @@ export const SERVICIOS = {
     publico: 'empresas',
     precio: { moneda: 'UF', valor: 8, iva: 'mas', periodo: 'mes' },
     plazo: 'Mensual, sin permanencia',
+    plazoCorto: 'mensual',
     resumen: 'Monitoreo, ajustes y nuevas automatizaciones sobre lo que ya está funcionando.',
     url: '/automatizacion-procesos-ia#soporte',
     incluye: [
@@ -92,14 +111,16 @@ export const SERVICIOS = {
       'Soporte con plazo de respuesta por escrito',
       'Reporte mensual de una página',
     ],
+    cta: { texto: 'Conversar por WhatsApp', wsp: 'piloto' },
   },
   intelligence: {
     id: 'intelligence',
     nombre: 'ANVAR Intelligence',
     publico: 'empresas',
     precio: { moneda: 'UF', valor: 6, desde: true, iva: 'mas', periodo: 'mes' },
-    plazo: 'Mensual',
-    resumen: 'Tus datos de ventas, stock y costos convertidos cada mes en un tablero, alertas y un informe ejecutivo.',
+    plazo: 'Mensual, sin permanencia',
+    plazoCorto: 'mensual',
+    resumen: 'Tus datos de ventas, stock y costos revisados cada mes: tablero, alertas y un informe con recomendaciones.',
     url: '/inteligencia-datos#anvar-intelligence',
     incluye: [
       'Tablero actualizado con tus datos',
@@ -107,6 +128,7 @@ export const SERVICIOS = {
       'Informe ejecutivo mensual con recomendaciones',
       'Reunión mensual de seguimiento',
     ],
+    cta: { texto: 'Conversar por WhatsApp', wsp: 'intelligence' },
     hipotesis: true,
   },
   capacitacion: {
@@ -115,6 +137,7 @@ export const SERVICIOS = {
     publico: 'empresas',
     precio: { moneda: 'UF', valor: 14, iva: 'mas' },
     plazo: '4 horas, hasta 15 personas',
+    plazoCorto: 'cuatro horas',
     resumen: 'Taller práctico en tus oficinas: cada persona sale con una tarea suya resuelta.',
     url: '/capacitacion-ia-empresas',
     incluye: [
@@ -123,6 +146,7 @@ export const SERVICIOS = {
       'Política escrita de qué información se puede subir',
       'Informe de cierre para la jefatura',
     ],
+    cta: { texto: 'Conversar por WhatsApp', wsp: 'capacitacion' },
   },
 
   // Línea secundaria: personas. Precios en pesos con IVA incluido.
@@ -132,6 +156,7 @@ export const SERVICIOS = {
     publico: 'personas',
     precio: { moneda: 'CLP', valor: 49000, iva: 'incluido' },
     plazo: '90 minutos',
+    plazoCorto: '90 minutos',
     resumen: 'Una sesión uno a uno: sales con tres tareas tuyas resueltas y funcionando.',
     url: '/asesoria-ia-personal',
     incluye: [
@@ -139,6 +164,7 @@ export const SERVICIOS = {
       'Tres flujos listos para usar',
       'Grabación y hoja con tus prompts',
     ],
+    cta: { texto: 'Coordinar sesión por WhatsApp', wsp: 'personal' },
   },
   planPersonal: {
     id: 'planPersonal',
@@ -146,6 +172,7 @@ export const SERVICIOS = {
     publico: 'personas',
     precio: { moneda: 'CLP', valor: 229000, iva: 'incluido' },
     plazo: '4 semanas',
+    plazoCorto: 'cuatro semanas',
     resumen: 'Cuatro semanas para que una tarea tuya quede automatizada y sepas resolver la siguiente.',
     url: '/asesoria-ia-personal',
     incluye: [
@@ -153,6 +180,7 @@ export const SERVICIOS = {
       'Una tarea tuya automatizada',
       'Biblioteca de prompts y plan de tres meses',
     ],
+    cta: { texto: 'Coordinar por WhatsApp', wsp: 'personal' },
   },
   acompanamiento: {
     id: 'acompanamiento',
@@ -160,9 +188,11 @@ export const SERVICIOS = {
     publico: 'personas',
     precio: { moneda: 'CLP', valor: 89000, iva: 'incluido', periodo: 'mes' },
     plazo: 'Mensual, sin permanencia',
+    plazoCorto: 'mensual',
     resumen: 'Dos sesiones al mes para seguir incorporando lo que te sirve.',
     url: '/asesoria-ia-personal',
     incluye: ['Dos sesiones al mes', 'Revisión de lo que armaste', 'Correo mensual con lo que vale la pena probar'],
+    cta: { texto: 'Coordinar por WhatsApp', wsp: 'personal' },
   },
 };
 

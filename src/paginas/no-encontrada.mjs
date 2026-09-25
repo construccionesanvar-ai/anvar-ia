@@ -1,5 +1,6 @@
 // @ts-check
 import { boton, evaluar } from '../componentes/base.mjs';
+import { FUENTES } from '../datos/whatsapp.mjs';
 
 export default {
   ruta: '/404',
@@ -9,6 +10,7 @@ export default {
   titulo: 'Página no encontrada | ANVAR TECH',
   descripcion: 'La página que buscas no existe o cambió de dirección.',
   contextoWsp: 'general',
+  fuente: FUENTES.notFound,
   jsonld: [],
   cuerpo: () => `
 <section class="hero hero--servicio" aria-labelledby="hero-tit">
@@ -16,11 +18,12 @@ export default {
     <div class="hero-servicio">
       <p class="sobretitulo">Error 404</p>
       <h1 id="hero-tit">Esta página no existe o cambió de dirección</h1>
-      <p class="lead">Puede que el enlace esté incompleto. Estas son las páginas más visitadas:</p>
+      <p class="lead">Puede que el enlace esté incompleto. Estas son las páginas más consultadas:</p>
       <div class="hero-cta">
         ${boton({ href: '/', texto: 'Ir al inicio' })}
         ${boton({ href: '/casos', texto: 'Ver casos reales', variante: 'secundario' })}
         ${boton({ href: '/automatizacion-express', texto: 'Automatización Express', variante: 'secundario' })}
+        ${boton({ href: '/#autodiagnostico', texto: 'Autodiagnóstico gratuito', variante: 'secundario' })}
       </div>
     </div>
   </div>

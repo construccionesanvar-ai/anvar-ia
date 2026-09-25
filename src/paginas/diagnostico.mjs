@@ -3,7 +3,8 @@ import { SERVICIOS } from '../datos/oferta.mjs';
 import { FAQ } from '../datos/faq.mjs';
 import { precioTexto, esc } from '../html.mjs';
 import { evaluar, encabezado } from '../componentes/base.mjs';
-import { heroServicio, paraQuien, etapas, bloquePrecio, casosRelacionados, preguntas, otrosServicios } from '../componentes/secciones.mjs';
+import { heroServicio, paraQuien, etapas, bloquePrecio, casosRelacionados, preguntas, otrosServicios, precioLinea } from '../componentes/secciones.mjs';
+import { FUENTES } from '../datos/whatsapp.mjs';
 import { migas, servicio, faq } from './ld.mjs';
 
 const s = SERVICIOS.diagnostico;
@@ -23,8 +24,9 @@ export default {
   archivo: 'diagnostico-ia-empresas.html',
   prioridad: '0.8',
   titulo: 'Diagnóstico de automatización e IA para empresas | ANVAR TECH',
-  descripcion: `Una semana midiendo tus procesos en horas y pesos: qué automatizar, cuánto ahorra cada oportunidad y qué no tocar. UF ${s.precio.valor} + IVA, descontable del piloto.`,
+  descripcion: `Una semana midiendo tus procesos en horas y pesos: qué automatizar, cuánto ahorra cada oportunidad y qué no tocar. ${pt.principal} + IVA, descontable del piloto.`,
   contextoWsp: 'diagnostico',
+  fuente: FUENTES.diagnosis,
   jsonld: [
     migas([['Diagnóstico de automatización', s.url]]),
     servicio({ nombre: 'Diagnóstico de automatización e IA', tipo: 'Consultoría en automatización de procesos', ruta: s.url, ofertas: ['diagnostico'], descripcion: 'Levantamiento en terreno de una semana que mide los procesos en horas y pesos y entrega tres oportunidades de automatización priorizadas por retorno, más lo que no conviene automatizar.' }),
@@ -36,7 +38,7 @@ ${heroServicio({
   h1: 'Qué conviene automatizar en tu empresa, y cuánto te ahorra',
   lead: 'Una semana dentro de tu operación. Nos sentamos junto a quien hace el trabajo, lo cronometramos y lo valorizamos en pesos. Recibes un informe con qué automatizar primero, cuánto rinde cada oportunidad y *qué no conviene tocar todavía*.',
   contexto: 'diagnostico',
-  ficha: [['Valor', `${pt.principal} ${pt.detalle}`], ['Duración', s.plazo], ['Entrega', 'Informe y presentación'], ['Si avanzas', 'Se descuenta del piloto']],
+  ficha: [['Valor', precioLinea('diagnostico')], ['Duración', s.plazo], ['Entrega', 'Informe y presentación'], ['Si avanzas', 'Se descuenta del piloto']],
 })}
 
 ${paraQuien({
@@ -45,6 +47,12 @@ ${paraQuien({
   si: ['Tienes varios procesos repetitivos y no sabes cuál atacar primero', 'Alguien arriba te va a pedir justificar la inversión', 'Ya te cotizaron un proyecto de IA y no sabes si vale lo que piden', 'Quieres partir por algo acotado, no por una transformación completa'],
   no: ['Es un solo proceso chico y claro: te conviene una *Automatización Express*', 'El trabajo lo hace una persona distinta cada vez y de forma distinta', 'Buscas una charla para el equipo: eso es capacitación', 'Esperas que el informe diga que sí a todo'],
 })}
+
+<section class="seccion seccion--angosta" aria-label="Autodiagnóstico gratuito">
+  <div class="contenedor contenedor--estrecho">
+    <p class="nota nota--destacada">¿Todavía no sabes si te conviene? El <a href="/#autodiagnostico">autodiagnóstico gratuito</a> te da una primera orientación en dos minutos, sin pedir datos personales. No reemplaza la medición en terreno, pero te dice por dónde partir.</p>
+  </div>
+</section>
 
 ${etapas({
   id: 'semana-tit', codigo: 'La semana', titulo: 'Cómo se hace, día por día',

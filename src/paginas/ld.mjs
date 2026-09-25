@@ -3,7 +3,7 @@
 // contenido visible, así nunca dicen algo distinto de la página.
 import { SITIO } from '../config.mjs';
 import { SERVICIOS } from '../datos/oferta.mjs';
-import { absoluta } from '../html.mjs';
+import { absoluta, precioTexto, plano } from '../html.mjs';
 
 const ORG_ID = SITIO.dominio + '/#organizacion';
 
@@ -39,17 +39,32 @@ export function migas(tramos) {
   };
 }
 
-/** Oferta de un servicio en pesos, desde la fuente única de precios. */
+/**
+ * Oferta de un servicio desde la fuente única de precios, en su moneda real:
+ * los precios en UF se declaran en CLF (código ISO 4217 de la Unidad de
+ * Fomento), así el dato estructurado no queda desactualizado con el peso.
+ */
 function oferta(id) {
-  const p = SERVICIOS[id].precio;
-  const valor = p.moneda === 'UF' ? p.valor * SITIO.uf : p.valor;
-  const iva = p.iva === 'incluido' ? 'IVA incluido' : 'más IVA';
+  const s = SERVICIOS[id];
+  const p = s.precio;
+  const moneda = p.moneda === 'UF' ? 'CLF' : 'CLP';
+  /** @type {Record<string, unknown>} */
+  const spec = {
+    '@type': p.periodo === 'mes' ? 'UnitPriceSpecification' : 'PriceSpecification',
+    priceCurrency: moneda,
+    valueAddedTaxIncluded: p.iva === 'incluido',
+    [p.desde ? 'minPrice' : 'price']: String(p.valor),
+  };
+  if (p.periodo === 'mes') Object.assign(spec, { unitCode: 'MON', unitText: 'mes' });
+  const t = precioTexto(p);
   return {
     '@type': 'Offer',
-    name: SERVICIOS[id].nombre,
-    price: String(Math.round(valor)),
-    priceCurrency: 'CLP',
-    description: `${p.desde ? 'Desde ' : ''}${p.moneda === 'UF' ? 'UF ' + p.valor : '$' + p.valor.toLocaleString('es-CL')}${p.periodo === 'mes' ? ' al mes' : ''}, ${iva}.${p.nota ? ' ' + p.nota + '.' : ''}`,
+    name: s.nombre,
+    url: absoluta(s.url.split('#')[0]),
+    priceCurrency: moneda,
+    ...(p.desde ? {} : { price: String(p.valor) }),
+    priceSpecification: spec,
+    description: `${plano(s.resumen)} ${t.principal.replace(/^desde/, 'Desde')}, ${p.iva === 'incluido' ? 'IVA incluido' : 'más IVA'}.${p.nota ? ' ' + p.nota + '.' : ''}`,
   };
 }
 
@@ -73,6 +88,23 @@ export function servicio(o) {
 export function faq(lista) {
   return {
     '@type': 'FAQPage',
-    mainEntity: lista.map((p) => ({ '@type': 'Question', name: p.q, acceptedAnswer: { '@type': 'Answer', text: p.a.replace(/\*/g, '') } })),
+    mainEntity: lista.map((p) => ({ '@type': 'Question', name: p.q, acceptedAnswer: { '@type': 'Answer', text: plano(p.a) } })),
+  };
+}
+
+/**
+ * Página informativa (p. ej. privacidad).
+ * @param {{ nombre: string, ruta: string, fecha?: string }} o
+ */
+export function paginaWeb(o) {
+  return {
+    '@type': 'WebPage',
+    '@id': absoluta(o.ruta) + '#pagina',
+    url: absoluta(o.ruta),
+    name: o.nombre,
+    inLanguage: SITIO.idioma,
+    isPartOf: { '@id': SITIO.dominio + '/#sitio' },
+    publisher: { '@id': ORG_ID },
+    ...(o.fecha ? { dateModified: o.fecha } : {}),
   };
 }

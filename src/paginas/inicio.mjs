@@ -1,7 +1,8 @@
 // @ts-check
 import { FAQ } from '../datos/faq.mjs';
 import { evaluar } from '../componentes/base.mjs';
-import { heroInicio, tiraMetricas, problemas, casosInicio, datosInicio, proceso, precios, seguridad, nosotros, preguntas } from '../componentes/secciones.mjs';
+import { heroInicio, tiraMetricas, problemas, casosInicio, testimonios, datosInicio, proceso, precios, seguridad, nosotros, preguntas } from '../componentes/secciones.mjs';
+import { FUENTES } from '../datos/whatsapp.mjs';
 import { herramientas } from '../componentes/herramientas.mjs';
 import { sitioWeb, faq } from './ld.mjs';
 
@@ -13,12 +14,14 @@ export default {
   ogTitulo: 'ANVAR TECH · Automatizamos el trabajo repetitivo de tu empresa',
   descripcion: 'Automatizamos procesos repetitivos de tu empresa con IA, software y las herramientas que ya usas: Excel, Word, PDF y WhatsApp. Medimos antes y después.',
   contextoWsp: 'general',
+  fuente: FUENTES.home,
   jsonld: [sitioWeb(), faq(FAQ.inicio)],
   cuerpo: () => [
     heroInicio(),
     tiraMetricas(),
     problemas(),
     casosInicio(),
+    testimonios(),
     datosInicio(),
     proceso(),
     precios(),
