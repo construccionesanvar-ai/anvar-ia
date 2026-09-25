@@ -30,7 +30,7 @@
 <link rel="alternate" type="application/rss+xml" title="Recursos de ANVAR TECH" href="/feed.xml">
 <link rel="preload" href="/fuentes/archivo-latin-500-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fuentes/ibm-plex-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/styles.css?v=f3b348b82a">
+<link rel="stylesheet" href="/styles.css?v=00b78c00cb">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"ProfessionalService","@id":"https://ia.anvartech.cl/#organizacion","name":"ANVAR TECH","alternateName":"ANVAR TECH · IA & Automatización","legalName":"ANVAR Construcciones SpA","taxID":"77.982.517-5","url":"https://ia.anvartech.cl/","logo":{"@type":"ImageObject","url":"https://ia.anvartech.cl/logo-512.png","width":512,"height":512},"image":"https://ia.anvartech.cl/og-image.png","description":"Automatización de procesos, software, datos e IA aplicada a las operaciones de empresas en Chile. Cada proceso se mide antes y después.","email":"contacto@anvartech.cl","telephone":"+56926333760","contactPoint":[{"@type":"ContactPoint","contactType":"sales","telephone":"+56926333760","email":"contacto@anvartech.cl","areaServed":"CL","availableLanguage":["es"]}],"areaServed":{"@type":"Country","name":"Chile"},"address":{"@type":"PostalAddress","addressLocality":"Santiago","addressRegion":"Región Metropolitana","addressCountry":"CL"},"founder":{"@type":"Person","@id":"https://ia.anvartech.cl/equipo/andres-vargas#persona","name":"Andrés Vargas","url":"https://ia.anvartech.cl/equipo/andres-vargas"},"knowsAbout":["Automatización de procesos","Automatización documental","Automatización de Excel","Inteligencia de datos","Gestión de inventario","Integración con AutoCAD","Inteligencia artificial aplicada a operaciones"],"sameAs":["https://anvartech.cl"]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://ia.anvartech.cl/"},{"@type":"ListItem","position":2,"name":"Recursos","item":"https://ia.anvartech.cl/recursos"},{"@type":"ListItem","position":3,"name":"Calculadora de ROI","item":"https://ia.anvartech.cl/calculadora-roi-automatizacion"}]},{"@type":"WebApplication","name":"Calculadora de ROI de automatización de procesos","description":"Calcula cuánto cuesta al año el trabajo manual de un proceso y en cuánto tiempo se pagaría automatizarlo. Gratis y sin registro.","url":"https://ia.anvartech.cl/calculadora-roi-automatizacion","applicationCategory":"BusinessApplication","operatingSystem":"Cualquiera (funciona en el navegador)","inLanguage":"es-CL","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"CLP"},"provider":{"@id":"https://ia.anvartech.cl/#organizacion"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿La calculadora es gratis? ¿Tengo que registrarme?","acceptedAnswer":{"@type":"Answer","text":"Es gratis y no pide registro, correo ni teléfono. Los cálculos se hacen en tu navegador y no guardamos los valores que ingresas."}},{"@type":"Question","name":"¿Qué costo por hora debo usar?","acceptedAnswer":{"@type":"Answer","text":"El costo empresa, no el sueldo líquido: sueldo bruto más los aportes que paga el empleador, dividido por las horas trabajadas al mes. Quien hace las remuneraciones lo tiene. Si varias personas con sueldos distintos hacen la tarea, usa un promedio."}},{"@type":"Question","name":"¿Por qué 44 semanas y no 52?","acceptedAnswer":{"@type":"Answer","text":"Porque nadie trabaja las 52 semanas del año. Descontamos el feriado legal de 15 días hábiles (tres semanas), los feriados y un margen para licencias y ausencias. Es un supuesto conservador: con 52 semanas el resultado sale inflado."}},{"@type":"Question","name":"¿El resultado es lo que voy a ahorrar?","acceptedAnswer":{"@type":"Answer","text":"No necesariamente. Es el valor del tiempo que hoy se va en la tarea. Se convierte en ahorro solo si ese tiempo se usa en otra cosa útil, y el resultado real depende del proceso y de cómo se implemente. Por eso es una estimación referencial, no una promesa."}},{"@type":"Question","name":"¿Puedo hacer este cálculo en Excel?","acceptedAnswer":{"@type":"Answer","text":"Sí. La plantilla gratuita de ROI usa las mismas fórmulas: con los mismos datos da el mismo resultado. Además permite comparar varios procesos para decidir por cuál partir, y sirve para presentarlo dentro de tu empresa."}},{"@type":"Question","name":"¿Qué inversión debo comparar?","acceptedAnswer":{"@type":"Answer","text":"Si tienes una cotización, usa \"Otro monto\" con ese valor neto. Si no, las opciones Automatización Express y Piloto usan los precios de entrada publicados, que son pisos: el precio de tu proceso se fija por escrito después de verlo."}}]}]}</script>
 </head>
 <body data-wsp-contexto="general" data-fuente="roi-calculator">
@@ -96,9 +96,10 @@
   </div>
     <fieldset class="calc-inversion">
       <legend>Inversión a comparar</legend>
-      <label class="calc-opcion"><input type="radio" name="c-inv" value="express" data-defecto="0"> <span class="calc-opcion-t"><b>Automatización Express</b> <span class="calc-opcion-d">desde $199.900 + IVA</span></span></label>
-      <label class="calc-opcion"><input type="radio" name="c-inv" value="piloto" checked data-defecto="1"> <span class="calc-opcion-t"><b>Piloto en producción</b> <span class="calc-opcion-d" id="c-piloto-d">desde UF 40 + IVA</span></span></label>
+      <label class="calc-opcion"><input type="radio" name="c-inv" value="express" checked data-defecto="1"> <span class="calc-opcion-t"><b>Automatización Express</b> <span class="calc-opcion-d">desde $199.900 + IVA</span></span></label>
+      <label class="calc-opcion"><input type="radio" name="c-inv" value="piloto" data-defecto="0"> <span class="calc-opcion-t"><b>Piloto en producción</b> <span class="calc-opcion-d" id="c-piloto-d">desde UF 40 + IVA</span></span></label>
       <label class="calc-opcion"><input type="radio" name="c-inv" value="otro" data-defecto="0"> <span class="calc-opcion-t"><b>Otro monto</b> <span class="calc-opcion-d">Tu cotización o presupuesto</span></span></label>
+      <p class="ayuda calc-inv-nota" id="c-inv-nota" role="status" hidden></p>
       <div class="calc-monto">
       <label for="c-monto">Monto de la inversión, neto</label>
       <div class="campo-pesos"><span aria-hidden="true">$</span><input id="c-monto" type="text" inputmode="numeric" autocomplete="off" value="" placeholder="0" data-defecto="" aria-describedby="c-monto-ayuda"></div>
@@ -131,25 +132,25 @@
 <dt>Horas potencialmente recuperadas</dt> <dd id="c-horas-lib">792 h</dd>
 </div>
       <div>
-<dt>Inversión inicial</dt> <dd id="c-inv">—</dd>
+<dt>Inversión inicial</dt> <dd id="c-inv">$199.900</dd>
 </div>
       <div>
 <dt>Costos recurrentes al año</dt> <dd id="c-recurrente">$0</dd>
 </div>
       <div>
-<dt>Ahorro neto estimado, año 1</dt> <dd id="c-neto1">—</dd>
+<dt>Ahorro neto estimado, año 1</dt> <dd id="c-neto1">$6.928.100</dd>
 </div>
       <div class="calc-dato-clave">
-<dt>Payback estimado</dt> <dd id="c-payback">—</dd>
+<dt>Payback estimado</dt> <dd id="c-payback">Menos de 1 mes</dd>
 </div>
       <div>
-<dt>ROI año 1</dt> <dd id="c-roi1">—</dd>
+<dt>ROI año 1</dt> <dd id="c-roi1">3.466%</dd>
 </div>
       <div>
-<dt>ROI a 3 años</dt> <dd id="c-roi3">—</dd>
+<dt>ROI a 3 años</dt> <dd id="c-roi3">10.597%</dd>
 </div>
     </dl>
-    <p class="calc-lectura" id="c-lectura">El piloto se pasa a pesos con la UF de hoy. Si no está disponible, elige «Otro monto» y escribe el valor de tu propuesta.</p>
+    <p class="calc-lectura" id="c-lectura">Con esta inversión, el ahorro estimado la recuperaría en menos de 1 mes. Es un valor referencial: depende del proceso, del alcance y de la implementación.</p>
     <p class="calc-aviso">Estimación referencial basada en los valores ingresados. El resultado real depende del proceso, alcance e implementación.</p>
     <p class="sr" id="c-anuncio" aria-live="polite" aria-atomic="true"></p>
     <div class="compartir"><button type="button" class="btn btn--secundario" id="c-compartir">Copiar enlace con estos valores</button> <span class="compartir-msg" id="c-compartir-msg" role="status" aria-live="polite"></span></div>
@@ -173,7 +174,7 @@
 <h2 id="que-significa">Qué significa el resultado</h2>
     <p><b>Ahorro bruto anual estimado</b> es cuánto le cuestan hoy a tu empresa, en un año, las horas que se van en la parte automatizable de la tarea. Con el ejemplo que trae la calculadora (5 personas, 6 horas a la semana cada una, <span class="cifra-ej">$9.000</span> la hora y 60% automatizable) son <span class="cifra-ej">$7.128.000</span> al año, sobre un costo anual del proceso de <span class="cifra-ej">$11.880.000</span>.</p>
     <p><b>Horas potencialmente recuperadas</b> es ese mismo tiempo en horas: 792 en el ejemplo. Es la cifra que conviene mirar primero, porque se entiende sin discutir el costo por hora.</p>
-    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. En el ejemplo, con una inversión de <span class="cifra-ej">$1.640.000</span>: payback <span class="cifra-ej">2,8 meses</span>, ROI año 1 <span class="cifra-ej">335%</span>.</p>
+    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. Los resultados se actualizan automáticamente cuando cambias los datos.</p>
     <p>Cuando algo no se puede calcular, la calculadora lo dice en vez de mostrar un número engañoso: "No aplica" si no hay inversión o no hay ahorro, y "Sin recuperación" si el costo mensual iguala o supera el ahorro.</p>
 </section>
 <section class="prosa-sec" aria-labelledby="como-se-calcula">
@@ -412,6 +413,6 @@ ROI a 3 años          = (ahorro neto anual × 3 − inversión) ÷ inversión</
 <script defer src="/_vercel/insights/script.js"></script>
 <script defer src="/calculo.js?v=cde9ed8861"></script>
 <script defer src="/app.js?v=2f405b65ff"></script>
-<script defer src="/herramientas.js?v=908b5601f8"></script>
+<script defer src="/herramientas.js?v=34c93d1aee"></script>
 </body>
 </html>

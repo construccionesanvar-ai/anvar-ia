@@ -8,6 +8,7 @@ no se desarrolla nada nuevo: se mide.
 | Fecha del deploy final | 25/09/2026 |
 | Versión congelada | `cfd6507` (merge de construccionesanvar-ai/anvar-ia#7) |
 | Deployment de Vercel | `dpl_EK69HVpj3rg71CeUudohZRyokKHm` (READY, alias ia.anvartech.cl) |
+| Corrección final | construccionesanvar-ai/anvar-ia#9: la calculadora abre con Express (resultados completos sin UF), sin el ejemplo fijo, y formación actual del fundador |
 | Después | Solo commits de verificación y documentación, sin cambios en `public/` |
 | URL | https://ia.anvartech.cl |
 | Congelado hasta | ~16/10/2026 (revisión del día 21) |

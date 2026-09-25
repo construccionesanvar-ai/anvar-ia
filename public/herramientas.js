@@ -244,10 +244,17 @@
       el.textContent = o.etiqueta + (uf ? ' · ≈ ' + P(K.ufAPesos(o.valor, uf.valor)) + ' (UF del ' + A.fechaCorta(uf.fecha) + ')' : '');
     };
     // Sin monto para el piloto: qué decir según si la UF todavía viene o no está.
+    var SIN_UF = 'La UF de hoy no está disponible por el momento. Para calcular el ROI del piloto, ingresa el monto de tu propuesta en «Otro monto».';
     var lecturaSinMonto = function () {
-      return A.ufEstado() === 'pendiente'
-        ? 'Pasando el piloto a pesos con la UF de hoy…'
-        : 'La equivalencia en pesos del piloto no está disponible en este momento. Para ver payback y ROI, elige «Otro monto» y escribe el valor de tu propuesta, o compara con la Automatización Express.';
+      return A.ufEstado() === 'pendiente' ? 'Pasando el piloto a pesos con la UF de hoy…' : SIN_UF;
+    };
+    // Aviso junto a las opciones, solo si el visitante elige el piloto y no hay UF de hoy.
+    var pintarNotaInversion = function (tipo) {
+      var nota = $('#c-inv-nota');
+      if (!nota) return;
+      var mostrar = tipo === 'piloto' && !uf && A.ufEstado() === 'no-disponible';
+      if (mostrar && nota.textContent !== SIN_UF) nota.textContent = SIN_UF;
+      nota.hidden = !mostrar;
     };
 
     var calcular = function () {
@@ -279,6 +286,7 @@
       $('#c-roi1').textContent = t.roi1;
       $('#c-roi3').textContent = t.roi3;
       $('#c-lectura').textContent = r.estado === 'sin-monto' && tipo === 'piloto' ? lecturaSinMonto() : t.lectura;
+      pintarNotaInversion(tipo);
       return r;
     };
     // Lectores de pantalla: un resumen al soltar el control, no en cada paso del arrastre.

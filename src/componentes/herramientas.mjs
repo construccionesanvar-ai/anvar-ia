@@ -116,6 +116,7 @@ export function calculadora({ compartir = false, formulas = '' } = {}) {
       ${opcion('express', ops.express.nombre, ops.express.etiqueta)}
       ${opcion('piloto', ops.piloto.nombre, ops.piloto.etiqueta, 'c-piloto-d')}
       ${opcion('otro', 'Otro monto', 'Tu cotización o presupuesto')}
+      <p class="ayuda calc-inv-nota" id="c-inv-nota" role="status" hidden></p>
       ${monto('c-monto', 'Monto de la inversión, neto', d.inversion === 'otro' ? d.monto : 0, 'Al escribir un monto se elige "Otro monto".')}
     </fieldset>
     ${monto('c-mensual', 'Costo mensual de operación o soporte (opcional)', d.mensual, 'Licencias, suscripciones o soporte. Si no hay, deja 0.')}

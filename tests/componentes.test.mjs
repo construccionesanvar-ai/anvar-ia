@@ -33,14 +33,17 @@ test('testimonios: uno público muestra nombre, empresa y caso relacionado', () 
   assert.match(html, /\/casos#documentos-legales/);
 });
 
-test('calculadora: el HTML inicial no trae pesos del piloto (no conoce la UF de hoy) ni una UF de respaldo', () => {
+test('calculadora: el ejemplo abre con Automatización Express y resultados completos, sin depender de la UF', () => {
   const r = calcularRoi(CALCULADORA.defecto);
   const html = calculadora({ compartir: true, formulas: '#como-se-calcula' });
-  assert.ok(html.includes(`id="c-valor">${pesos(r.ahorroBruto)}<`), 'el ahorro sí se calcula');
-  assert.match(html, /name="c-inv" value="piloto" checked/);
-  assert.match(html, /id="c-piloto-d">desde UF 40 \+ IVA</, 'el piloto solo con su precio en UF');
-  for (const id of ['c-inv', 'c-neto1', 'c-payback', 'c-roi1', 'c-roi3']) assert.match(html, new RegExp(`id="${id}">—<`), `${id} sin monto`);
-  assert.doesNotMatch(html, /UF de referencia|41\.000|24\/09\/2026|≈\s*\$/);
+  assert.match(html, /name="c-inv" value="express" checked data-defecto="1"/, 'Express seleccionado en el HTML');
+  assert.equal(r.inversion, SERVICIOS.express.precio.valor, 'precio de la fuente única');
+  assert.ok(html.includes(`id="c-inv">${pesos(SERVICIOS.express.precio.valor)}<`), 'inversión inicial');
+  for (const id of ['c-neto1', 'c-payback', 'c-roi1', 'c-roi3']) assert.doesNotMatch(html, new RegExp(`id="${id}">—<`), `${id} completo`);
+  assert.ok(html.includes(`id="c-valor">${pesos(r.ahorroBruto)}<`), 'ahorro bruto');
+  assert.match(html, /id="c-piloto-d">desde UF 40 \+ IVA</, 'el piloto sigue, solo con su precio en UF');
+  assert.match(html, /id="c-inv-nota" role="status" hidden>/, 'aviso del piloto sin UF, oculto de partida');
+  assert.doesNotMatch(html, /UF de referencia|41\.000|24\/09\/2026|≈\s*\$|1\.640\.000|335%/);
   assert.match(html, /href="#como-se-calcula">Cómo calculamos esto/);
   assert.match(html, /Estimación referencial basada en los valores ingresados/);
   assert.doesNotMatch(html, /Infinity|NaN|vas a ahorrar/);
