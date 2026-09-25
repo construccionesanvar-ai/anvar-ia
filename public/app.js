@@ -101,7 +101,8 @@
 
     var recomendar = function (e, c) {
       if (c && c.id === 'datos') return e.base >= 50 ? 'intelligence' : 'diagnostico';
-      if (e.potencial >= 60 && e.base >= 50 && e.traccion >= 50) return 'piloto';
+      // El piloto es el paso más grande: solo con datos ordenados y capacidad de decidir claras (2 de 3 o más).
+      if (e.potencial >= 60 && e.base >= 67 && e.traccion >= 67) return 'piloto';
       if (e.potencial >= 60) return 'diagnostico';
       if (e.potencial >= 40) return 'express';
       return 'capacitacion';
@@ -190,18 +191,18 @@
         '</div></div>';
       dVolver.hidden = false;
       var r = $('#diag-resultado'); if (r) r.focus({ preventScroll: false });
-      lecturaIA(e, n, c);
+      lecturaIA(e, n, c, recId);
     };
 
     // Lectura escrita por IA para este caso. La local ya está en pantalla:
     // si el servicio no responde, no se nota nada.
-    var lecturaIA = function (e, n, c) {
+    var lecturaIA = function (e, n, c, recId) {
       var destino = $('#diag-lectura');
       if (!destino || !window.fetch) return;
       fetch('/api/diagnostico', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ indice: n, potencial: e.potencial, base: e.base, traccion: e.traccion, publico: 'empresas', categoria: c.solucion })
+        body: JSON.stringify({ indice: n, potencial: e.potencial, base: e.base, traccion: e.traccion, publico: 'empresas', categoria: c.solucion, recomendacion: recId })
       }).then(function (r) { if (!r.ok) throw 0; return r.json(); })
         .then(function (j) {
           if (!j || !j.texto || !$('#diag-lectura')) return;

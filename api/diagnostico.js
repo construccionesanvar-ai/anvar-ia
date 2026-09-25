@@ -4,6 +4,15 @@
 // Si no hay ANTHROPIC_API_KEY, responde 503 y el sitio usa su lectura local.
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+
+// Primer paso que el sitio ya mostró. Mismos ids que src/datos/oferta.mjs.
+const PASOS = {
+  express: 'Automatización Express (un proceso pequeño, con precio fijo)',
+  diagnostico: 'Diagnóstico de automatización (una semana midiendo procesos en horas y pesos)',
+  piloto: 'Piloto en producción (automatizar el proceso más costoso y medirlo antes y después)',
+  intelligence: 'ANVAR Intelligence (tablero, alertas y análisis mensual de ventas, stock y costos)',
+  capacitacion: 'Capacitación para el equipo (taller práctico de 4 horas)'
+};
 const MODELO = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
 
 const SISTEMA = `Eres el asistente de ANVAR TECH (IA & Automatización), una empresa chilena de
@@ -22,9 +31,13 @@ Trata de "tú". Habla del resultado para la empresa, no de tecnología. No menci
 modelos de IA. Nunca prometas ahorros, porcentajes ni plazos que no estén en los datos.
 Si el diagnóstico muestra poco potencial, dilo con claridad y recomienda algo chico.
 
+El sitio ya le mostró un "primer paso sugerido". Tu lectura tiene que respaldar ese mismo
+paso: nunca recomiendes otro servicio como primer paso, porque el visitante lo ve como una
+contradicción. Si el dato no viene, elige tú según los criterios de arriba.
+
 Entregas exactamente tres párrafos cortos, sin títulos ni listas:
 1) Qué está pasando en su caso, leyendo los tres ejes y el tipo de problema.
-2) Cuál es el primer paso concreto y por qué ese y no otro.
+2) Por qué el primer paso sugerido es el que corresponde, y qué se hace en él.
 3) Qué debería poder medir en las primeras semanas.
 Máximo 140 palabras en total.`;
 
@@ -84,7 +97,9 @@ export default async function handler(req, res) {
     traccion: n(body.traccion, 0),
     publico: body.publico === 'personas' ? 'una persona' : 'una empresa',
     rubro: String(body.rubro || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 120),
-    categoria: String(body.categoria || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 80)
+    categoria: String(body.categoria || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 80),
+    // Solo ids conocidos: el texto que llega al modelo lo escribimos nosotros.
+    recomendacion: PASOS[body.recomendacion] || ''
   };
 
   const prompt = `Resultado del diagnóstico de ${d.publico}${d.rubro ? ` del rubro ${d.rubro}` : ''}:
@@ -92,7 +107,7 @@ export default async function handler(req, res) {
 - Potencial a ganar (horas repetidas y fragilidad del proceso): ${d.potencial}%
 - Base y orden (dónde viven los datos, si está medido): ${d.base}%
 - Tracción para partir (uso actual de IA y capacidad de decidir): ${d.traccion}%
-${d.categoria ? `- Tipo de problema que quiere resolver primero: ${d.categoria}\n` : ''}
+${d.categoria ? `- Tipo de problema que quiere resolver primero: ${d.categoria}\n` : ''}${d.recomendacion ? `- Primer paso sugerido que ya le mostró el sitio: ${d.recomendacion}\n` : ''}
 Escribe la lectura para esta empresa.`;
 
   try {

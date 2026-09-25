@@ -13,7 +13,6 @@ export function organizacion() {
     '@id': ORG_ID,
     name: SITIO.marca,
     alternateName: `${SITIO.marca} · ${SITIO.linea}`,
-    legalName: SITIO.empresa.razonSocial,
     url: SITIO.dominio + '/',
     logo: SITIO.dominio + '/apple-touch-icon.png',
     image: SITIO.dominio + '/og-image.png',

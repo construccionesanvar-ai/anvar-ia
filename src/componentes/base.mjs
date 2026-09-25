@@ -83,7 +83,7 @@ function pie() {
         <a class="marca" href="/" aria-label="${esc(SITIO.marca)}: inicio">${ISOTIPO}<span class="marca-txt"><b>${esc(SITIO.marca)}</b><span>${esc(SITIO.linea)}</span></span></a>
         <p>Automatización e inteligencia operacional para empresas. Medimos cada proceso antes y después.</p>
         <dl class="pie-legal">
-          <div><dt>Razón social</dt><dd>${esc(e.razonSocial)}</dd></div>
+          <div><dt>Empresa</dt><dd>${esc(e.nombre)}</dd></div>
           <div><dt>RUT</dt><dd>${esc(e.rut)}</dd></div>
           <div><dt>Empresa</dt><dd>Chilena · emitimos factura</dd></div>
           <div><dt>Atención</dt><dd>${esc(e.atencion)}</dd></div>
@@ -110,7 +110,7 @@ function pie() {
         ['Asesoría personal', '/asesoria-ia-personal'],
       ])}
     </div>
-    <p class="pie-base">© <span data-anio>2026</span> ${esc(e.razonSocial)} · <a href="${esc(SITIO.sitioMatriz)}">anvartech.cl</a></p>
+    <p class="pie-base">© <span data-anio>2026</span> ${esc(e.nombre)} · <a href="${esc(SITIO.sitioMatriz)}">anvartech.cl</a></p>
   </div>
 </footer>`;
 }

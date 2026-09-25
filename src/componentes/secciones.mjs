@@ -53,7 +53,7 @@ export function heroInicio() {
   return `<section class="hero" aria-labelledby="hero-tit">
   <div class="contenedor hero-grid">
     <div class="hero-txt">
-      <p class="sobretitulo">${esc(SITIO.empresa.razonSocial)} · Automatización e inteligencia operacional · Chile</p>
+      <p class="sobretitulo">${esc(SITIO.empresa.nombre)} · Automatización e inteligencia operacional · Chile</p>
       <h1 id="hero-tit">Automatizamos el trabajo repetitivo de tu empresa.</h1>
       <p class="lead">Conectamos IA, software y las herramientas que ya usas —Excel, Word, PDF, correo, WhatsApp— para que tu equipo deje de copiar, pegar y digitar.</p>
       <p class="hero-metodo">Partimos por un proceso. Lo medimos antes y después. <b>Si no genera valor, no escalamos.</b></p>
@@ -336,7 +336,7 @@ export function nosotros() {
         </picture>
         <div class="ficha-nombre"><b>${esc(f.nombre)}</b><span>${esc(f.cargo)}</span></div>
         <dl class="ficha-datos">
-          <div><dt>Empresa</dt><dd>${esc(e.razonSocial)} · RUT ${esc(e.rut)}</dd></div>
+          <div><dt>Empresa</dt><dd>${esc(e.nombre)} · RUT ${esc(e.rut)}</dd></div>
           <div><dt>Formación</dt><dd>${esc(f.formacion)}</dd></div>
           <div><dt>Experiencia</dt><dd>${esc(f.experiencia)}</dd></div>
           <div><dt>Atención</dt><dd>${esc(e.atencion)}</dd></div>

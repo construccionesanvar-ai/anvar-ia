@@ -10,10 +10,11 @@ export const SITIO = {
   idioma: 'es-CL',
 
   empresa: {
-    // VALIDAR: en la memoria del proyecto anvartech.cl este RUT aparece asociado
-    // a "ANVAR Construcciones SpA". Si la razón social que factura es otra,
-    // cámbiala aquí y se actualiza en todas las páginas.
-    razonSocial: 'ANVAR TECH SpA',
+    // Nombre que se muestra. Decisión de Andrés (2026-09-24): se usa ANVAR TECH SpA
+    // como nombre de fantasía. El RUT es de ANVAR Construcciones SpA, que es quien
+    // factura; por eso el sitio no rotula este nombre como "razón social" ni lo
+    // declara como legalName en los datos estructurados.
+    nombre: 'ANVAR TECH SpA',
     rut: '77.982.517-5',
     pais: 'Chile',
     ciudad: 'Santiago',

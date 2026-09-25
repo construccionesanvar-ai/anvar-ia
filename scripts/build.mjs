@@ -38,7 +38,8 @@ const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(RAIZ, 'public');
 const OBSOLETOS = ['servicio.css', 'servicio.js'];
 
-const hash = (archivo) => createHash('sha256').update(readFileSync(join(PUBLIC, archivo))).digest('hex').slice(0, 10);
+// Sin \r: Vercel vuelve a construir en Linux (LF) y el hash tiene que coincidir con el de Windows (CRLF).
+const hash = (archivo) => createHash('sha256').update(readFileSync(join(PUBLIC, archivo), 'utf8').replace(/\r/g, '')).digest('hex').slice(0, 10);
 
 /** Lo que el JavaScript del navegador necesita saber. Sin secretos. */
 function configCliente() {

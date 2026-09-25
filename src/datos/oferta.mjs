@@ -2,8 +2,9 @@
 // Fuente única de servicios y precios. Cualquier precio del sitio sale de aquí:
 // páginas, tarjetas, datos estructurados para Google, calculadora y diagnóstico.
 //
-// Hipótesis comerciales todavía por validar con clientes reales (marcadas con
-// `hipotesis: true`): Automatización Express y ANVAR Intelligence.
+// Automatización Express y ANVAR Intelligence (marcados `hipotesis: true`): precios
+// aprobados por Andrés el 2026-09-24, todavía sin validar con clientes reales.
+// Revisarlos después de las primeras ventas.
 
 /** @typedef {import('../html.mjs').Precio} Precio */
 
