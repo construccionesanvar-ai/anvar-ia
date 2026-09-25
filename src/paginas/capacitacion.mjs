@@ -1,13 +1,13 @@
 // @ts-check
 import { SERVICIOS } from '../datos/oferta.mjs';
 import { FAQ } from '../datos/faq.mjs';
-import { precioTexto, esc } from '../html.mjs';
+import { esc } from '../html.mjs';
 import { evaluar, encabezado } from '../componentes/base.mjs';
-import { heroServicio, paraQuien, etapas, bloquePrecio, preguntas, otrosServicios } from '../componentes/secciones.mjs';
+import { heroServicio, paraQuien, etapas, bloquePrecio, preguntas, otrosServicios, precioLinea } from '../componentes/secciones.mjs';
+import { FUENTES } from '../datos/whatsapp.mjs';
 import { migas, servicio, faq } from './ld.mjs';
 
 const s = SERVICIOS.capacitacion;
-const pt = precioTexto(s.precio);
 
 const ENTREGAS = [
   ['Biblioteca de prompts del rubro', 'Los que se usaron en el taller, ordenados por tarea y con una línea de cuándo conviene usar cada uno.'],
@@ -23,6 +23,7 @@ export default {
   titulo: 'Capacitación en IA para equipos de empresas en Santiago | ANVAR TECH',
   descripcion: 'Taller práctico de 4 horas en tus oficinas, hasta 15 personas. Cada persona sale con una tarea suya resuelta y la empresa con una política escrita de uso de IA.',
   contextoWsp: 'capacitacion',
+  fuente: FUENTES.training,
   jsonld: [
     migas([['Capacitación para equipos', s.url]]),
     servicio({ nombre: 'Capacitación en IA para equipos', tipo: 'Capacitación in-company', ruta: s.url, ofertas: ['capacitacion'], area: 'Santiago', descripcion: 'Taller práctico de cuatro horas en las oficinas del cliente, para hasta quince personas, con casos de su rubro. Incluye biblioteca de prompts, guía de uso responsable y plan de treinta días.' }),
@@ -34,7 +35,7 @@ ${heroServicio({
   h1: 'Capacitación en IA para tu equipo, en tus oficinas',
   lead: 'Nadie escucha una charla. En este taller *cada persona llega con una tarea suya y se va con esa tarea resuelta*, y la empresa queda con una política escrita de qué información se puede subir y cuál no.',
   contexto: 'capacitacion',
-  ficha: [['Valor', `${pt.principal} ${pt.detalle}`], ['Duración', '4 horas'], ['Capacidad', 'Hasta 15 personas'], ['Práctica', '2 de las 4 horas']],
+  ficha: [['Valor', precioLinea('capacitacion')], ['Duración', '4 horas'], ['Capacidad', 'Hasta 15 personas'], ['Práctica', '2 de las 4 horas']],
 })}
 
 ${paraQuien({

@@ -72,6 +72,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Método no permitido' });
   }
+  res.setHeader('Cache-Control', 'no-store');
   if (!ANTHROPIC_API_KEY) {
     return res.status(503).json({ error: 'Sin clave de IA configurada.' });
   }
@@ -96,8 +97,10 @@ export default async function handler(req, res) {
     base: n(body.base, 0),
     traccion: n(body.traccion, 0),
     publico: body.publico === 'personas' ? 'una persona' : 'una empresa',
+    /* eslint-disable no-control-regex -- quita caracteres de control a propósito */
     rubro: String(body.rubro || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 120),
     categoria: String(body.categoria || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 80),
+    /* eslint-enable no-control-regex */
     // Solo ids conocidos: el texto que llega al modelo lo escribimos nosotros.
     recomendacion: PASOS[body.recomendacion] || ''
   };
@@ -123,7 +126,8 @@ Escribe la lectura para esta empresa.`;
         max_tokens: 500,
         system: SISTEMA,
         messages: [{ role: 'user', content: prompt }]
-      })
+      }),
+      signal: AbortSignal.timeout(15000)
     });
     if (!r.ok) throw new Error(await r.text());
     const j = await r.json();
@@ -131,7 +135,7 @@ Escribe la lectura para esta empresa.`;
     if (!texto) throw new Error('respuesta vacía');
     return res.status(200).json({ ok: true, texto });
   } catch (e) {
-    console.error('anthropic', e);
+    console.error('anthropic', e instanceof Error ? e.message : e);
     return res.status(502).json({ error: 'La IA no respondió.' });
   }
 }

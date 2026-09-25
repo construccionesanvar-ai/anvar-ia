@@ -2,7 +2,9 @@
 // Estructura común de todas las páginas: <head>, cabecera, pie, botones,
 // WhatsApp y el bloque final de evaluación.
 import { SITIO } from '../config.mjs';
-import { NAVEGACION, MENSAJES } from '../datos/contenido.mjs';
+import { NAVEGACION } from '../datos/contenido.mjs';
+import { wsp, urlWsp, conRef, MENSAJES } from '../datos/whatsapp.mjs';
+import { PAGINA } from '../contexto.mjs';
 import { esc, attrs, absoluta } from '../html.mjs';
 
 export const ISOTIPO = `<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect width="100" height="100" rx="8" fill="#101A1E"/><path d="M22 76 L50 22 L78 76" fill="none" stroke="#E9EBE4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 56 L66 56" stroke="#F0A92A" stroke-width="9" stroke-linecap="round"/><circle cx="50" cy="22" r="6" fill="#F0A92A"/></svg>`;
@@ -17,14 +19,21 @@ const ICONOS = {
 export const icono = (n) => ICONOS[n] ?? '';
 
 /**
+ * Nombre de la marca en el logo. El espacio entre las dos líneas no se ve
+ * (el contenedor es flex en columna) pero evita que el texto accesible o un
+ * rastreador lea "ANVAR TECHIA & Automatización".
+ */
+const marcaTexto = () => `<span class="marca-txt"><b>${esc(SITIO.marca)}</b> <span>${esc(SITIO.linea)}</span></span>`;
+
+/**
  * Botón o enlace con estilo de botón.
- * @param {{ href: string, texto: string, variante?: 'primario'|'secundario'|'claro',
+ * @param {{ href?: string, texto: string, variante?: 'primario'|'secundario'|'claro',
  *   track?: string, trackData?: string, wsp?: string, grande?: boolean,
- *   icono?: string, externo?: boolean }} o
+ *   icono?: string, externo?: boolean, sr?: string }} o
  */
 export function boton(o) {
   const clases = ['btn', `btn--${o.variante ?? 'primario'}`, o.grande ? 'btn--grande' : ''].filter(Boolean).join(' ');
-  const href = o.wsp ? `https://wa.me/${SITIO.contacto.whatsapp}?text=${encodeURIComponent(MENSAJES[o.wsp] ?? MENSAJES.general)}` : o.href;
+  const href = o.wsp ? wsp(o.wsp, PAGINA.fuente) : o.href;
   return `<a${attrs({
     class: clases,
     href,
@@ -33,8 +42,11 @@ export function boton(o) {
     'data-track-label': o.trackData ?? null,
     target: o.wsp || o.externo ? '_blank' : null,
     rel: o.wsp || o.externo ? 'noopener' : null,
-  })}>${o.icono ? icono(o.icono) : ''}<span>${esc(o.texto)}</span></a>`;
+  })}>${o.icono ? icono(o.icono) : ''}<span>${esc(o.texto)}</span>${o.sr ? `<span class="sr"> ${esc(o.sr)}</span>` : ''}</a>`;
 }
+
+/** Enlace a la sección "Evaluar mi proceso": en la misma página si existe, si no en la portada. */
+export const hrefEvaluar = (tiene) => (tiene ? '#evaluar' : '/#evaluar');
 
 /**
  * Encabezado de sección.
@@ -49,7 +61,7 @@ export function encabezado(o) {
 </div>`;
 }
 
-function cabecera(ruta) {
+function cabecera(ruta, evaluar) {
   const links = NAVEGACION.map((l) => {
     const actual = l.href === ruta ? ' aria-current="page"' : '';
     return `<li><a href="${esc(l.href)}"${actual}>${esc(l.texto)}</a></li>`;
@@ -58,34 +70,35 @@ function cabecera(ruta) {
   <div class="contenedor cab-in">
     <a class="marca" href="/" aria-label="${esc(SITIO.marca)}, ${esc(SITIO.linea)}: ir al inicio">
       ${ISOTIPO}
-      <span class="marca-txt"><b>${esc(SITIO.marca)}</b><span>${esc(SITIO.linea)}</span></span>
+      ${marcaTexto()}
     </a>
     <nav class="menu" id="menu" aria-label="Principal">
       <ul>${links}</ul>
-      <a class="menu-sec" href="/asesoria-ia-personal"${ruta === '/asesoria-ia-personal' ? ' aria-current="page"' : ''}>Asesoría personal</a>
-      <a class="btn btn--primario menu-cta" href="#evaluar" data-track="hero_cta_click" data-track-label="menu"><span>Evaluar mi proceso</span></a>
+      <a class="btn btn--primario menu-cta" href="${hrefEvaluar(evaluar)}" data-track="hero_cta_click" data-track-label="menu"><span>Evaluar mi proceso</span></a>
     </nav>
     <div class="cab-acciones">
-      <a class="btn btn--primario btn--cab" href="#evaluar" data-track="hero_cta_click" data-track-label="cabecera"><span>Evaluar mi proceso</span></a>
+      <a class="btn btn--primario btn--cab" href="${hrefEvaluar(evaluar)}" data-track="hero_cta_click" data-track-label="cabecera"><span>Evaluar mi proceso</span></a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="sr">Abrir menú</span>${icono('menu')}</button>
     </div>
   </div>
 </header>`;
 }
 
-function pie() {
+function pie(evaluar) {
   const e = SITIO.empresa;
-  const col = (titulo, items) => `<div class="pie-col"><h2 class="pie-tit">${esc(titulo)}</h2><ul>${items.map(([t, h]) => `<li><a href="${esc(h)}">${esc(t)}</a></li>`).join('')}</ul></div>`;
+  const enlace = ([t, h, extra]) => `<li><a href="${esc(h)}"${extra ?? ''}>${esc(t)}</a></li>`;
+  const col = (titulo, items) => `<div class="pie-col"><h2 class="pie-tit">${esc(titulo)}</h2><ul>${items.map(enlace).join('')}</ul></div>`;
+  const wspPie = ` data-wsp="general" data-track-label="pie" target="_blank" rel="noopener"`;
   return `<footer class="pie">
   <div class="contenedor">
     <div class="pie-grid">
       <div class="pie-marca">
-        <a class="marca" href="/" aria-label="${esc(SITIO.marca)}: inicio">${ISOTIPO}<span class="marca-txt"><b>${esc(SITIO.marca)}</b><span>${esc(SITIO.linea)}</span></span></a>
-        <p>Automatización e inteligencia operacional para empresas. Medimos cada proceso antes y después.</p>
+        <a class="marca" href="/" aria-label="${esc(SITIO.marca)}, ${esc(SITIO.linea)}: ir al inicio">${ISOTIPO}${marcaTexto()}</a>
+        <p>Automatización, software, datos e IA aplicada a las operaciones de empresas. Medimos cada proceso antes y después.</p>
         <dl class="pie-legal">
           <div><dt>Empresa</dt><dd>${esc(e.nombre)}</dd></div>
           <div><dt>RUT</dt><dd>${esc(e.rut)}</dd></div>
-          <div><dt>Empresa</dt><dd>Chilena · emitimos factura</dd></div>
+          <div><dt>Facturación</dt><dd>Empresa chilena · emitimos factura</dd></div>
           <div><dt>Atención</dt><dd>${esc(e.atencion)}</dd></div>
         </dl>
       </div>
@@ -104,39 +117,54 @@ function pie() {
         ['Preguntas frecuentes', '/#preguntas'],
       ])}
       ${col('Contacto', [
-        ['Evaluar mi proceso', '#evaluar'],
-        [`WhatsApp ${SITIO.contacto.whatsappVisible}`, `https://wa.me/${SITIO.contacto.whatsapp}`],
+        ['Evaluar mi proceso', hrefEvaluar(evaluar)],
+        [`WhatsApp ${SITIO.contacto.whatsappVisible}`, wsp('general', PAGINA.fuente), wspPie],
         [SITIO.contacto.email, `mailto:${SITIO.contacto.email}`],
-        ['Asesoría personal', '/asesoria-ia-personal'],
+        ['Asesoría personal en IA', '/asesoria-ia-personal'],
       ])}
     </div>
-    <p class="pie-base">© <span data-anio>2026</span> ${esc(e.nombre)} · <a href="${esc(SITIO.sitioMatriz)}">anvartech.cl</a></p>
+    <div class="pie-base">
+      <p>© <span data-anio>2026</span> ${esc(e.nombre)} · <a href="${esc(SITIO.sitioMatriz)}">anvartech.cl</a></p>
+      <p><a href="/privacidad">Política de privacidad</a></p>
+    </div>
   </div>
 </footer>`;
 }
 
+/** Aviso de privacidad junto a cada formulario. */
+export const avisoPrivacidad = (clase = 'form-aviso') => `<p class="${clase}">Al enviar este formulario aceptas nuestra <a href="/privacidad">Política de Privacidad</a>.</p>`;
+
 /**
- * Bloque final "Evaluar mi proceso": agenda, WhatsApp, correo y formulario.
+ * Bloque final "Evaluar mi proceso": agenda o WhatsApp, correo y formulario.
  * @param {{ contexto?: string, titulo?: string, bajada?: string, tipo?: string, conFormulario?: boolean,
  *   accion?: { texto: string, nota: string } }} o
  */
 export function evaluar(o = {}) {
+  const contexto = o.contexto ?? 'general';
+  const f = PAGINA.fuente;
   // Páginas que no venden una evaluación (asesoría personal) cambian la
   // acción principal por un WhatsApp con su propio mensaje.
   if (o.accion) {
-    const btn = `<a class="btn btn--primario btn--grande" href="https://wa.me/${SITIO.contacto.whatsapp}?text=${encodeURIComponent(MENSAJES[o.contexto ?? 'general'])}" data-wsp="${esc(o.contexto ?? 'general')}" data-track-label="evaluar-principal" target="_blank" rel="noopener">${icono('whatsapp')}<span>${esc(o.accion.texto)}</span></a>`;
-    return evaluarBloque(o, btn, o.accion.nota);
+    const btn = `<a class="btn btn--primario btn--grande" href="${esc(wsp(contexto, f))}" data-wsp="${esc(contexto)}" data-track-label="evaluar-principal" target="_blank" rel="noopener">${icono('whatsapp')}<span>${esc(o.accion.texto)}</span></a>`;
+    return evaluarBloque(o, btn, o.accion.nota, false);
   }
-  const agenda = SITIO.agenda.url
-    ? `<a class="btn btn--primario btn--grande" href="${esc(SITIO.agenda.url)}" target="_blank" rel="noopener" data-track="calendar_click" data-track-label="agenda">${icono('calendario')}<span>Agendar evaluación de ${SITIO.agenda.duracionMin} min</span></a>`
-    : `<a class="btn btn--primario btn--grande" href="https://wa.me/${SITIO.contacto.whatsapp}?text=${encodeURIComponent(MENSAJES.agenda)}" data-wsp="agenda" data-track="calendar_click" data-track-label="whatsapp" target="_blank" rel="noopener">${icono('calendario')}<span>Agendar evaluación de ${SITIO.agenda.duracionMin} min</span></a>`;
-  const notaAgenda = SITIO.agenda.url
-    ? 'Eliges el horario en el calendario. Videollamada o presencial en Santiago.'
-    : 'Coordinamos el horario por WhatsApp. Videollamada o presencial en Santiago.';
-  return evaluarBloque(o, agenda, notaAgenda);
+  // Agenda real si hay enlace configurado; si no, se dice lo que pasa: se coordina por WhatsApp.
+  if (SITIO.agenda.url) {
+    const btn = `<a class="btn btn--primario btn--grande" href="${esc(SITIO.agenda.url)}" target="_blank" rel="noopener" data-track="calendar_click" data-track-label="evaluar">${icono('calendario')}<span>Agendar evaluación de ${SITIO.agenda.duracionMin} min</span></a>`;
+    return evaluarBloque(o, btn, 'Eliges el horario en el calendario. Videollamada o presencial en Santiago.', true);
+  }
+  const btn = `<a class="btn btn--primario btn--grande" href="${esc(urlWsp(conRef(MENSAJES.agenda, f)))}" data-wsp="agenda" data-track-label="evaluar-coordinar" target="_blank" rel="noopener">${icono('whatsapp')}<span>Coordinar evaluación por WhatsApp</span></a>`;
+  return evaluarBloque(o, btn, `Coordinamos el horario por WhatsApp (${SITIO.contacto.whatsappVisible}). Videollamada o presencial en Santiago.`, false);
 }
 
-function evaluarBloque(o, accionPrincipal, notaAccion) {
+/**
+ * @param {{ contexto?: string, titulo?: string, bajada?: string, tipo?: string, conFormulario?: boolean }} o
+ * @param {string} accionPrincipal
+ * @param {string} notaAccion
+ * @param {boolean} conWsp  mostrar WhatsApp como vía adicional (cuando la acción principal no lo es)
+ */
+function evaluarBloque(o, accionPrincipal, notaAccion, conWsp) {
+  const contexto = o.contexto ?? 'general';
   const tipos = [
     ['express', 'Automatizar un proceso puntual'],
     ['diagnostico', 'Evaluar varios procesos'],
@@ -147,18 +175,21 @@ function evaluarBloque(o, accionPrincipal, notaAccion) {
   const opciones = tipos.map(([v, t]) => `<option value="${v}"${v === (o.tipo ?? 'express') ? ' selected' : ''}>${esc(t)}</option>`).join('');
 
   const formulario = o.conFormulario === false ? '' : `
-    <form class="form" id="form-contacto" novalidate>
+    <form class="form" id="form-contacto" action="/api/contacto" method="post" novalidate>
       <h3 class="form-tit">O déjanos los datos y te escribimos</h3>
       <div class="form-fila">
-        <div class="campo"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" type="text" autocomplete="name" required></div>
-        <div class="campo"><label for="f-empresa">Empresa <span class="opc">(opcional)</span></label><input id="f-empresa" name="empresa" type="text" autocomplete="organization"></div>
+        <div class="campo"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" type="text" autocomplete="name" maxlength="120" required aria-describedby="f-nombre-err"><p class="campo-err" id="f-nombre-err" hidden>Escribe tu nombre.</p></div>
+        <div class="campo"><label for="f-empresa">Empresa <span class="opc">(opcional)</span></label><input id="f-empresa" name="empresa" type="text" autocomplete="organization" maxlength="160"></div>
       </div>
-      <div class="campo"><label for="f-contacto">WhatsApp o correo</label><input id="f-contacto" name="contacto" type="text" autocomplete="email" required aria-describedby="f-contacto-ayuda"><p class="ayuda" id="f-contacto-ayuda">Solo lo usamos para responderte.</p></div>
+      <div class="campo"><label for="f-contacto">WhatsApp o correo</label><input id="f-contacto" name="contacto" type="text" autocomplete="email" maxlength="160" required aria-describedby="f-contacto-ayuda f-contacto-err"><p class="ayuda" id="f-contacto-ayuda">Solo lo usamos para responderte. Ej.: +56 9 1234 5678 o nombre@empresa.cl</p><p class="campo-err" id="f-contacto-err" hidden>Escribe un WhatsApp (8 dígitos o más) o un correo válido.</p></div>
       <div class="campo"><label for="f-tipo">Qué necesitas</label><select id="f-tipo" name="tipo">${opciones}</select></div>
-      <div class="campo"><label for="f-mensaje">Qué proceso te está costando tiempo <span class="opc">(opcional)</span></label><textarea id="f-mensaje" name="mensaje" rows="4" placeholder="Ejemplo: cada semana armamos el mismo informe de ventas desde tres planillas."></textarea></div>
+      <div class="campo"><label for="f-mensaje">Qué proceso te está costando tiempo <span class="opc">(opcional)</span></label><textarea id="f-mensaje" name="mensaje" rows="4" maxlength="2000" placeholder="Ejemplo: cada semana armamos el mismo informe de ventas desde tres planillas."></textarea></div>
       <div class="trampa" aria-hidden="true"><label for="f-web">No completar</label><input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off"></div>
+      <input type="hidden" name="fuente" value="${esc(PAGINA.fuente)}">
+      <input type="hidden" name="t" value="">
       <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
       <button class="btn btn--primario" type="submit" id="form-enviar"><span>Enviar</span></button>
+      ${avisoPrivacidad()}
     </form>`;
 
   return `<section class="seccion seccion--oscura" id="evaluar" aria-labelledby="evaluar-tit">
@@ -172,8 +203,8 @@ function evaluarBloque(o, accionPrincipal, notaAccion) {
         <p class="nota-clara">${esc(notaAccion)}</p>
       </div>
       <ul class="vias">
-        <li><a href="https://wa.me/${SITIO.contacto.whatsapp}?text=${encodeURIComponent(MENSAJES[o.contexto ?? 'general'] ?? MENSAJES.general)}" data-wsp="${esc(o.contexto ?? 'general')}" data-track-label="evaluar" target="_blank" rel="noopener">${icono('whatsapp')}<span><b>WhatsApp</b>${esc(SITIO.contacto.whatsappVisible)}</span></a></li>
-        <li><a href="mailto:${esc(SITIO.contacto.email)}">${icono('correo')}<span><b>Correo</b>${esc(SITIO.contacto.email)}</span></a></li>
+        ${conWsp ? `<li><a href="${esc(wsp(contexto, PAGINA.fuente))}" data-wsp="${esc(contexto)}" data-track-label="evaluar" target="_blank" rel="noopener">${icono('whatsapp')}<span><b>WhatsApp</b>${esc(SITIO.contacto.whatsappVisible)}</span></a></li>` : ''}
+        <li><a href="mailto:${esc(SITIO.contacto.email)}" data-track="email_click" data-track-label="evaluar">${icono('correo')}<span><b>Correo</b>${esc(SITIO.contacto.email)}</span></a></li>
       </ul>
       <p class="nota-clara">${esc(SITIO.contacto.respuesta)} · Confidencialidad por escrito antes de ver tus datos.</p>
     </div>
@@ -185,16 +216,17 @@ function evaluarBloque(o, accionPrincipal, notaAccion) {
 /**
  * Documento HTML completo.
  * @param {{ ruta: string, titulo: string, descripcion: string, cuerpo: string,
- *   jsonld?: object[], noindex?: boolean, contextoWsp?: string,
+ *   jsonld?: object[], noindex?: boolean, contextoWsp?: string, fuente: string,
  *   ogTitulo?: string, hashes: { css: string, js: string }, cliente: object }} p
  */
 export function documento(p) {
   const url = absoluta(p.ruta);
   const og = p.ogTitulo ?? p.titulo;
   const ld = (p.jsonld ?? []).length
-    ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': p.jsonld })}</script>`
+    ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': p.jsonld }).replace(/</g, '\\u003c')}</script>`
     : '';
-  const wsp = p.contextoWsp ?? 'general';
+  const contexto = p.contextoWsp ?? 'general';
+  const tieneEvaluar = p.cuerpo.includes('id="evaluar"');
   return `<!DOCTYPE html>
 <html lang="${SITIO.idioma}">
 <head>
@@ -224,22 +256,21 @@ ${p.noindex ? '' : `<link rel="canonical" href="${esc(url)}">`}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="preload" href="/fuentes/archivo-latin-500-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fuentes/ibm-plex-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css?v=${p.hashes.css}">
 ${ld}
 </head>
-<body data-wsp-contexto="${esc(wsp)}">
+<body data-wsp-contexto="${esc(contexto)}" data-fuente="${esc(p.fuente)}">
 <a class="saltar" href="#contenido">Saltar al contenido</a>
-${cabecera(p.ruta)}
+${cabecera(p.ruta, tieneEvaluar)}
 <main id="contenido">
 ${p.cuerpo}
 </main>
-${pie()}
-<a class="wsp-flotante" href="https://wa.me/${SITIO.contacto.whatsapp}?text=${encodeURIComponent(MENSAJES[wsp] ?? MENSAJES.general)}" data-wsp="${esc(wsp)}" data-track-label="flotante" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">${icono('whatsapp')}<span>WhatsApp</span></a>
+${pie(tieneEvaluar)}
+<a class="wsp-flotante" href="${esc(wsp(contexto, p.fuente))}" data-wsp="${esc(contexto)}" data-track-label="flotante" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">${icono('whatsapp')}<span>WhatsApp</span></a>
 <script type="application/json" id="config">${JSON.stringify(p.cliente).replace(/</g, '\\u003c')}</script>
-<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="${esc(SITIO.analitica.script)}"></script>
 <script defer src="/app.js?v=${p.hashes.js}"></script>
 </body>
 </html>

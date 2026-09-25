@@ -2,49 +2,71 @@
 // Secciones reutilizables. Cada función recibe datos y devuelve HTML.
 import { SITIO } from '../config.mjs';
 import { SERVICIOS, ESCALERA } from '../datos/oferta.mjs';
-import { CASOS, ETIQUETAS, METRICAS } from '../datos/casos.mjs';
+import { CASOS, ETIQUETAS, METRICAS, caso, urlCaso } from '../datos/casos.mjs';
 import { PROBLEMAS, PROCESO, SEGURIDAD } from '../datos/contenido.mjs';
-import { esc, rico, precioTexto, attrs } from '../html.mjs';
+import { publicables } from '../datos/testimonios.mjs';
+import { urlWsp, conRef, mensajeCaso } from '../datos/whatsapp.mjs';
+import { PAGINA } from '../contexto.mjs';
+import { esc, rico, precioTexto, notaUf, attrs } from '../html.mjs';
 import { boton, encabezado, icono } from './base.mjs';
-
-const caso = (id) => CASOS.find((c) => c.id === id);
 
 /** Etiqueta de transparencia: qué tipo de proyecto es. */
 export function etiqueta(c) {
   return `<span class="etiqueta etiqueta--${esc(c.etiqueta)}">${esc(ETIQUETAS[c.etiqueta])}</span>`;
 }
 
+/**
+ * Detalle de un precio (IVA y, si es en UF, su equivalente en pesos). Los
+ * precios en UF llevan `data-uf` para que el navegador los actualice con la
+ * UF del día (ver /api/uf y app.js).
+ */
+function detallePrecio(s, t) {
+  if (s.precio.moneda !== 'UF') return `<span class="precio-d">${esc(t.detalle)}</span>`;
+  return `<span class="precio-d"${attrs({ 'data-uf': s.precio.valor, 'data-iva': s.precio.iva })}>${esc(t.detalle)}</span>`;
+}
+
 /** Precio en dos líneas, desde la fuente única. */
 export function precio(id, clase = 'precio') {
   const s = SERVICIOS[id];
   const t = precioTexto(s.precio);
-  return `<p class="${clase}"><span class="precio-v">${esc(t.principal)}</span><span class="precio-d">${esc(t.detalle)}</span>${s.precio.nota ? `<span class="precio-n">${esc(s.precio.nota)}</span>` : ''}</p>`;
+  return `<p class="${clase}"><span class="precio-v">${esc(t.principal)}</span>${detallePrecio(s, t)}${s.precio.nota ? `<span class="precio-n">${esc(s.precio.nota)}</span>` : ''}</p>`;
 }
+
+/** Precio en una línea, para fichas: "UF 12 ≈ $492.000 + IVA". Devuelve HTML. */
+export function precioLinea(id) {
+  const s = SERVICIOS[id];
+  const t = precioTexto(s.precio);
+  return { html: `${esc(t.principal)} ${detallePrecio(s, t)}` };
+}
+
+/** Nota de la UF (con fecha), actualizable por el navegador. */
+export const notaPreciosUf = () => `<span data-uf-nota>${esc(notaUf())}</span>`;
 
 /* ------------------------------------------------------------------ hero */
 
 /** Tarjeta de prueba del hero: un caso real, con sus números. */
 function tarjetaPrueba(c) {
-  const [antes, despues] = c.metricas[0][0].split('→').map((x) => x.trim());
+  const ad = c.antesDespues;
+  if (!ad) return '';
   return `<aside class="prueba" aria-label="Caso real ${esc(c.codigo)}">
   <div class="prueba-top"><span>Caso real · ${esc(c.codigo)}</span>${etiqueta(c)}</div>
   <div class="prueba-cuerpo">
     <p class="prueba-cat">${esc(c.categoria)}</p>
     <p class="prueba-tit">${esc(c.titulo)}</p>
-    <div class="antes-despues" role="group" aria-label="Tiempo por procedimiento">
-      <div><span class="ad-l">Antes</span><span class="ad-v">${esc(antes)}</span></div>
+    <div class="antes-despues" role="group" aria-label="${esc(ad.texto)}">
+      <div><span class="ad-l">Antes</span><span class="ad-v">${esc(ad.antes)}</span></div>
       <span class="ad-flecha" aria-hidden="true">→</span>
-      <div><span class="ad-l">Después</span><span class="ad-v ad-v--ok">${esc(despues)}</span></div>
+      <div><span class="ad-l">Después</span><span class="ad-v ad-v--ok">${esc(ad.despues)}</span></div>
     </div>
-    <div class="barra" aria-hidden="true"><i class="barra-91"></i></div>
+    <div class="barra" aria-hidden="true"><i class="barra-${esc(ad.pct)}"></i></div>
     <p class="prueba-res"><b>${esc(c.resultado.valor)}</b> ${esc(c.resultado.texto)}</p>
     <p class="prueba-txt">${esc(c.despues)}</p>
   </div>
   <dl class="rotulo">
     <div><dt>Estado</dt><dd>${esc(c.estado)}</dd></div>
     <div><dt>Medición</dt><dd>Antes y después</dd></div>
-    <div><dt>Contexto</dt><dd>Retail</dd></div>
-    <div><dt>Detalle</dt><dd><a href="/casos#${esc(c.id)}" data-track="case_study_click" data-track-label="${esc(c.id)}">Ver caso</a></dd></div>
+    <div><dt>Contexto</dt><dd>${esc(c.cliente.industria ?? c.categoria)}</dd></div>
+    <div><dt>Detalle</dt><dd><a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="hero-${esc(c.id)}">Ver caso<span class="sr"> ${esc(c.codigo)}</span></a></dd></div>
   </dl>
 </aside>`;
 }
@@ -80,7 +102,8 @@ export function tiraMetricas() {
     <ul class="metricas-lista">
       ${METRICAS.map((m) => {
         const c = caso(m.caso);
-        return `<li><a href="/casos#${esc(c.id)}" data-track="case_study_click" data-track-label="metrica-${esc(c.id)}"><span class="metrica-v">${esc(m.valor)}</span><span class="metrica-t">${esc(m.texto)}</span><span class="metrica-f">${esc(c.codigo)} · ${esc(ETIQUETAS[c.etiqueta])}</span></a></li>`;
+        const v = c.metricas[m.metrica].valor;
+        return `<li><a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="metrica-${esc(c.id)}"><span class="metrica-v">${esc(v)}</span><span class="metrica-t">${esc(m.texto)}</span><span class="metrica-f">${esc(c.codigo)} · ${esc(ETIQUETAS[c.etiqueta])}</span></a></li>`;
       }).join('')}
     </ul>
     <p class="metricas-nota">Resultados de proyectos propios y de un cliente confidencial, con la etiqueta de cada uno. Así medimos también cada proyecto nuevo.</p>
@@ -105,7 +128,7 @@ export function problemas() {
         <p class="problema-pie">
           <span class="label">Se parte con</span>
           <a href="${esc(s.url)}" data-track="service_click" data-track-label="${esc(s.id)}">${esc(s.nombre)}</a>
-          ${c ? `<span class="problema-caso">· <a href="/casos#${esc(c.id)}" data-track="case_study_click" data-track-label="problema-${esc(c.id)}">caso ${esc(c.codigo)}</a></span>` : ''}
+          ${c ? `<span class="problema-caso">· <a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="problema-${esc(c.id)}">caso ${esc(c.codigo)}</a></span>` : ''}
         </p>
       </li>`;
       }).join('')}
@@ -116,11 +139,40 @@ export function problemas() {
 
 /* ----------------------------------------------------------------- casos */
 
+/** Un archivo de un caso: video en bucle, GIF, imagen o captura. */
+function medio(m, { lazy = true } = {}) {
+  const leyenda = m.leyenda ? `<figcaption>${esc(m.leyenda)}${m.duracion ? ` <span class="medio-dur">${esc(m.duracion)}</span>` : ''}</figcaption>` : '';
+  if (m.tipo === 'video') {
+    // Sin sonido, en bucle y con controles: se puede pausar. preload="none" no carga nada hasta que se pide.
+    return `<figure class="medio medio--video"><video controls muted loop playsinline preload="none"${attrs({ poster: m.poster, width: m.ancho, height: m.alto, 'aria-label': m.alt })}><source src="${esc(m.src)}" type="video/mp4"></video>${leyenda}</figure>`;
+  }
+  return `<figure class="medio medio--${esc(m.tipo)}"><img${attrs({ src: m.src, alt: m.alt, width: m.ancho, height: m.alto, loading: lazy ? 'lazy' : null, decoding: 'async' })}>${leyenda}</figure>`;
+}
+
+/** Diagrama del flujo del caso, en HTML: sirve de evidencia visual cuando aún no hay video. */
+export function flujoCaso(c, clase = '') {
+  return `<ol class="flujo-caso${clase ? ' ' + clase : ''}" aria-label="Cómo funciona el caso ${esc(c.codigo)}">${c.flujo.map(([t, d]) => `<li><span class="flujo-caso-t">${esc(t)}</span><span class="flujo-caso-d">${esc(d)}</span></li>`).join('')}</ol>`;
+}
+
+/** Evidencia visual completa del caso (para /casos): principal, galería y demostración. */
+function evidenciaCaso(c) {
+  const m = c.media;
+  if (!m) return flujoCaso(c);
+  const partes = [];
+  if (m.principal) partes.push(medio(m.principal));
+  if (m.galeria?.length) partes.push(`<div class="galeria">${m.galeria.map((g) => medio(g)).join('')}</div>`);
+  if (m.demo) partes.push(`<p class="demo-enlace"><a class="btn btn--secundario" href="${esc(m.demo.url)}" target="_blank" rel="noopener" data-track="case_study_click" data-track-label="demo-${esc(c.id)}"><span>${esc(m.demo.texto)}</span></a></p>`);
+  partes.push(flujoCaso(c, 'flujo-caso--compacto'));
+  return `<div class="evidencia">${partes.join('')}</div>`;
+}
+
 /** Tarjeta visual de un caso: problema, antes, después y resultado. */
 export function tarjetaCaso(c) {
-  const media = c.media ? mediaCaso(c) : '';
+  const portada = c.media?.principal ? medio(c.media.principal.tipo === 'video' && c.media.principal.poster
+    ? { tipo: 'imagen', src: c.media.principal.poster, alt: c.media.principal.alt, ancho: c.media.principal.ancho, alto: c.media.principal.alto }
+    : c.media.principal) : '';
   return `<article class="caso" aria-labelledby="caso-${esc(c.id)}">
-  ${media}
+  ${portada ? `<div class="caso-media">${portada}</div>` : ''}
   <header class="caso-cab">
     <p class="caso-meta"><span class="caso-cod">${esc(c.codigo)}</span>${etiqueta(c)}<span class="caso-estado">${esc(c.estado)}</span></p>
     <p class="caso-cat">${esc(c.categoria)}</p>
@@ -132,16 +184,8 @@ export function tarjetaCaso(c) {
     <div class="ad-bloque ad-bloque--despues"><span class="label">Después</span><p>${esc(c.despues)}</p></div>
   </div>
   <p class="caso-resultado"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span><span>${esc(c.resultado.texto)}</span></p>
-  <a class="enlace-flecha" href="/casos#${esc(c.id)}" data-track="case_study_click" data-track-label="${esc(c.id)}"><span>Ver caso completo</span>${icono('flecha')}</a>
+  <a class="enlace-flecha" href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="${esc(c.id)}"><span>Ver caso completo<span class="sr"> ${esc(c.codigo)}</span></span>${icono('flecha')}</a>
 </article>`;
-}
-
-function mediaCaso(c) {
-  const m = c.media;
-  if (m.tipo === 'video') {
-    return `<figure class="caso-media"><video controls preload="none"${attrs({ poster: m.poster, width: m.ancho, height: m.alto })}><source src="${esc(m.src)}"></video><figcaption class="sr">${esc(m.alt)}</figcaption></figure>`;
-  }
-  return `<figure class="caso-media"><img${attrs({ src: m.src, alt: m.alt, width: m.ancho, height: m.alto, loading: 'lazy', decoding: 'async' })}></figure>`;
 }
 
 export function casosInicio() {
@@ -160,9 +204,10 @@ export function casosInicio() {
 /** Ficha completa de un caso, para /casos. */
 export function detalleCaso(c) {
   const metricas = c.metricas.length
-    ? `<ul class="metricas-caso">${c.metricas.map(([v, t]) => `<li><span class="metrica-v">${esc(v)}</span><span class="metrica-t">${esc(t)}</span></li>`).join('')}</ul>`
+    ? `<ul class="metricas-caso">${c.metricas.map((m) => `<li><span class="metrica-v">${esc(m.valor)}</span><span class="metrica-t">${esc(m.texto)}</span>${m.nota ? `<span class="metrica-nota">${esc(m.nota)}</span>` : ''}</li>`).join('')}</ul>`
     : '';
   const s = SERVICIOS[c.servicio];
+  const wspCaso = urlWsp(conRef(mensajeCaso(c.codigo), PAGINA.fuente));
   return `<article class="detalle" id="${esc(c.id)}" aria-labelledby="det-${esc(c.id)}">
   <header class="detalle-cab">
     <p class="caso-meta"><span class="caso-cod">${esc(c.codigo)}</span>${etiqueta(c)}<span class="caso-estado">${esc(c.estado)}</span></p>
@@ -170,7 +215,7 @@ export function detalleCaso(c) {
     <h2 id="det-${esc(c.id)}">${esc(c.titulo)}</h2>
     <p class="detalle-contexto">${esc(c.contexto)}</p>
   </header>
-  ${c.media ? mediaCaso(c) : ''}
+  ${evidenciaCaso(c)}
   <div class="detalle-grid">
     <div class="detalle-bloque"><h3 class="label">Problema</h3><p>${esc(c.problema)}</p></div>
     <div class="detalle-bloque"><h3 class="label">Antes</h3><p>${esc(c.antes)}</p></div>
@@ -180,11 +225,44 @@ export function detalleCaso(c) {
   ${metricas}
   <div class="detalle-grid detalle-grid--2">
     <div class="detalle-bloque"><h3 class="label">Qué se construyó</h3><ul class="lista">${c.construido.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
-    <div class="detalle-bloque"><h3 class="label">Cómo se midió</h3><p>${esc(c.medicion)}</p></div>
+    <div class="detalle-bloque"><h3 class="label">Cómo se midió</h3><p>${esc(c.medicion)}</p>${c.disclaimer ? `<p class="alcance"><b>Alcance de la cifra.</b> ${esc(c.disclaimer)}</p>` : ''}</div>
   </div>
-  <details class="tecnico"><summary>Detalles técnicos</summary><p>${esc(c.tecnico)}</p></details>
-  <p class="detalle-pie">¿Un proceso parecido en tu empresa? Lo más cercano es <a href="${esc(s.url)}" data-track="service_click" data-track-label="${esc(s.id)}">${esc(s.nombre)}</a>.</p>
+  <details class="tecnico"><summary>Detalles técnicos</summary><ul class="chips chips--tec">${c.tecnologias.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>
+  <div class="detalle-pie">
+    <p>¿Un proceso parecido en tu empresa? Lo más cercano es <a href="${esc(s.url)}" data-track="service_click" data-track-label="caso-${esc(s.id)}">${esc(s.nombre)}</a>.</p>
+    <a class="btn btn--secundario" href="${esc(wspCaso)}" data-wsp="caso" data-track="case_study_click" data-track-label="wsp-${esc(c.id)}" target="_blank" rel="noopener">${icono('whatsapp')}<span>Tengo un proceso parecido</span><span class="sr"> al caso ${esc(c.codigo)}</span></a>
+  </div>
 </article>`;
+}
+
+/* ------------------------------------------------------------ testimonios */
+
+/**
+ * Testimonios autorizados. Sin ninguno publicable devuelve '' y la sección
+ * no existe: nunca se muestra un bloque vacío ni un testimonio genérico.
+ */
+export function testimonios({ caso: idCaso = null, titulo = 'Lo que dicen quienes ya trabajaron con nosotros', datos = undefined } = {}) {
+  const lista = publicables(datos).filter((t) => !idCaso || t.caso === idCaso);
+  if (!lista.length) return '';
+  const tarjeta = (t) => {
+    const quien = t.confidencial
+      ? `<span class="testimonio-nombre">${esc(t.cargo)}</span><span class="testimonio-org">Cliente confidencial · ${esc(t.industria)}</span>`
+      : `<span class="testimonio-nombre">${esc(t.nombre)}</span><span class="testimonio-org">${esc(t.cargo)} · ${esc(t.empresa)} · ${esc(t.industria)}</span>`;
+    const foto = !t.confidencial && t.foto ? `<img class="testimonio-foto" src="${esc(t.foto)}" alt="" width="56" height="56" loading="lazy" decoding="async">` : '';
+    const logo = !t.confidencial && t.logo ? `<img class="testimonio-logo" src="${esc(t.logo)}" alt="${esc(t.empresa)}" height="28" loading="lazy" decoding="async">` : '';
+    const c = t.caso ? caso(t.caso) : null;
+    return `<figure class="testimonio">
+      <blockquote><p>${esc(t.frase)}</p></blockquote>
+      <figcaption>${foto}<span class="testimonio-quien">${quien}</span>${logo}</figcaption>
+      ${t.resultado || c ? `<p class="testimonio-res">${t.resultado ? `<b>${esc(t.resultado)}</b>` : ''}${c ? ` · <a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="testimonio-${esc(c.id)}">caso ${esc(c.codigo)}</a>` : ''}</p>` : ''}
+    </figure>`;
+  };
+  return `<section class="seccion" id="testimonios" aria-labelledby="testimonios-tit">
+  <div class="contenedor">
+    ${encabezado({ codigo: 'Clientes', titulo, id: 'testimonios-tit', bajada: 'Publicados con autorización escrita de cada cliente.' })}
+    <div class="testimonios">${lista.map(tarjeta).join('')}</div>
+  </div>
+</section>`;
 }
 
 /* ---------------------------------------------------------------- método */
@@ -208,7 +286,7 @@ export function proceso() {
 
 /* ---------------------------------------------------------------- precios */
 
-function tarjetaPrecio({ nivel, titulo, bajada, ids, destacado, cta }) {
+function tarjetaPrecio({ nivel, titulo, bajada, ids, destacado = false, cta }) {
   const lineas = ids.map((id) => {
     const s = SERVICIOS[id];
     return `<div class="plan-linea">
@@ -227,25 +305,32 @@ function tarjetaPrecio({ nivel, titulo, bajada, ids, destacado, cta }) {
   </article>`;
 }
 
+/** "desde UF 6 / mes + IVA" en una línea, para listas cortas. */
+const precioCorto = (id) => {
+  const s = SERVICIOS[id];
+  const t = precioTexto(s.precio);
+  return s.precio.moneda === 'UF' ? `${t.principal} + IVA` : `${t.principal} ${t.detalle}`;
+};
+
 export function precios() {
   return `<section class="seccion seccion--panel" id="contratar" aria-labelledby="contratar-tit">
   <div class="contenedor">
     ${encabezado({ codigo: 'Formas de contratar', titulo: 'Empieza pequeño. Escala solo si funciona.', id: 'contratar-tit', bajada: 'Tres formas de empezar según el tamaño del problema. Precios publicados, netos más IVA, con alcance escrito antes de partir.' })}
     <div class="planes">
       ${tarjetaPrecio({
-        nivel: 'Empezar', titulo: 'Un proceso pequeño', bajada: 'La forma de probar ANVAR TECH con bajo riesgo: un proceso delimitado, resuelto y funcionando.',
+        nivel: 'Empezar', titulo: 'Un proceso pequeño', bajada: 'La forma de probar ANVAR TECH con bajo riesgo: un proceso delimitado, resuelto y funcionando. El precio final se fija por escrito según el proceso.',
         ids: ['express'], destacado: true,
-        cta: boton({ href: '/automatizacion-express', texto: 'Ver Automatización Express', track: 'service_click', trackData: 'express' }),
+        cta: boton({ href: SERVICIOS.express.url, texto: 'Ver Automatización Express', track: 'service_click', trackData: 'plan-express' }),
       })}
       ${tarjetaPrecio({
         nivel: 'Validar', titulo: 'Varios procesos o uno grande', bajada: 'Primero medimos, después construimos un piloto sobre la mejor oportunidad.',
         ids: ['diagnostico', 'piloto'],
-        cta: boton({ href: '/diagnostico-ia-empresas', texto: 'Ver diagnóstico y piloto', variante: 'secundario', track: 'service_click', trackData: 'diagnostico' }),
+        cta: boton({ href: SERVICIOS.diagnostico.url, texto: 'Ver diagnóstico y piloto', variante: 'secundario', track: 'service_click', trackData: 'plan-diagnostico' }),
       })}
       ${tarjetaPrecio({
         nivel: 'Escalar', titulo: 'La solución completa', bajada: 'Implementación integrada con tus sistemas y soporte para que siga funcionando.',
         ids: ['implementacion', 'soporte'],
-        cta: boton({ href: '/automatizacion-procesos-ia#implementacion', texto: 'Ver implementación', variante: 'secundario', track: 'service_click', trackData: 'implementacion' }),
+        cta: boton({ href: SERVICIOS.implementacion.url, texto: 'Ver implementación', variante: 'secundario', track: 'service_click', trackData: 'plan-implementacion' }),
       })}
     </div>
     <ol class="escalera" aria-label="Recorrido típico">
@@ -254,12 +339,12 @@ export function precios() {
     <div class="otras">
       <p class="label">También</p>
       <ul>
-        <li><a href="${esc(SERVICIOS.intelligence.url)}" data-track="service_click" data-track-label="intelligence">${esc(SERVICIOS.intelligence.nombre)}</a> <span>${esc(precioTexto(SERVICIOS.intelligence.precio).principal)} + IVA · datos y alertas cada mes</span></li>
-        <li><a href="${esc(SERVICIOS.capacitacion.url)}" data-track="service_click" data-track-label="capacitacion">${esc(SERVICIOS.capacitacion.nombre)}</a> <span>${esc(precioTexto(SERVICIOS.capacitacion.precio).principal)} + IVA · taller de 4 horas</span></li>
-        <li><a href="/asesoria-ia-personal" data-track="service_click" data-track-label="personas">Asesoría personal</a> <span>para personas, desde ${esc(precioTexto(SERVICIOS.sesion.precio).principal)}</span></li>
+        <li><a href="${esc(SERVICIOS.intelligence.url)}" data-track="service_click" data-track-label="intelligence">${esc(SERVICIOS.intelligence.nombre)}</a> <span>${esc(precioCorto('intelligence'))} · datos y alertas cada mes</span></li>
+        <li><a href="${esc(SERVICIOS.capacitacion.url)}" data-track="service_click" data-track-label="capacitacion">${esc(SERVICIOS.capacitacion.nombre)}</a> <span>${esc(precioCorto('capacitacion'))} · taller de 4 horas</span></li>
+        <li><a href="${esc(SERVICIOS.sesion.url)}" data-track="service_click" data-track-label="personas">Asesoría personal</a> <span>para personas, desde ${esc(precioCorto('sesion'))}</span></li>
       </ul>
     </div>
-    <p class="nota">Valores referenciales. Los precios en UF se muestran con su equivalente en pesos a una UF de ${esc(precioTexto({ moneda: 'CLP', valor: SITIO.uf, iva: 'mas' }).principal)}. Emitimos factura.</p>
+    <p class="nota">Valores referenciales, netos más IVA. Los proyectos se cotizan y facturan en UF. ${notaPreciosUf()} Emitimos factura.</p>
   </div>
 </section>`;
 }
@@ -273,7 +358,7 @@ export function flujoDatos() {
     ['Datos consolidados', 'Limpios, unificados, en un solo lugar'],
     ['Análisis', 'Rotación, márgenes, ABC, anomalías'],
     ['Tablero', 'Actualizado y fácil de leer'],
-    ['Alertas y pronóstico', 'Stock crítico, desvíos, demanda'],
+    ['Alertas y tendencias', 'Stock crítico, desvíos, demanda'],
     ['Decisiones', 'Qué pedir, qué ajustar, qué revisar'],
   ];
   return `<ol class="flujo" aria-label="Del dato a la decisión">
@@ -294,11 +379,12 @@ export function datosInicio() {
         <li><h3>Dejar de armar reportes a mano</h3><p>Reportes periódicos que se generan solos, con un resumen ejecutivo en lenguaje claro.</p></li>
       </ul>
       <aside class="servicio-mes" aria-labelledby="intel-tit">
-        <p class="plan-nivel">Servicio mensual</p>
+        <p class="plan-nivel">Servicio mensual · nuevo</p>
         <h3 id="intel-tit">${esc(s.nombre)}</h3>
         <p>${esc(s.resumen)}</p>
         <ul class="lista lista--check">${s.incluye.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         ${precio('intelligence')}
+        <p class="servicio-mes-nota">Servicio reciente: el alcance se define por escrito con cada empresa y no tiene permanencia mínima.</p>
         ${boton({ href: '/inteligencia-datos', texto: 'Ver inteligencia de datos', variante: 'secundario', track: 'service_click', trackData: 'intelligence' })}
       </aside>
     </div>
@@ -311,16 +397,25 @@ export function datosInicio() {
 export function seguridad() {
   return `<section class="seccion seccion--panel" id="seguridad" aria-labelledby="seguridad-tit">
   <div class="contenedor">
-    ${encabezado({ codigo: 'Seguridad y propiedad', titulo: 'Diseñado para operar dentro de una empresa real', id: 'seguridad-tit', bajada: 'Tus datos, tu código y tu operación siguen siendo tuyos. Esto es lo que hacemos en cada proyecto.' })}
+    ${encabezado({ codigo: 'Seguridad y propiedad', titulo: 'Diseñado para operar dentro de una empresa real', id: 'seguridad-tit', bajada: 'Medidas y controles que aplicamos en cada proyecto, según el riesgo de la información que maneja.' })}
     <ul class="seguridad">
       ${SEGURIDAD.map((s) => `<li><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p></li>`).join('')}
     </ul>
-    <p class="nota">No prometemos seguridad absoluta ni certificaciones que no tenemos. Diseñamos cada proyecto según el riesgo real de la información que maneja.</p>
+    <p class="nota">Ningún sistema es invulnerable, y no prometemos seguridad absoluta ni certificaciones que no tenemos. Lo que sí hacemos es reducir el riesgo con estas medidas y decirte por escrito qué se hace con tu información. Más detalle en la <a href="/privacidad">política de privacidad</a>.</p>
   </div>
 </section>`;
 }
 
 /* ------------------------------------------------------------- fundador */
+
+/** Foto del fundador, en los tamaños que corresponden. */
+export function retrato({ sizes = '(max-width: 900px) 168px, 360px', clase = 'ficha-foto', lazy = true } = {}) {
+  const f = SITIO.fundador;
+  return `<picture>
+          <source type="image/webp" srcset="/andres-vargas-160.webp 160w, /andres-vargas-320.webp 320w, /andres-vargas-600.webp 600w" sizes="${esc(sizes)}">
+          <img class="${esc(clase)}" src="/andres-vargas-600.jpg" srcset="/andres-vargas-160.jpg 160w, /andres-vargas-320.jpg 320w, /andres-vargas-600.jpg 600w" sizes="${esc(sizes)}" width="600" height="750" alt="${esc(f.nombre)}, fundador de ANVAR TECH"${lazy ? ' loading="lazy"' : ''} decoding="async">
+        </picture>`;
+}
 
 export function nosotros() {
   const e = SITIO.empresa;
@@ -330,10 +425,7 @@ export function nosotros() {
     ${encabezado({ codigo: 'Quiénes somos', titulo: 'Una empresa chilena que parte desde las operaciones', id: 'nosotros-tit' })}
     <div class="nosotros">
       <div class="ficha">
-        <picture>
-          <source type="image/webp" srcset="/andres-vargas-160.webp 160w, /andres-vargas-320.webp 320w, /andres-vargas-600.webp 600w" sizes="(max-width: 900px) 168px, 360px">
-          <img class="ficha-foto" src="/andres-vargas-600.jpg" srcset="/andres-vargas-160.jpg 160w, /andres-vargas-320.jpg 320w, /andres-vargas-600.jpg 600w" sizes="(max-width: 900px) 168px, 360px" width="600" height="750" alt="${esc(f.nombre)}, fundador de ANVAR TECH" loading="lazy" decoding="async">
-        </picture>
+        ${retrato()}
         <div class="ficha-nombre"><b>${esc(f.nombre)}</b><span>${esc(f.cargo)}</span></div>
         <dl class="ficha-datos">
           <div><dt>Empresa</dt><dd>${esc(e.nombre)} · RUT ${esc(e.rut)}</dd></div>
@@ -373,31 +465,50 @@ export function preguntas(lista, { titulo = 'Lo que las empresas nos preguntan',
 
 /* ------------------------------------------------------ páginas de servicio */
 
+/** Migas de pan visibles. `tramos` sin el inicio; el último es la página actual. */
+export function migasVisibles(tramos) {
+  const partes = [`<a href="/">Inicio</a>`];
+  tramos.forEach(([t, h], i) => {
+    partes.push('<span aria-hidden="true">/</span>');
+    partes.push(i === tramos.length - 1 ? `<span aria-current="page">${esc(t)}</span>` : `<a href="${esc(h)}">${esc(t)}</a>`);
+  });
+  return `<nav class="migas" aria-label="Ruta">${partes.join('')}</nav>`;
+}
+
 /**
  * Portada de una página de servicio.
- * @param {{ sobretitulo: string, h1: string, lead: string, servicio?: string,
- *   ficha: [string,string][], contexto: string, secundario?: {href:string, texto:string} }} o
+ * @param {{ sobretitulo: string, h1: string, lead: string, migas?: [string, string][],
+ *   ficha: [string, string | { html: string }][], contexto: string,
+ *   secundario?: {href:string, texto:string, track?: string},
+ *   primario?: {href?:string, wsp?: string, texto:string, track?: string}, aviso?: string }} o
+ *   `ficha`: [etiqueta, valor]. Texto (se escapa) o { html } (p. ej. un precio de `precioLinea`).
+ *   `aviso`: HTML ya escapado que va sobre el título (p. ej. "línea para personas").
  */
 export function heroServicio(o) {
+  const primario = o.primario ?? { href: '#evaluar', texto: 'Evaluar mi proceso', track: 'hero_cta_click' };
+  const btnPrimario = primario.wsp
+    ? boton({ wsp: primario.wsp, texto: primario.texto, icono: 'whatsapp', grande: true, trackData: 'hero-' + o.contexto })
+    : boton({ href: primario.href, texto: primario.texto, grande: true, track: primario.track ?? 'hero_cta_click', trackData: o.contexto });
   return `<section class="hero hero--servicio" aria-labelledby="hero-tit">
   <div class="contenedor">
-    <nav class="migas" aria-label="Ruta"><a href="/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">${esc(o.sobretitulo)}</span></nav>
+    ${migasVisibles(o.migas ?? [[o.sobretitulo, '']])}
     <div class="hero-servicio">
+      ${o.aviso ? `<p class="aviso-linea">${o.aviso}</p>` : ''}
       <p class="sobretitulo">${esc(o.sobretitulo)}</p>
       <h1 id="hero-tit">${esc(o.h1)}</h1>
       <p class="lead">${rico(o.lead)}</p>
       <div class="hero-cta">
-        ${boton({ href: '#evaluar', texto: 'Evaluar mi proceso', grande: true, track: 'hero_cta_click', trackData: o.contexto })}
-        ${o.secundario ? boton({ href: o.secundario.href, texto: o.secundario.texto, variante: 'secundario', grande: true }) : boton({ href: '/casos', texto: 'Ver casos reales', variante: 'secundario', grande: true, track: 'case_study_click', trackData: 'hero-' + o.contexto })}
+        ${btnPrimario}
+        ${o.secundario ? boton({ href: o.secundario.href, texto: o.secundario.texto, variante: 'secundario', grande: true, track: o.secundario.track ?? null, trackData: o.secundario.track ? 'hero-' + o.contexto : null }) : boton({ href: '/casos', texto: 'Ver casos reales', variante: 'secundario', grande: true, track: 'case_study_click', trackData: 'hero-' + o.contexto })}
       </div>
-      <dl class="datos-servicio">${o.ficha.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      <dl class="datos-servicio">${o.ficha.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${typeof v === 'string' ? esc(v) : v.html}</dd></div>`).join('')}</dl>
     </div>
   </div>
 </section>`;
 }
 
 /** Para quién sí y para quién no. */
-export function paraQuien({ id, codigo, titulo, bajada, si, no, tituloSi = 'Es para ti si…', tituloNo = 'No es para ti si…' }) {
+export function paraQuien({ id, codigo, titulo, bajada = '', si, no, tituloSi = 'Es para ti si…', tituloNo = 'No es para ti si…' }) {
   return `<section class="seccion" aria-labelledby="${esc(id)}">
   <div class="contenedor">
     ${encabezado({ codigo, titulo, bajada, id })}
@@ -410,7 +521,7 @@ export function paraQuien({ id, codigo, titulo, bajada, si, no, tituloSi = 'Es p
 }
 
 /** Etapas numeradas de un servicio. */
-export function etapas({ id, codigo, titulo, bajada, lista, panel = true }) {
+export function etapas({ id, codigo, titulo, bajada = '', lista, panel = true }) {
   return `<section class="seccion${panel ? ' seccion--panel' : ''}" aria-labelledby="${esc(id)}">
   <div class="contenedor">
     ${encabezado({ codigo, titulo, bajada, id })}
@@ -421,22 +532,31 @@ export function etapas({ id, codigo, titulo, bajada, lista, panel = true }) {
 </section>`;
 }
 
-/** Bloque de precio de un servicio, con lo que incluye. */
-export function bloquePrecio({ id, titulo, ids, nota }) {
+/**
+ * Bloque de precio de un servicio, con lo que incluye, lo que no y su acción.
+ * @param {{ titulo: { id: string, texto: string }, ids: string[], nota?: string, conCta?: boolean }} o
+ */
+export function bloquePrecio({ titulo, ids, nota = '', conCta = false }) {
+  const hayUf = ids.some((sid) => SERVICIOS[sid].precio.moneda === 'UF');
   return `<section class="seccion" aria-labelledby="${esc(titulo.id)}">
   <div class="contenedor">
     ${encabezado({ codigo: 'Valor', titulo: titulo.texto, id: titulo.id })}
     <div class="precios-servicio">
       ${ids.map((sid) => {
         const s = SERVICIOS[sid];
+        const noIncluye = s.noIncluye?.length ? `<p class="label">No incluye</p><ul class="lista lista--no">${s.noIncluye.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+        const cta = conCta ? boton({ wsp: s.cta.wsp, texto: s.cta.texto, icono: 'whatsapp', trackData: 'precio-' + sid }) : '';
         return `<article class="precio-tarjeta" id="${esc(sid === 'implementacion' ? 'implementacion' : sid === 'soporte' ? 'soporte' : 'precio-' + sid)}">
           <div class="precio-tarjeta-cab"><h3>${esc(s.nombre)}</h3><p class="precio-plazo">${esc(s.plazo)}</p>${precio(sid, 'precio precio--grande')}</div>
           <p>${esc(s.resumen)}</p>
+          <p class="label">Incluye</p>
           <ul class="lista lista--check">${s.incluye.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+          ${noIncluye}
+          ${cta}
         </article>`;
       }).join('')}
     </div>
-    ${nota ? `<p class="nota">${rico(nota)}</p>` : ''}
+    ${nota || hayUf ? `<p class="nota">${rico(nota)}${hayUf ? ` ${notaPreciosUf()}` : ''}</p>` : ''}
   </div>
 </section>`;
 }
@@ -462,7 +582,7 @@ export function otrosServicios(actual) {
     <ul class="otros">
       ${ids.map((id) => {
         const s = SERVICIOS[id];
-        return `<li><a href="${esc(s.url)}" data-track="service_click" data-track-label="otros-${esc(id)}"><span class="otros-t">${esc(s.nombre)}</span><span class="otros-d">${esc(s.resumen)}</span><span class="otros-p">${esc(precioTexto(s.precio).principal)}</span></a></li>`;
+        return `<li><a href="${esc(s.url)}" data-track="service_click" data-track-label="otros-${esc(id)}"><span class="otros-t">${esc(s.nombre)}</span><span class="otros-d">${esc(s.resumen)}</span><span class="otros-p">${esc(precioCorto(id))}</span></a></li>`;
       }).join('')}
     </ul>
   </div>

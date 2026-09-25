@@ -7,6 +7,15 @@
    bloquea). Todo estilo vive aquí.
    ========================================================================== */
 
+/* ------------------------------------------------------------ tipografías */
+/* Servidas desde el propio dominio (sin Google Fonts): una conexión menos,
+   sin CSS externo que bloquee el render y sin enviar la IP del visitante a un
+   tercero. Subconjunto latino, el mismo que servía Google. Licencia: fuentes/OFL.txt */
+@font-face{font-family:'Archivo';font-style:normal;font-weight:500 700;font-stretch:62% 125%;font-display:swap;src:url(/fuentes/archivo-latin-500-700.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-stretch:100%;font-display:swap;src:url(/fuentes/ibm-plex-sans-latin-var.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(/fuentes/ibm-plex-mono-latin-500.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url(/fuentes/ibm-plex-mono-latin-600.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
 /* ----------------------------------------------------------------- tokens */
 :root{
   --paper:#EFF0EC; --paper-2:#E6E8E2; --panel:#FBFBF9; --panel-2:#F4F5F1;
@@ -74,7 +83,7 @@ h1{font-size:var(--fs-h1);font-stretch:114%}
 h2{font-size:var(--fs-h2)}
 h3{font-size:var(--fs-h3);font-stretch:104%}
 p{text-wrap:pretty}
-.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.sr{position:absolute;top:0;left:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .saltar{position:absolute;left:var(--s-4);top:-60px;z-index:100;background:var(--ink);color:var(--paper);padding:var(--s-3) var(--s-4);border-radius:var(--radio);font-weight:600;text-decoration:none}
 .saltar:focus{top:var(--s-3)}
 
@@ -214,7 +223,7 @@ p{text-wrap:pretty}
 /* ----------------------------------------------------------------- casos */
 .casos{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s-5)}
 .casos--1{grid-template-columns:minmax(0,640px)}
-.caso{display:flex;flex-direction:column;gap:var(--s-4);padding:var(--s-5);background:var(--panel);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--sh)}
+.caso{position:relative;display:flex;flex-direction:column;gap:var(--s-4);padding:var(--s-5);background:var(--panel);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--sh)}
 .caso-meta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2)}
 .caso-cod{font-family:var(--mono);font-size:var(--fs-label);font-weight:600;color:var(--ink-3)}
 .caso-estado{font-size:var(--fs-sm);color:var(--ink-3)}
@@ -419,7 +428,7 @@ p{text-wrap:pretty}
 .pie-base a{color:var(--ink-2)}
 
 /* ----------------------------------------------------- whatsapp flotante */
-.wsp-flotante{position:fixed;right:16px;bottom:16px;z-index:40;display:inline-flex;align-items:center;gap:var(--s-2);min-height:48px;padding:0 var(--s-4);background:var(--ink);color:var(--paper);border-radius:24px;box-shadow:0 10px 28px -10px rgba(0,0,0,.5);font-weight:600;font-size:var(--fs-sm);text-decoration:none}
+.wsp-flotante{position:fixed;right:16px;bottom:16px;z-index:40;display:inline-flex;align-items:center;gap:var(--s-2);min-height:48px;padding:0 var(--s-4);background:var(--ink);color:var(--paper);border:1px solid rgba(255,255,255,.22);border-radius:24px;box-shadow:0 10px 28px -10px rgba(0,0,0,.5);font-weight:600;font-size:var(--fs-sm);text-decoration:none}
 .wsp-flotante svg{width:20px;height:20px}
 .wsp-flotante:hover{background:#000}
 
@@ -453,6 +462,7 @@ p{text-wrap:pretty}
 .precios-servicio{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--s-4)}
 .precio-tarjeta{display:flex;flex-direction:column;gap:var(--s-4);padding:var(--s-5);background:var(--panel);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--sh)}
 .precio-tarjeta:first-child{border:2px solid var(--amber)}
+.precio-tarjeta:only-child{max-width:780px}
 .precio-tarjeta-cab{display:flex;flex-direction:column;gap:var(--s-2);padding-bottom:var(--s-4);border-bottom:1px solid var(--rule)}
 .precio-plazo{font-size:var(--fs-sm);color:var(--ink-3)}
 .precio-tarjeta>p{color:var(--ink-2)}
@@ -533,6 +543,95 @@ input[type=range]:focus-visible{outline:2px solid var(--focus);outline-offset:4p
 .calc-datos dt{font-size:var(--fs-sm);color:var(--ink-3)}
 .calc-datos dd{margin-top:2px;font-weight:600}
 .calc-datos dd#c-horas-lib{font-family:var(--mono);font-size:1.15rem}
+
+/* -------------------------------------------- evidencia de casos (media) */
+.flujo-caso{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--s-2);margin-top:var(--s-5);counter-reset:fc}
+.flujo-caso li{position:relative;display:flex;flex-direction:column;gap:var(--s-1);padding:var(--s-3) var(--s-4);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radio);counter-increment:fc}
+.flujo-caso li:last-child{border-color:var(--good);background:var(--good-soft)}
+.flujo-caso-t{font-family:var(--mono);font-size:var(--fs-label);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--amber-text)}
+.flujo-caso-t::before{content:counter(fc,decimal-leading-zero) " · "}
+.flujo-caso li:last-child .flujo-caso-t{color:var(--good)}
+.flujo-caso-d{font-size:var(--fs-sm);color:var(--ink-2);line-height:1.45}
+.flujo-caso--compacto{margin-top:var(--s-3)}
+.evidencia{margin-top:var(--s-5);display:grid;gap:var(--s-3)}
+.medio{margin:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--deep)}
+.medio img,.medio video{width:100%;height:auto;aspect-ratio:auto}
+.medio figcaption{padding:var(--s-2) var(--s-4);font-size:var(--fs-sm);color:var(--on-deep-2);background:var(--deep-2)}
+.medio-dur{font-family:var(--mono);color:var(--amber)}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s-3)}
+.demo-enlace{margin:0}
+.caso-media .medio{border:0;border-radius:0}
+.metricas-caso .metrica-nota{font-size:var(--fs-label);color:var(--ink-3);line-height:1.4;margin-top:var(--s-1)}
+.alcance{margin-top:var(--s-4);padding:var(--s-3) var(--s-4);border-left:3px solid var(--amber);background:var(--panel-2);font-size:var(--fs-sm);color:var(--ink-2)}
+.alcance b{color:var(--ink)}
+.chips--tec{padding:0 var(--s-4) var(--s-4)}
+.detalle-pie{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3)}
+.detalle-pie p{color:var(--ink-2)}
+
+/* ------------------------------------------------------------ testimonios */
+.testimonios{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--s-4)}
+.testimonio{margin:0;display:flex;flex-direction:column;gap:var(--s-4);padding:var(--s-5);background:var(--panel);border:1px solid var(--rule);border-radius:6px;border-top:3px solid var(--amber)}
+.testimonio blockquote{margin:0}
+.testimonio blockquote p{font-family:var(--disp);font-size:1.15rem;font-weight:700;font-stretch:104%;line-height:1.3}
+.testimonio figcaption{display:flex;align-items:center;gap:var(--s-3);margin-top:auto}
+.testimonio-foto{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none}
+.testimonio-quien{display:flex;flex-direction:column;flex:1;min-width:0}
+.testimonio-nombre{font-weight:600}
+.testimonio-org{font-size:var(--fs-sm);color:var(--ink-3)}
+.testimonio-logo{height:28px;width:auto;flex:none}
+.testimonio-res{font-size:var(--fs-sm);color:var(--ink-2);padding-top:var(--s-3);border-top:1px solid var(--rule)}
+.testimonio-res a{color:var(--amber-text);font-weight:600}
+
+/* ------------------------------------------------------ línea personal */
+.aviso-linea{margin-bottom:var(--s-4);padding:var(--s-3) var(--s-4);border:1px dashed var(--rule-2);border-radius:var(--radio);background:var(--panel);font-size:var(--fs-sm);color:var(--ink-2);max-width:64ch}
+.aviso-linea a{color:var(--amber-text);font-weight:600;text-underline-offset:3px}
+.acompana{display:grid;grid-template-columns:200px minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:start}
+.acompana-img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:6px;border:1px solid var(--rule-2)}
+.acompana-txt{display:grid;gap:var(--s-4)}
+.acompana-txt>p:not(.lead):not(.nota){color:var(--ink-2);max-width:64ch}
+.acompana-txt .lead{color:var(--ink);font-family:var(--disp);font-weight:700;font-size:clamp(1.2rem,2.2vw,1.5rem);line-height:1.2;font-stretch:106%}
+.acompana-txt a{color:var(--amber-text);font-weight:600}
+.acompana-txt .nota{margin-top:0}
+
+/* ----------------------------------------------------------- privacidad */
+.hero--legal .lead{margin-top:var(--s-4)}
+.resumen-legal{display:grid;gap:var(--s-2);margin-top:var(--s-5);padding:var(--s-4) var(--s-5);background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--good);border-radius:var(--radio)}
+.resumen-legal li{position:relative;padding-left:1.4rem;color:var(--ink-2)}
+.resumen-legal li::before{content:"";position:absolute;left:.1rem;top:.35em;width:.45rem;height:.75rem;border:solid var(--good);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.seccion--legal{padding-top:var(--s-6)}
+.indice-legal{padding:var(--s-4) var(--s-5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radio);margin-bottom:var(--s-6)}
+.indice-legal ol{display:grid;gap:var(--s-1);margin-top:var(--s-2);padding-left:1.4rem;list-style:decimal;color:var(--ink-3)}
+.indice-legal a{display:inline-block;padding-block:4px;color:var(--ink-2);text-underline-offset:3px}
+.indice-legal a:hover{color:var(--ink)}
+.legal-sec{padding:var(--s-6) 0;border-top:1px solid var(--rule)}
+.legal-sec h2{font-size:clamp(1.3rem,2.4vw,1.7rem);margin-bottom:var(--s-4)}
+.legal-sec p{color:var(--ink-2);max-width:70ch}
+.legal-sec p+p,.legal-sec p+.lista,.legal-sec .lista+p,.legal-sec .tabla-envoltorio+p,.legal-sec p+.tabla-envoltorio{margin-top:var(--s-3)}
+.legal-sec a{color:var(--amber-text);text-underline-offset:3px}
+.legal-sec .lista li b{color:var(--ink)}
+.tabla-envoltorio{overflow-x:auto;border:1px solid var(--rule);border-radius:var(--radio);background:var(--panel)}
+.tabla{width:100%;min-width:520px;border-collapse:collapse;font-size:var(--fs-sm)}
+.tabla th,.tabla td{padding:var(--s-3) var(--s-4);text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+.tabla tr:last-child td{border-bottom:0}
+.tabla th{font-family:var(--mono);font-size:var(--fs-label);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);background:var(--panel-2)}
+.tabla td{color:var(--ink-2)}
+.tabla td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+
+/* ------------------------------------------ formulario, avisos y notas */
+.form-aviso{font-size:var(--fs-sm);color:var(--on-deep-2)}
+.form-aviso a{color:var(--on-deep);text-underline-offset:3px}
+.campo-err{margin-top:var(--s-1);font-size:var(--fs-sm);color:#F2A797}
+.campo-err[hidden]{display:none}
+.form-msg a{color:var(--on-deep);font-weight:600}
+.form [aria-busy="true"]{opacity:.7;cursor:progress}
+.calc-aviso{margin-top:var(--s-4);padding-top:var(--s-3);border-top:1px solid var(--rule);font-size:var(--fs-sm);color:var(--ink-2)}
+.servicio-mes-nota{font-size:var(--fs-sm);color:var(--ink-3)!important}
+.intel-nota{margin-top:var(--s-4);padding-left:var(--s-4);border-left:3px solid var(--amber);font-size:var(--fs-sm);color:var(--on-deep-2);max-width:62ch}
+.seccion--angosta{padding:0 0 clamp(40px,5vw,64px)}
+.nota a,.nota-clara a{color:inherit;text-underline-offset:3px}
+.precio-tarjeta .label{margin-top:var(--s-1)}
+.precio-tarjeta .btn{align-self:flex-start;margin-top:var(--s-2)}
+.pie-base{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s-2) var(--s-5)}
 
 /* ------------------------------------------------------ movimiento reducido */
 @media (prefers-reduced-motion:reduce){
@@ -625,4 +724,20 @@ input[type=range]:focus-visible{outline:2px solid var(--focus);outline-offset:4p
   .escalera li{display:grid;grid-template-columns:6.5rem minmax(0,1fr);align-items:baseline;column-gap:var(--s-3);padding:var(--s-2) var(--s-4)}
   .escalera-que{display:none}
   .medidor{max-width:220px;margin-inline:auto;display:block}
+  .acompana{grid-template-columns:96px minmax(0,1fr);gap:var(--s-4)}
+  .acompana-txt .lead{font-size:1.15rem}
+  .flujo-caso{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flujo-caso li{padding:var(--s-3)}
+  .detalle-pie .btn,.precio-tarjeta .btn{width:100%}
+  .indice-legal,.resumen-legal{padding:var(--s-3) var(--s-4)}
+  /* Tabla de proveedores: en el teléfono, cada fila es una ficha (sin columnas escondidas) */
+  .tabla-envoltorio{overflow:visible}
+  .tabla{min-width:0}
+  .tabla thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  .tabla tr{display:block;padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--rule)}
+  .tabla tr:last-child{border-bottom:0}
+  .tabla td{display:block;padding:var(--s-1) 0;border:0}
+  .tabla td:first-child{white-space:normal}
+  .tabla td[data-label]::before{content:attr(data-label);display:block;font-family:var(--mono);font-size:var(--fs-label);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .pie-base{flex-direction:column}
 }
