@@ -13,7 +13,7 @@ export default [
   },
   {
     // El E2E ejecuta funciones dentro del navegador (page.evaluate).
-    files: ['scripts/e2e.mjs'],
+    files: ['scripts/e2e.mjs', 'scripts/og.mjs'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {

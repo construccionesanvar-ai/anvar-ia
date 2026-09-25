@@ -5,6 +5,7 @@ import { SITIO } from '../config.mjs';
 import { NAVEGACION } from '../datos/contenido.mjs';
 import { wsp, urlWsp, conRef, MENSAJES } from '../datos/whatsapp.mjs';
 import { PAGINA } from '../contexto.mjs';
+import { SOLUCIONES } from '../datos/soluciones.mjs';
 import { esc, attrs, absoluta } from '../html.mjs';
 
 export const ISOTIPO = `<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect width="100" height="100" rx="8" fill="#101A1E"/><path d="M22 76 L50 22 L78 76" fill="none" stroke="#E9EBE4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 56 L66 56" stroke="#F0A92A" stroke-width="9" stroke-linecap="round"/><circle cx="50" cy="22" r="6" fill="#F0A92A"/></svg>`;
@@ -89,6 +90,7 @@ function pie(evaluar) {
   const enlace = ([t, h, extra]) => `<li><a href="${esc(h)}"${extra ?? ''}>${esc(t)}</a></li>`;
   const col = (titulo, items) => `<div class="pie-col"><h2 class="pie-tit">${esc(titulo)}</h2><ul>${items.map(enlace).join('')}</ul></div>`;
   const wspPie = ` data-wsp="general" data-track-label="pie" target="_blank" rel="noopener"`;
+  const redes = SITIO.redes.length ? `<li>${SITIO.redes.map((r) => `<a href="${esc(r.url)}" rel="noopener me" target="_blank">${esc(r.nombre)}</a>`).join(' · ')}</li>` : '';
   return `<footer class="pie">
   <div class="contenedor">
     <div class="pie-grid">
@@ -101,13 +103,27 @@ function pie(evaluar) {
           <div><dt>Facturación</dt><dd>Empresa chilena · emitimos factura</dd></div>
           <div><dt>Atención</dt><dd>${esc(e.atencion)}</dd></div>
         </dl>
+        <ul class="pie-contacto">
+          <li><a href="${hrefEvaluar(evaluar)}">Evaluar mi proceso</a></li>
+          <li><a href="${esc(wsp('general', PAGINA.fuente))}"${wspPie}>WhatsApp ${esc(SITIO.contacto.whatsappVisible)}</a></li>
+          <li><a href="mailto:${esc(SITIO.contacto.email)}" data-track="email_click" data-track-label="pie">${esc(SITIO.contacto.email)}</a></li>
+          ${redes}
+        </ul>
       </div>
-      ${col('Soluciones', [
+      ${col('Servicios', [
         ['Automatización Express', '/automatizacion-express'],
-        ['Diagnóstico', '/diagnostico-ia-empresas'],
+        ['Diagnóstico de procesos', '/diagnostico-ia-empresas'],
         ['Piloto e implementación', '/automatizacion-procesos-ia'],
         ['Inteligencia de datos', '/inteligencia-datos'],
         ['Capacitación para equipos', '/capacitacion-ia-empresas'],
+      ])}
+      ${col('Soluciones', SOLUCIONES.map((x) => [x.nombre, x.ruta]))}
+      ${col('Recursos gratuitos', [
+        ['Guías y recursos', '/recursos'],
+        ['Calculadora de ROI', '/calculadora-roi-automatizacion'],
+        ['Autodiagnóstico', '/diagnostico-automatizacion'],
+        ['Plantilla Excel de ROI', '/recursos/plantilla-roi-automatizacion'],
+        ['Punto de pedido', '/herramientas/punto-de-pedido'],
       ])}
       ${col('Empresa', [
         ['Casos reales', '/casos'],
@@ -115,11 +131,6 @@ function pie(evaluar) {
         ['Seguridad y propiedad', '/#seguridad'],
         ['Quiénes somos', '/#nosotros'],
         ['Preguntas frecuentes', '/#preguntas'],
-      ])}
-      ${col('Contacto', [
-        ['Evaluar mi proceso', hrefEvaluar(evaluar)],
-        [`WhatsApp ${SITIO.contacto.whatsappVisible}`, wsp('general', PAGINA.fuente), wspPie],
-        [SITIO.contacto.email, `mailto:${SITIO.contacto.email}`],
         ['Asesoría personal en IA', '/asesoria-ia-personal'],
       ])}
     </div>
@@ -217,7 +228,8 @@ function evaluarBloque(o, accionPrincipal, notaAccion, conWsp) {
  * Documento HTML completo.
  * @param {{ ruta: string, titulo: string, descripcion: string, cuerpo: string,
  *   jsonld?: object[], noindex?: boolean, contextoWsp?: string, fuente: string,
- *   ogTitulo?: string, hashes: { css: string, js: string }, cliente: object }} p
+ *   ogTitulo?: string, ogImagen?: string, articulo?: { publicado: string, actualizado: string },
+ *   hashes: { css: string, js: string }, cliente: object }} p
  */
 export function documento(p) {
   const url = absoluta(p.ruta);
@@ -227,6 +239,10 @@ export function documento(p) {
     : '';
   const contexto = p.contextoWsp ?? 'general';
   const tieneEvaluar = p.cuerpo.includes('id="evaluar"');
+  const imagen = SITIO.dominio + (p.ogImagen ?? '/og-image.png');
+  const art = p.articulo
+    ? `\n<meta property="article:published_time" content="${esc(p.articulo.publicado)}">\n<meta property="article:modified_time" content="${esc(p.articulo.actualizado)}">\n<meta property="article:author" content="${esc(SITIO.fundador.nombre)}">`
+    : '';
   return `<!DOCTYPE html>
 <html lang="${SITIO.idioma}">
 <head>
@@ -237,25 +253,26 @@ export function documento(p) {
 <meta name="robots" content="${p.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'}">
 <meta name="theme-color" content="#EFF0EC" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1215" media="(prefers-color-scheme: dark)">
-<meta name="google-site-verification" content="F0wlUHOu0ZbhIH8Lr_W29YTM3gHIGOkzrA9IIeWU8Jw">
+<meta name="google-site-verification" content="F0wlUHOu0ZbhIH8Lr_W29YTM3gHIGOkzrA9IIeWU8Jw">${SITIO.verificacion?.bing ? `\n<meta name="msvalidate.01" content="${esc(SITIO.verificacion.bing)}">` : ''}
 ${p.noindex ? '' : `<link rel="canonical" href="${esc(url)}">`}
-<meta property="og:type" content="website">
+<meta property="og:type" content="${p.articulo ? 'article' : 'website'}">
 <meta property="og:locale" content="es_CL">
 <meta property="og:site_name" content="${esc(SITIO.marca)} · ${esc(SITIO.linea)}">
 <meta property="og:title" content="${esc(og)}">
 <meta property="og:description" content="${esc(p.descripcion)}">
 <meta property="og:url" content="${esc(url)}">
-<meta property="og:image" content="${esc(SITIO.dominio)}/og-image.png">
+<meta property="og:image" content="${esc(imagen)}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${esc(SITIO.marca)} · ${esc(SITIO.linea)}">
+<meta property="og:image:alt" content="${esc(og)}">${art}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(og)}">
 <meta name="twitter:description" content="${esc(p.descripcion)}">
-<meta name="twitter:image" content="${esc(SITIO.dominio)}/og-image.png">
+<meta name="twitter:image" content="${esc(imagen)}">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="alternate" type="application/rss+xml" title="Recursos de ANVAR TECH" href="/feed.xml">
 <link rel="preload" href="/fuentes/archivo-latin-500-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fuentes/ibm-plex-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css?v=${p.hashes.css}">

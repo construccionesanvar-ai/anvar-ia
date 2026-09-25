@@ -86,8 +86,8 @@ ${etapas({
       <div class="acompana-foto">${retrato({ sizes: '(max-width: 640px) 120px, 200px', clase: 'acompana-img' })}</div>
       <div class="acompana-txt">
         <p class="lead">Mi especialidad parte desde operaciones, no desde la tecnología.</p>
-        <p>Vengo de operaciones de retail y prevención de pérdidas, y empecé construyendo herramientas para sacarme de encima el trabajo repetitivo: el sistema documental del <a href="/casos#documentos-legales" data-track="case_study_click" data-track-label="personal-c01">caso C-01</a> nació así. Por eso la sesión parte desde tu tarea real y no desde la herramienta.</p>
-        <p class="nota">La asesoría personal es una línea secundaria. El foco de ANVAR TECH es automatizar procesos de empresas: si eso es lo que buscas, mira los <a href="/casos" data-track="case_study_click" data-track-label="personal-casos">casos reales</a>.</p>
+        <p>Vengo de operaciones de retail y prevención de pérdidas, y empecé construyendo herramientas para sacarme de encima el trabajo repetitivo: el sistema documental del <a href="/casos#documentos-legales" data-track="case_cta_click" data-track-label="personal-c01">caso C-01</a> nació así. Por eso la sesión parte desde tu tarea real y no desde la herramienta.</p>
+        <p class="nota">La asesoría personal es una línea secundaria. El foco de ANVAR TECH es automatizar procesos de empresas: si eso es lo que buscas, mira los <a href="/casos" data-track="case_cta_click" data-track-label="personal-casos">casos reales</a>.</p>
       </div>
     </div>
   </div>

@@ -7,6 +7,7 @@ export const NAVEGACION = [
   { texto: 'Soluciones', href: '/#soluciones' },
   { texto: 'Casos', href: '/casos' },
   { texto: 'Datos', href: '/inteligencia-datos' },
+  { texto: 'Recursos', href: '/recursos' },
   { texto: 'Precios', href: '/#contratar' },
   { texto: 'Nosotros', href: '/#nosotros' },
 ];
@@ -21,6 +22,7 @@ export const PROBLEMAS = [
     empieza: 'express',
     caso: 'documentos-legales',
     url: '/automatizacion-express',
+    guia: ['/automatizacion-documental', 'Cómo se automatizan documentos'],
   },
   {
     id: 'comercial',
@@ -30,6 +32,7 @@ export const PROBLEMAS = [
     empieza: 'express',
     caso: 'venta-en-linea',
     url: '/automatizacion-express',
+    guia: ['/automatizar-cotizaciones', 'Cómo se automatizan cotizaciones'],
   },
   {
     id: 'datos',
@@ -39,6 +42,7 @@ export const PROBLEMAS = [
     empieza: 'intelligence',
     caso: 'pronostico-stock',
     url: '/inteligencia-datos',
+    guia: ['/herramientas/punto-de-pedido', 'Calcular el punto de pedido'],
   },
   {
     id: 'operacional',
@@ -48,6 +52,7 @@ export const PROBLEMAS = [
     empieza: 'diagnostico',
     caso: null,
     url: '/automatizacion-procesos-ia',
+    guia: ['/automatizar-excel', 'Cómo se automatiza Excel'],
   },
   {
     id: 'copiloto',
@@ -66,6 +71,7 @@ export const PROBLEMAS = [
     empieza: 'diagnostico',
     caso: 'planos-autocad',
     url: '/automatizacion-procesos-ia',
+    guia: ['/automatizacion-autocad', 'Automatización en AutoCAD'],
   },
 ];
 

@@ -21,6 +21,21 @@ export const FUENTES = {
   personal: 'personal-advisory',
   privacy: 'privacy',
   notFound: 'not-found',
+  // Herramientas y contenido de adquisición orgánica
+  calculator: 'roi-calculator',
+  reorderPoint: 'reorder-point',
+  template: 'roi-template',
+  resources: 'resources',
+  smb: 'smb-automation',
+  documental: 'document-automation',
+  excel: 'excel-automation',
+  quotes: 'quote-automation',
+  autocad: 'autocad-automation',
+  caseDocumental: 'case-document-retail',
+  guideCost: 'guide-cost',
+  guideDetect: 'guide-detect',
+  guideDont: 'guide-dont-automate',
+  guideAi: 'guide-ai-vs-rules',
 };
 
 /**

@@ -16,6 +16,7 @@ const TIPOS = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp',
   '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.mp4': 'video/mp4', '.gif': 'image/gif',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
 async function existe(ruta) {
@@ -68,6 +69,7 @@ export function iniciar({ puerto = 8123, silencioso = false } = {}) {
         return res.end(await readFile(join(PUBLIC, '404.html')));
       }
       res.setHeader('Content-Type', TIPOS[extname(archivo)] || 'application/octet-stream');
+      if (ruta.startsWith('/descargas/')) res.setHeader('Content-Disposition', 'attachment'); // igual que vercel.json
       return res.end(await readFile(archivo));
     } catch (e) {
       console.error(e);

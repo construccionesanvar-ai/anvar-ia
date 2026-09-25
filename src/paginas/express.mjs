@@ -5,6 +5,7 @@ import { FUENTES } from '../datos/whatsapp.mjs';
 import { precioTexto, esc } from '../html.mjs';
 import { evaluar, encabezado } from '../componentes/base.mjs';
 import { heroServicio, paraQuien, etapas, bloquePrecio, casosRelacionados, preguntas, otrosServicios, precioLinea } from '../componentes/secciones.mjs';
+import { relacionados } from '../componentes/articulo.mjs';
 import { migas, servicio, faq } from './ld.mjs';
 
 const s = SERVICIOS.express;
@@ -27,6 +28,7 @@ export default {
   archivo: 'automatizacion-express.html',
   prioridad: '0.9',
   titulo: `Automatización Express para pymes, ${pt.principal} | ANVAR TECH`,
+  og: { titulo: 'Automatización Express', bajada: 'Un proceso pequeño, con alcance y precio fijo antes de partir', etiqueta: 'Servicio · pymes' },
   descripcion: `Resolvemos un proceso pequeño y repetitivo —PDF a Excel, documentos, informes, cotizaciones— con alcance y precio fijo antes de partir. ${desde} ${pt.detalle}.`,
   contextoWsp: 'express',
   fuente: FUENTES.express,
@@ -82,6 +84,7 @@ ${etapas({
 
 ${casosRelacionados(['documentos-legales', 'venta-en-linea'], 'El tipo de resultado que buscamos')}
 ${preguntas(FAQ.express, { titulo: 'Preguntas sobre Automatización Express' })}
+${relacionados(['/automatizacion-documental', '/automatizar-excel', '/automatizar-cotizaciones', '/recursos/cuanto-cuesta-automatizar-proceso-chile'], 'Guías sobre procesos que caben en un Express')}
 ${otrosServicios('express')}
 ${evaluar({ contexto: 'express', tipo: 'express', titulo: '¿Qué proceso te gustaría resolver primero?', bajada: 'Cuéntanos cuál es. En 20 minutos te decimos si cabe en una Automatización Express y cuánto costaría.' })}
 `,

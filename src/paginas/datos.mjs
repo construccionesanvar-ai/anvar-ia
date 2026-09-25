@@ -4,6 +4,7 @@ import { FAQ } from '../datos/faq.mjs';
 import { esc } from '../html.mjs';
 import { evaluar, encabezado, boton } from '../componentes/base.mjs';
 import { heroServicio, flujoDatos, precio, precioLinea, notaPreciosUf, casosRelacionados, preguntas, otrosServicios, paraQuien } from '../componentes/secciones.mjs';
+import { relacionados } from '../componentes/articulo.mjs';
 import { FUENTES } from '../datos/whatsapp.mjs';
 import { migas, servicio, faq } from './ld.mjs';
 
@@ -29,6 +30,7 @@ export default {
   archivo: 'inteligencia-datos.html',
   prioridad: '0.9',
   titulo: 'Inteligencia de datos para pymes: stock y márgenes | ANVAR TECH',
+  og: { titulo: 'Inteligencia de datos para pymes', bajada: 'Stock, márgenes y alertas desde los datos que ya tienes', etiqueta: 'ANVAR Intelligence' },
   descripcion: 'Convertimos ventas, inventario y costos en decisiones: datos consolidados, tablero, alertas de stock crítico y márgenes. Servicio mensual ANVAR Intelligence.',
   contextoWsp: 'datos',
   fuente: FUENTES.data,
@@ -96,6 +98,7 @@ ${casosRelacionados(['pronostico-stock'], 'Lo que ya construimos en datos')}
   </div>
 </section>
 ${preguntas(FAQ.datos, { titulo: 'Preguntas sobre inteligencia de datos' })}
+${relacionados(['/herramientas/punto-de-pedido', '/automatizar-excel', '/recursos/plantilla-roi-automatizacion'], 'Herramientas gratuitas para tus datos')}
 ${otrosServicios('intelligence')}
 ${evaluar({ contexto: 'datos', tipo: 'datos', titulo: 'Revisemos tus datos', bajada: 'En 20 minutos vemos qué datos tienes, cómo están y qué decisiones podrían salir de ellos. Sin costo.' })}
 `,

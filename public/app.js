@@ -7,13 +7,16 @@
    que genera el build desde src/ (precios, mensajes, WhatsApp, agenda, UF).
 
    Embudo medido (Vercel Web Analytics; page_view lo registra Vercel solo):
-     hero_cta_click · case_study_click · cases_view · service_click
-     roi_calculator_start · roi_calculator_complete
+     organic_landing_view (primera página de cada visita, con su canal)
+     hero_cta_click · content_cta_click · case_cta_click · cases_view · service_click
+     calculator_start · calculator_complete (herramienta: roi | punto-pedido)
      diagnostic_start · diagnostic_complete · diagnostic_whatsapp_click
-     whatsapp_click · calendar_click · email_click
-     form_start · form_submit · form_error
-   Cada evento lleva `pagina` y `fuente` (origen del lead). No se envían datos
-   personales: ni nombres, ni correos, ni teléfonos, ni textos escritos.
+     template_download · calendar_click · email_click
+     whatsapp_lead · form_start · service_lead · form_error
+   Cada evento lleva `pagina` y `fuente` (origen del lead). Los de lead llevan
+   además la atribución de la visita (landing, canal, campaña). No se envían
+   datos personales: ni nombres, ni correos, ni teléfonos, ni textos escritos.
+   La lista completa está en README.md › Medición.
    ========================================================================== */
 (function () {
   'use strict';
@@ -48,12 +51,54 @@
     } catch (e) { /* la medición nunca rompe la página */ }
   }
 
+  /* ---------------------------------------------------------- atribución */
+  // Primera página de la visita: de dónde llegó (UTM o referente) y dónde
+  // aterrizó. Se guarda en sessionStorage (se borra al cerrar la pestaña) y
+  // viaja solo con los eventos de lead. Nunca la URL completa del referente.
+  var ATR = 'anvar-atr';
+  function canalDeReferente(ref) {
+    var h;
+    try { h = ref ? new URL(ref).hostname.replace(/^www\./, '') : ''; } catch (e) { h = ''; }
+    if (!h) return 'directo';
+    if (h === location.hostname) return 'interno';
+    if (/(^|\.)google\./.test(h)) return 'google/organic';
+    if (/(^|\.)bing\.com$/.test(h)) return 'bing/organic';
+    if (/(^|\.)duckduckgo\.com$/.test(h)) return 'duckduckgo/organic';
+    if (/(^|\.)(yahoo|ecosia|brave)\./.test(h)) return h.split('.').slice(-2, -1)[0] + '/organic';
+    if (/(^|\.)(chatgpt\.com|openai\.com|perplexity\.ai|claude\.ai|gemini\.google\.com|copilot\.microsoft\.com)$/.test(h)) return h + '/ai';
+    if (/(^|\.)(linkedin\.com|lnkd\.in)$/.test(h)) return 'linkedin/social';
+    if (/(^|\.)(facebook\.com|instagram\.com|t\.co|x\.com|youtube\.com|tiktok\.com)$/.test(h)) return h + '/social';
+    return h.slice(0, 40) + '/referral';
+  }
+  var atribucion = (function () {
+    try {
+      var guardada = sessionStorage.getItem(ATR);
+      if (guardada) return JSON.parse(guardada);
+    } catch (e) { /* sin sessionStorage: se calcula igual para esta página */ }
+    var q = new URLSearchParams(location.search);
+    var limpio = function (v) { return (v || '').toLowerCase().replace(/[^a-z0-9._/-]/g, '-').slice(0, 40); };
+    var src = limpio(q.get('utm_source')), med = limpio(q.get('utm_medium'));
+    var a = {
+      landing: pagina,
+      canal: src ? src + '/' + (med || 'sin-medio') : canalDeReferente(document.referrer),
+      campana: limpio(q.get('utm_campaign')) || 'sin-campana',
+      nueva: true
+    };
+    try { sessionStorage.setItem(ATR, JSON.stringify({ landing: a.landing, canal: a.canal, campana: a.campana })); } catch (e) { /* nada */ }
+    return a;
+  })();
+  var conAtribucion = function (d) {
+    d.landing = atribucion.landing; d.canal = atribucion.canal; d.campana = atribucion.campana;
+    return d;
+  };
+  if (atribucion.nueva) medir('organic_landing_view', { landing: atribucion.landing, canal: atribucion.canal, campana: atribucion.campana });
+
   document.addEventListener('click', function (ev) {
     var t = ev.target.closest ? ev.target.closest('[data-track],[data-wsp]') : null;
     if (!t) return;
     var etiqueta = t.getAttribute('data-track-label') || 'sin-etiqueta';
     if (t.hasAttribute('data-track')) medir(t.getAttribute('data-track'), { etiqueta: etiqueta });
-    if (t.hasAttribute('data-wsp')) medir('whatsapp_click', { contexto: t.getAttribute('data-wsp'), etiqueta: etiqueta });
+    if (t.hasAttribute('data-wsp')) medir('whatsapp_lead', conAtribucion({ contexto: t.getAttribute('data-wsp'), etiqueta: etiqueta }));
   });
 
   /* ------------------------------------------------------------ WhatsApp */
@@ -186,6 +231,36 @@
     };
 
     /** Mensaje de WhatsApp con el resultado: solo respuestas del cuestionario, nada personal. */
+    // Oportunidades concretas, leídas de las respuestas (no del puntaje).
+    // Cada una dice qué hacer y adónde ir; se muestran hasta tres.
+    var ENLACE_CAT = {
+      documental: ['/automatizacion-documental', 'Cómo se automatizan documentos'],
+      comercial: ['/automatizar-cotizaciones', 'Cómo se automatizan cotizaciones'],
+      datos: ['/herramientas/punto-de-pedido', 'Calcular el punto de pedido'],
+      operacional: ['/automatizar-excel', 'Cómo se automatiza Excel']
+    };
+    var oportunidades = function (c) {
+      var o = [];
+      var r = function (i) { return resp[i]; };
+      if (r(0) >= 2) o.push(['Hay tiempo suficiente en tareas repetidas para que automatizar se note: ' + D.preguntas[0].o[r(0)].toLowerCase() + '.', ENLACE_CAT[c.id]]);
+      if (r(1) >= 2) o.push(['El proceso depende de una persona. Documentarlo es el primer paso y baja el riesgo aunque no se automatice.', ['/recursos/como-detectar-proceso-automatizable', 'Checklist antes de automatizar']]);
+      if (r(2) === 0) o.push(['La información está en papel o en la cabeza de alguien: antes de automatizar hay que pasarla a digital.', ['/recursos/procesos-que-no-deberias-automatizar', 'Qué ordenar antes']]);
+      else if (r(2) === 1) o.push(['Los archivos están sueltos. Juntarlos en un lugar común abarata cualquier automatización.', null]);
+      else if (r(2) === 3) o.push(['Ya tienen un sistema: lo normal es conectarse a él, no reemplazarlo.', ['/recursos/ia-vs-automatizacion-tradicional', 'Reglas, RPA o IA']]);
+      if (r(3) !== null && r(3) <= 1) o.push(['No tienen medido cuánto cuesta el proceso. Con cuatro datos se estima en un minuto.', ['/calculadora-roi-automatizacion', 'Calcular el costo y el retorno']]);
+      if (r(5) !== null && r(5) <= 1) o.push(['Para avanzar hará falta un caso con números para quien decide.', ['/recursos/plantilla-roi-automatizacion', 'Plantilla Excel de ROI']]);
+      else if (r(5) >= 2) o.push(['Hay capacidad de decisión: un proceso pequeño con precio fijo se puede partir sin un proyecto grande.', null]);
+      if (o.length < 3 && ENLACE_CAT[c.id] && r(0) < 2) o.push(['Tu foco está en ' + c.frase + '.', ENLACE_CAT[c.id]]);
+      return o.slice(0, 3);
+    };
+    var htmlOportunidades = function (c) {
+      var o = oportunidades(c);
+      if (!o.length) return '';
+      return '<div class="oportunidades"><h4>Lo que sale de tus respuestas</h4><ul>' + o.map(function (x) {
+        return '<li>' + esc(x[0]) + (x[1] ? ' <a href="' + esc(x[1][0]) + '" data-track="content_cta_click" data-track-label="diagnostico-' + esc(x[1][0].split('/').pop()) + '">' + esc(x[1][1]) + ' →</a>' : '') + '</li>';
+      }).join('') + '</ul></div>';
+    };
+
     var mensajeResultado = function (n, e, c, rec) {
       var lineas = [
         'Hola ANVAR TECH. Hice el autodiagnóstico de automatización en su sitio.',
@@ -265,6 +340,7 @@
           '<div><dt>Tipo de solución</dt><dd>' + esc(c.solucion) + '</dd></div>' +
         '</dl>' +
         '<p class="lectura" id="diag-lectura">' + esc(lectura(e, recId)) + '</p>' +
+        htmlOportunidades(c) +
         '<div class="resultado-acciones">' +
           '<a class="btn btn--primario" href="' + esc(enlaceWsp(mensajeResultado(n, e, c, rec))) + '" target="_blank" rel="noopener" data-wsp="diagnostico-resultado" data-track="diagnostic_whatsapp_click" data-track-label="resultado">Conversar este resultado por WhatsApp</a>' +
           segunda +
@@ -361,21 +437,100 @@
     controles.forEach(function (el) {
       el.addEventListener('input', function () {
         calcular();
-        if (!empezo) { empezo = true; marcarTuya(true); medir('roi_calculator_start', {}, true); }
+        if (!empezo) { empezo = true; marcarTuya(true); medir('calculator_start', { herramienta: 'roi' }, true); }
       });
       el.addEventListener('change', function () {
         anunciar();
         if (!empezo) return;
         var v = calcular().valor;
-        medir('roi_calculator_complete', { tramo: v < 2000000 ? 'menos-2M' : v < 10000000 ? '2M-10M' : 'mas-10M' }, true);
+        medir('calculator_complete', { herramienta: 'roi', tramo: v < 2000000 ? 'menos-2M' : v < 10000000 ? '2M-10M' : 'mas-10M' }, true);
       });
     });
     if (cReset) cReset.addEventListener('click', function () {
       controles.forEach(function (el) { el.value = el.getAttribute('data-defecto'); });
       empezo = false; marcarTuya(false); calcular(); anunciar();
     });
+    // Enlace para compartir: solo los cuatro valores, en la URL. Al abrirlo,
+    // la calculadora parte con ellos (ajustados a los rangos permitidos).
+    var PARAMS = { personas: cPers, horas: cHoras, costo: cCosto, auto: cAuto };
+    var cCompartir = $('#c-compartir');
+    if (cCompartir) {
+      var q = new URLSearchParams(location.search), traidos = false;
+      Object.keys(PARAMS).forEach(function (k) {
+        var el = PARAMS[k], v = parseFloat(q.get(k));
+        if (!isFinite(v)) return;
+        var min = +el.min, max = +el.max, paso = +el.step || 1;
+        v = Math.min(max, Math.max(min, Math.round((v - min) / paso) * paso + min));
+        el.value = String(v); traidos = true;
+      });
+      if (traidos) { empezo = true; marcarTuya(true); }
+      var cMsg = $('#c-compartir-msg');
+      cCompartir.addEventListener('click', function () {
+        var u = location.origin + location.pathname + '?' + Object.keys(PARAMS).map(function (k) { return k + '=' + encodeURIComponent(PARAMS[k].value); }).join('&') + '#herramienta';
+        var listo = function (txt) { if (cMsg) cMsg.textContent = txt; };
+        medir('content_cta_click', { etiqueta: 'calculadora-compartir' });
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(u).then(function () { listo('Enlace copiado. Al abrirlo, la calculadora parte con estos valores.'); },
+            function () { history.replaceState(null, '', u); listo('Copia el enlace desde la barra de direcciones.'); });
+        } else { history.replaceState(null, '', u); listo('Copia el enlace desde la barra de direcciones.'); }
+      });
+    }
     ufListeners.push(calcular);
     calcular();
+  }
+
+  /* ----------------------------------------------------- punto de pedido */
+  // Misma fórmula que src/componentes/herramientas.mjs (puntoPedido).
+  var ppForm = $('#pp-form');
+  if (ppForm) {
+    var Z = { '90': 1.282, '95': 1.645, '97.5': 1.96, '99': 2.326 };
+    var ppNum = function (id) { var el = $('#' + id); var t = (el.value || '').trim().replace(',', '.'); return t === '' ? null : Number(t); };
+    var unid = function (n) { return CLP.format(n) + '<small>unidades</small>'; };
+    var ppEmpezo = false, ppAnuncio = null, ppUltimo = null;
+    var ppCalcular = function () {
+      var d = ppNum('pp-demanda'), sd = ppNum('pp-desv-demanda') || 0, L = ppNum('pp-plazo'), sL = ppNum('pp-desv-plazo') || 0;
+      var nivel = $('#pp-servicio').value, stock = ppNum('pp-stock');
+      var err = $('#pp-error'), malo = null;
+      var campos = { 'pp-demanda': d, 'pp-desv-demanda': sd, 'pp-plazo': L, 'pp-desv-plazo': sL, 'pp-stock': stock };
+      Object.keys(campos).forEach(function (id) {
+        var v = campos[id], invalido = v !== null && (!isFinite(v) || v < 0 || v > 1e7);
+        $('#' + id).setAttribute('aria-invalid', String(invalido));
+        if (invalido && !malo) malo = 'Revisa los valores: deben ser números positivos.';
+      });
+      if (!malo && (d === null || L === null)) malo = 'Completa la demanda diaria y el plazo del proveedor.';
+      if (!malo && (d === 0 || L === 0)) malo = 'La demanda y el plazo deben ser mayores que cero.';
+      err.hidden = !malo; err.textContent = malo || '';
+      if (malo) { ppUltimo = null; return null; }
+      var z = Z[nivel] || Z['95'];
+      var durante = Math.ceil(d * L);
+      var seg = Math.ceil(z * Math.sqrt(L * sd * sd + d * d * sL * sL));
+      var punto = Math.ceil(d * L + seg);
+      $('#pp-punto').innerHTML = unid(punto);
+      $('#pp-seguridad').innerHTML = unid(seg);
+      var txt = 'Cuando el stock baje de ' + CLP.format(punto) + ' unidades, haz el pedido. Esa cifra cubre la demanda esperada durante el plazo (' + CLP.format(durante) + ' unidades) más ' + CLP.format(seg) + ' de seguridad, con un nivel de servicio de ' + nivel.replace('.', ',') + '%.';
+      if (stock !== null) {
+        if (stock <= punto) txt += ' Tu stock actual (' + CLP.format(stock) + ') ya está en el punto de pedido o bajo él: corresponde pedir ahora.';
+        else {
+          var dias = (stock - punto) / d;
+          txt += ' Con tu stock actual (' + CLP.format(stock) + '), a la demanda promedio llegarías al punto de pedido en ' + (dias < 1 ? 'menos de un día' : 'unos ' + CLP.format(Math.floor(dias)) + (Math.floor(dias) === 1 ? ' día' : ' días')) + '.';
+        }
+      }
+      $('#pp-lectura').textContent = txt;
+      ppUltimo = { punto: punto, seguridad: seg, texto: txt, nivel: nivel };
+      return ppUltimo;
+    };
+    ppForm.addEventListener('input', function () {
+      if (!ppEmpezo) { ppEmpezo = true; medir('calculator_start', { herramienta: 'punto-pedido' }, true); }
+      ppCalcular();
+      clearTimeout(ppAnuncio);
+      ppAnuncio = setTimeout(function () { if (ppUltimo) $('#pp-anuncio').textContent = ppUltimo.texto; }, 700);
+    });
+    ppForm.addEventListener('change', function () {
+      var r = ppCalcular();
+      if (r && ppEmpezo) medir('calculator_complete', { herramienta: 'punto-pedido', nivel: r.nivel }, true);
+    });
+    ppForm.addEventListener('submit', function (ev) { ev.preventDefault(); ppCalcular(); });
+    ppCalcular();
   }
 
   /* ---------------------------------------------------------- formulario */
@@ -453,7 +608,7 @@
               : null;
             return alternativa('http-' + res.status, texto);
           }
-          medir('form_submit', { tipo: d.tipo });
+          medir('service_lead', conAtribucion({ tipo: d.tipo }));
           msg.className = 'form-msg ok';
           msg.textContent = 'Listo, nos llegó. Te respondemos antes de 24 horas hábiles.';
           form.reset();

@@ -21,6 +21,7 @@ export default {
   archivo: 'capacitacion-ia-empresas.html',
   prioridad: '0.7',
   titulo: 'Capacitación en IA para equipos de empresas en Santiago | ANVAR TECH',
+  og: { titulo: 'Capacitación en IA para equipos', bajada: 'Con los procesos reales de tu empresa, no con ejemplos genéricos', etiqueta: 'Servicio · equipos' },
   descripcion: 'Taller práctico de 4 horas en tus oficinas, hasta 15 personas. Cada persona sale con una tarea suya resuelta y la empresa con una política escrita de uso de IA.',
   contextoWsp: 'capacitacion',
   fuente: FUENTES.training,

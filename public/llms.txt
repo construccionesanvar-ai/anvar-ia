@@ -1,0 +1,41 @@
+# ANVAR TECH · IA & Automatización
+
+> Empresa chilena (ANVAR TECH SpA, RUT 77.982.517-5) que automatiza procesos de empresas con software, datos e IA aplicada a operaciones. Trabaja sobre las herramientas que el cliente ya usa (Excel, Word, PDF, correo, WhatsApp, ERP, AutoCAD) y mide cada proceso antes y después. Atención presencial en la Región Metropolitana y remota en todo Chile. Contacto: contacto@anvartech.cl, WhatsApp +56926333760.
+
+Los casos publicados llevan una etiqueta que dice si son proyecto propio, cliente, cliente confidencial o demostración. Las cifras tienen su alcance declarado. Precios netos, para empresas.
+
+## Servicios
+- [Automatización Express](https://ia.anvartech.cl/automatizacion-express): Un proceso pequeño y bien delimitado, resuelto y funcionando en tus herramientas. desde $199.900 + IVA.
+- [Diagnóstico de automatización](https://ia.anvartech.cl/diagnostico-ia-empresas): Medimos tus procesos en horas y pesos y te decimos qué automatizar primero y qué no tocar. UF 12 + IVA.
+- [Piloto en producción](https://ia.anvartech.cl/automatizacion-procesos-ia): Un proceso funcionando de verdad, usado por tu equipo y medido antes y después. desde UF 40 + IVA.
+- [Implementación](https://ia.anvartech.cl/automatizacion-procesos-ia): La solución completa, integrada con tus sistemas, documentada y traspasada a tu equipo. desde UF 60 + IVA.
+- [Soporte y evolución](https://ia.anvartech.cl/automatizacion-procesos-ia): Monitoreo, ajustes y nuevas automatizaciones sobre lo que ya está funcionando. UF 8 / mes + IVA.
+- [ANVAR Intelligence](https://ia.anvartech.cl/inteligencia-datos): Tus datos de ventas, stock y costos revisados cada mes: tablero, alertas y un informe con recomendaciones. desde UF 6 / mes + IVA.
+- [Capacitación para equipos](https://ia.anvartech.cl/capacitacion-ia-empresas): Taller práctico en tus oficinas: cada persona sale con una tarea suya resuelta. UF 14 + IVA.
+
+## Soluciones por tipo de proceso
+- [Automatización para pymes](https://ia.anvartech.cl/automatizacion-procesos-pymes): Qué conviene automatizar en una pyme, qué no, y cómo partir sin un proyecto grande.
+- [Automatización documental](https://ia.anvartech.cl/automatizacion-documental): Documentos Word, Excel y PDF generados desde un solo ingreso de datos, con revisión humana donde importa.
+- [Automatizar Excel](https://ia.anvartech.cl/automatizar-excel): Cuándo basta con Power Query o una macro, cuándo conviene Python y cuándo la IA agrega algo de verdad.
+- [Automatizar cotizaciones](https://ia.anvartech.cl/automatizar-cotizaciones): De la solicitud del cliente al documento aprobado: la IA interpreta, las reglas calculan el precio.
+- [Automatización en AutoCAD](https://ia.anvartech.cl/automatizacion-autocad): Cambios en planos pedidos en español y aplicados sobre el .dwg real, con revisión de un profesional.
+
+## Casos
+- [Casos reales](https://ia.anvartech.cl/casos): documentos (C-01, 45 → 4 min por procedimiento), venta en línea (C-02), planos en AutoCAD (C-03), pronóstico de stock (C-04, prototipo académico).
+- [Caso C-01: de 45 a 4 minutos por procedimiento](https://ia.anvartech.cl/casos/automatizacion-documental-retail): El caso completo: ocho documentos oficiales llenados a mano, cómo se rediseñó el proceso, la arquitectura, las limitaciones y cuándo se puede replicar.
+
+## Herramientas gratuitas
+- [Plantilla Excel de ROI (gratis)](https://ia.anvartech.cl/recursos/plantilla-roi-automatizacion): Descarga gratis la planilla para calcular costo anual, horas liberadas, ahorro, payback y ROI de automatizar un proceso. Sin registro.
+- [Calculadora de ROI](https://ia.anvartech.cl/calculadora-roi-automatizacion): Calcula cuánto cuesta al año el trabajo manual de un proceso y en cuánto tiempo se pagaría automatizarlo. Gratis y sin registro.
+- [Autodiagnóstico de automatización](https://ia.anvartech.cl/diagnostico-automatizacion): Siete preguntas, dos minutos: puntaje de preparación, principales oportunidades y el primer paso recomendado. Sin pedir tus datos.
+- [Punto de pedido y stock de seguridad](https://ia.anvartech.cl/herramientas/punto-de-pedido): Calcula cuándo reponer un producto y cuánto stock de seguridad mantener según tu demanda, su variación y el plazo del proveedor.
+
+## Guías
+- [Cuánto cuesta automatizar un proceso](https://ia.anvartech.cl/recursos/cuanto-cuesta-automatizar-proceso-chile): Rangos reales por tipo de proyecto, qué encarece y qué abarata una automatización, y cómo saber si se paga sola. Con los precios publicados de ANVAR TECH.
+- [Checklist: ¿se puede automatizar este proceso?](https://ia.anvartech.cl/recursos/como-detectar-proceso-automatizable): Diez preguntas para revisar un proceso antes de invertir en automatizarlo, con ejemplos de procesos que califican y otros que todavía no.
+- [7 procesos que todavía no conviene automatizar](https://ia.anvartech.cl/recursos/procesos-que-no-deberias-automatizar): Automatizar un proceso mal definido solo hace más rápido el desorden. Siete situaciones en que conviene esperar, y qué hacer antes.
+- [IA vs. reglas, scripts y RPA](https://ia.anvartech.cl/recursos/ia-vs-automatizacion-tradicional): Reglas, scripts, RPA e inteligencia artificial resuelven problemas distintos. Cómo elegir, con ejemplos de procesos reales y una tabla para decidir.
+
+## Optional
+- [Asesoría personal en IA](https://ia.anvartech.cl/asesoria-ia-personal): línea secundaria para personas.
+- [Política de privacidad](https://ia.anvartech.cl/privacidad)
