@@ -6,8 +6,9 @@ no se desarrolla nada nuevo: se mide.
 | | |
 |---|---|
 | Fecha del deploy final | 25/09/2026 |
-| Commit en producción | _(se completa al publicar)_ |
-| Deployment de Vercel | _(se completa al publicar)_ |
+| Versión congelada | `cfd6507` (merge de construccionesanvar-ai/anvar-ia#7) |
+| Deployment de Vercel | `dpl_EK69HVpj3rg71CeUudohZRyokKHm` (READY, alias ia.anvartech.cl) |
+| Después | Solo commits de verificación y documentación, sin cambios en `public/` |
 | URL | https://ia.anvartech.cl |
 | Congelado hasta | ~16/10/2026 (revisión del día 21) |
 
@@ -49,6 +50,10 @@ solo las páginas cuyo contenido cambió; no hace falta hacer nada más.
 - **SEO técnico:** robots, sitemap, canonicals, meta robots, H1 y JSON-LD revisados en cada deploy
   por `scripts/seo-check.mjs` (resumen en GitHub → Actions → "Verificación post-deploy").
 - **Pruebas:** lint, typecheck, pruebas unitarias, `npm run check` y E2E en navegador.
+- **Verificación post-deploy** (GitHub → Actions): las 25 páginas idénticas al build, SEO técnico
+  y la UF de producción (debe ser la de hoy en Chile o "no disponible", nunca otra fecha).
+- **UF al congelar:** 41.016,28 para el 25/09/2026 (mindicador.cl), el mismo valor que publican
+  fuentes independientes para ese día.
 
 ## Qué mirar
 

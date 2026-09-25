@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
 import { SITIO } from '../src/config.mjs';
+import { fechaChile, UF_MINIMA, UF_MAXIMA } from '../src/uf.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(RAIZ, 'public');
@@ -129,6 +130,28 @@ for (const [desde, hacia, permanente] of redirecciones) {
   const destino = (r.headers.get('location') || '').replace(BASE, '').replace(SITIO.dominio, '');
   const codigos = permanente ? [301, 308] : [302, 307];
   ok(codigos.includes(r.status) && destino === hacia, `${desde}: esperaba ${codigos.join('/')} → ${hacia}, llegó ${r.status} → ${destino || '(sin location)'}`);
+}
+
+// UF: la de hoy en Chile o "no disponible"; nunca otra fecha ni un valor de respaldo.
+{
+  const pedirUf = () => fetch(BASE + '/api/uf', { headers: { 'user-agent': 'anvar-smoke/1.0' } });
+  const r = await pedirUf();
+  const cache = r.headers.get('cache-control') || '';
+  /** @type {any} */ let j = null;
+  try { j = await r.json(); } catch { /* se informa abajo */ }
+  const hoy = fechaChile();
+  ok(r.status === 200 && j && (j.estado === 'vigente' || j.estado === 'no-disponible'), `/api/uf: respuesta inesperada (${r.status})`);
+  if (j && j.estado === 'vigente') {
+    ok(j.fecha === hoy, `/api/uf: fecha ${j.fecha}, hoy en Chile es ${hoy}`);
+    ok(typeof j.valor === 'number' && j.valor >= UF_MINIMA && j.valor <= UF_MAXIMA, `/api/uf: valor fuera de rango ${j.valor}`);
+  }
+  ok(!/stale-while-revalidate/.test(cache), '/api/uf: la caché no debe servir la UF de ayer (stale-while-revalidate)');
+  const segunda = await pedirUf();
+  await segunda.arrayBuffer();
+  console.log(`UF en producción: ${j ? JSON.stringify(j) : '(sin JSON)'} · caché de la CDN en la segunda consulta: ${segunda.headers.get('x-vercel-cache') || '—'}`);
+  // La calculadora nunca trae pesos del piloto ni una UF de respaldo en el HTML.
+  const calc = await (await traer('/calculadora-roi-automatizacion')).text();
+  ok(!/UF de referencia|≈\s*\$/.test(calc.replace(/<[^>]+>/g, ' ')), '/calculadora-roi-automatizacion: trae una equivalencia en pesos fija');
 }
 
 // 404 real, con la página de ayuda.
