@@ -37,9 +37,10 @@ y Vercel vuelve a correr `npm run build` en cada deploy.
 
 ```
 src/
-  config.mjs              empresa, contacto, UF de referencia, agenda, analítica, calculadora
+  config.mjs              empresa, contacto, agenda, analítica, calculadora
   contexto.mjs            página que se está generando (ruta y origen del lead)
   html.mjs                escape, formato de precios en CLP/UF, fechas
+  uf.mjs                  UF de hoy: fecha de Chile, consulta a mindicador.cl, validación y caché
   datos/
     oferta.mjs            SERVICIOS y PRECIOS (fuente única) + escalera de contratación
     casos.mjs             casos con etiqueta, métricas, alcance de cada cifra, flujo y media
@@ -72,7 +73,7 @@ public/                   lo que publica Vercel (HTML generado, styles.css, app.
 api/
   contacto.js             formulario → correo (Resend) → CRM en Sheets (opcional)
   diagnostico.js          lectura del autodiagnóstico escrita por IA (opcional)
-  uf.js                   valor de la UF del día (CMF o mindicador.cl), con caché
+  uf.js                   UF de hoy en Chile (mindicador.cl, sin clave), con caché
 operacion/                material comercial interno (plantillas)
 ```
 
@@ -92,7 +93,7 @@ operacion/                material comercial interno (plantillas)
 | Preguntas del autodiagnóstico | `DIAGNOSTICO` en `src/datos/contenido.mjs` (`wsp` marca las respuestas que viajan en el WhatsApp) |
 | **Razón social, RUT**, relación marca → sociedad | `SITIO.empresa` en `src/config.mjs` (ver "Identidad empresarial") |
 | WhatsApp, correo | `SITIO.contacto` en `src/config.mjs` |
-| UF de referencia de la calculadora | `SITIO.uf` en `src/config.mjs` (ver "Precios y UF") |
+| UF: fuente, validación y caché | `src/uf.mjs` (ver "Precios y UF"); no hay un valor de UF configurado |
 | **Fórmulas** de la calculadora de ROI y del punto de pedido | `src/calculo.mjs` (única fuente; el build genera `public/calculo.js`) |
 | Ejemplo y supuestos de la calculadora | `CALCULADORA` en `src/config.mjs` |
 | Autor (perfil, bio, perfiles públicos) | `SITIO.fundador` en `src/config.mjs` y `AUTOR` en `src/datos/recursos.mjs` |
@@ -123,23 +124,32 @@ del negocio") y el propio anvartech.cl, que factura con esa razón social y ese 
 Los proyectos y mensualidades de empresa se cotizan y facturan **en UF**; los
 servicios de entrada (Automatización Express) y de personas, en pesos.
 
-**El HTML nunca trae una equivalencia en pesos fija** de un precio en UF: una cifra así envejece
-al día siguiente. Funciona así:
+**El precio contractual es el precio en UF.** Los pesos son solo una equivalencia de referencia,
+y solo con la **UF de hoy en Chile**. No hay ningún valor de UF de respaldo en el código.
 
-1. El HTML muestra el precio en UF y "+ IVA" (por ejemplo, "UF 12 + IVA").
-2. Después de cargar, el navegador pide `/api/uf` (CMF si existe `CMF_API_KEY`, si no mindicador.cl;
-   timeout de 7 s por fuente; caché de 6 horas en la CDN y en memoria; si la fuente no responde al
-   renovar, sirve el último valor solo si es del mismo día en Chile) y agrega "≈ $X + IVA" con la **fecha del
-   valor** a la vista ("Equivalencia en pesos con la UF del 25/09/2026"). La carga de la página
-   **nunca** espera esa llamada.
-3. Si `/api/uf` falla, queda solo el precio en UF y la nota dice "Equivalencia en pesos no
-   disponible temporalmente". No se muestra ningún valor viejo.
+1. El HTML muestra el precio en UF: "desde UF 40 + IVA". Nunca trae pesos derivados de la UF
+   (`npm run check` falla si aparece "≈ $…" o "UF de referencia").
+2. Después de cargar, el navegador pide `/api/uf` (nuestro servidor; el navegador nunca llama a la
+   fuente). La lógica vive en `src/uf.mjs`:
+   - **Fuente:** mindicador.cl, API pública **sin clave**. Primero `/api/uf/DD-MM-AAAA` con la fecha
+     de hoy en Chile; si no trae ese día, la serie `/api/uf`, tomando exactamente el día de hoy.
+   - **Fecha:** "hoy" es la fecha en `America/Santiago` (`fechaChile()`), no UTC.
+   - **Validación:** HTTP 200, JSON válido, número entre 10.000 y 1.000.000, y fecha igual a hoy
+     en Chile. Una UF de ayer, de mañana, 0, 999 o 900.000.000 no se muestran.
+   - **Tiempo:** 3 s por consulta, dos consultas como máximo. La página nunca espera esta llamada.
+   - **Caché:** CDN de Vercel y memoria de la función, 6 horas o **hasta la medianoche de Chile**, lo
+     que llegue primero (sin `stale-while-revalidate`: nunca se sirve la UF de ayer). Una falla se
+     guarda 5 minutos.
+   - **Respuesta:** `{ estado: 'vigente', valor, fecha, fuente }` o `{ estado: 'no-disponible' }`.
+3. El navegador vuelve a comprobar que la fecha sea la de hoy en Chile y agrega "· ≈ $X"
+   ("desde UF 40 + IVA · ≈ $1.640.651"), con la fecha en la nota ("Equivalencia en pesos con la UF
+   del 25/09/2026"). UF × cantidad se redondea al peso (`ufAPesos()` en `src/calculo.mjs`).
+4. **Sin UF de hoy**, queda solo el precio en UF ("desde UF 40 + IVA"), sin avisos técnicos. En la
+   calculadora de ROI, el piloto queda sin monto: el ahorro se calcula igual y el payback y el ROI
+   piden elegir Express u «Otro monto». Nunca se usa un valor en pesos inventado.
 
-`SITIO.uf` (valor y fecha de referencia) se usa **solo** en la calculadora de ROI, para el cálculo
-inicial de la opción "Piloto", siempre rotulado "con UF de referencia ($41.000 al 24/09/2026)", y
-se reemplaza por la UF del día apenas llega. `npm run check` avisa si esa referencia tiene más de
-60 días. Toda conversión UF → pesos pasa por `opcionesInversion()` (servidor) o por la UF del día
-que expone `app.js` (navegador): no hay valores de UF copiados en otros archivos.
+Los precios en UF se facturan con la UF del día de la factura (así lo dice la nota junto a los
+precios y el acuerdo de servicio en `operacion/05-acuerdo-de-servicio.md`).
 
 En los datos estructurados los precios en UF se declaran en `CLF` (código ISO de la UF), así no se desactualizan.
 
@@ -159,7 +169,12 @@ payback, ROI año 1 y ROI a 3 años. Las fórmulas están a la vista en la pági
   generado esté al día y dé el mismo resultado.
 - **Casos límite:** sin ahorro o sin inversión → "No aplica"; costos recurrentes ≥ ahorro →
   "Sin recuperación"; payback > 36 meses → "Más de 36 meses". Nunca Infinity, NaN ni -0
-  (`tests/calculo.test.mjs`, 11 pruebas con casos calculados a mano).
+  (`tests/calculo.test.mjs`, con casos calculados a mano).
+- **Piloto y UF:** el piloto (UF 40) se pasa a pesos solo con la UF de hoy. Sin ella, la inversión
+  queda sin monto (`inversion: null`, estado `sin-monto`): el ahorro se calcula igual, y la
+  inversión, el ahorro neto del año 1, el payback y el ROI muestran "—" con la indicación de elegir
+  Express u «Otro monto». El ejemplo del texto de la página usa un monto fijo ($1.640.000, el mismo
+  de la plantilla Excel), no la UF.
 - **Plantilla Excel** (`scripts/plantillas/roi.py`): mismas fórmulas y mismas etiquetas; con el
   ejemplo (5 personas, 6 h/semana, $9.000, 60 %, $1.640.000) da exactamente lo mismo que la web
   (payback 2,76 meses, ROI 335 %, ROI 3 años 1.204 %).
@@ -252,7 +267,6 @@ Todas son opcionales: sin ellas, el formulario cae a WhatsApp y el autodiagnóst
 | `SHEETS_WEBHOOK_URL` | Deja cada contacto en el CRM de Sheets | No registra, igual llega el correo |
 | `ANTHROPIC_API_KEY` | Lectura del autodiagnóstico escrita por IA | Usa la lectura local |
 | `ANTHROPIC_MODEL` | Modelo (por defecto `claude-sonnet-5`) | Usa el de por defecto |
-| `CMF_API_KEY` | UF oficial de la CMF (gratis en api.cmfchile.cl) | Usa mindicador.cl |
 
 ## Analítica (Vercel Web Analytics)
 
@@ -468,6 +482,9 @@ logos, métricas, certificaciones ni integraciones que no existan.** Cada caso
 lleva su etiqueta y, si la cifra tiene límites, su "alcance de la cifra".
 
 ## Publicar
+
+> **Modo medición desde el 25/09/2026.** Qué está congelado, qué se puede tocar y qué mirar los
+> días 7, 14 y 30: [`POST_LAUNCH_FREEZE.md`](POST_LAUNCH_FREEZE.md).
 
 Cada `git push` a `main` publica solo en Vercel (proyecto `anvar-ia`, equipo
 ANVAR TECH): Vercel corre `npm install` y `npm run build`. Lo que Vercel no corre

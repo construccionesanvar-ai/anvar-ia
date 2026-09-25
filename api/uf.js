@@ -1,51 +1,24 @@
 // GET /api/uf
-// Valor de la UF del día, para mostrar la equivalencia en pesos de los precios
-// en UF. El sitio no depende de esta función para cargar: el navegador la pide
-// después, y si falla muestra solo el precio en UF y avisa que la equivalencia
-// en pesos no está disponible (nunca un valor viejo como si fuera de hoy).
+// UF del día en Chile, para mostrar la equivalencia en pesos de los precios en
+// UF. La página no espera esta llamada: el navegador la pide después de cargar
+// y, si la respuesta no es la UF de hoy, muestra solo el precio en UF.
 //
-// Fuentes, en orden:
-//  1. CMF (Comisión para el Mercado Financiero), la oficial. Requiere
-//     CMF_API_KEY (gratis en https://api.cmfchile.cl).
-//  2. mindicador.cl, pública y sin clave.
-// La respuesta se guarda 6 horas en la CDN de Vercel y en la memoria de la
-// función, así casi ninguna visita llega a consultar la fuente. Si la fuente no
-// responde al renovar, se sigue usando el valor en memoria solo si es de hoy.
+// Fuente: mindicador.cl, sin clave (la lógica y las validaciones están en
+// src/uf.mjs). Respuestas:
+//   { estado: 'vigente', valor, fecha, fuente }   UF de hoy (America/Santiago)
+//   { estado: 'no-disponible' }                    sin UF de hoy: no se muestran pesos
+//
+// Caché: la CDN de Vercel y la memoria de la función guardan la UF hasta 6
+// horas, nunca más allá de la medianoche de Chile (así nunca se sirve la de
+// ayer). Sin stale-while-revalidate, por la misma razón. Una falla se guarda
+// 5 minutos para no consultar la fuente en cada visita.
+import { obtenerUf, fechaChile, segundosDeCache } from '../src/uf.mjs';
 
-const CMF_API_KEY = process.env.CMF_API_KEY;
-const SEIS_HORAS = 6 * 60 * 60;
-const ESPERA_MS = 7000;
 let memoria = null; // { valor, fecha, fuente, hasta }
 
-const hoyEnChile = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
-const valida = (v) => typeof v === 'number' && Number.isFinite(v) && v > 20000 && v < 100000;
-
-async function traer(url) {
-  const r = await fetch(url, {
-    signal: AbortSignal.timeout(ESPERA_MS),
-    headers: { accept: 'application/json', 'user-agent': 'ANVAR-IA/1.0 (+https://ia.anvartech.cl)' },
-  });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
-}
-
-async function desdeCmf() {
-  if (!CMF_API_KEY) throw new Error('sin clave');
-  const j = await traer(`https://api.cmfchile.cl/api-sbifv3/recursos_api/uf?apikey=${encodeURIComponent(CMF_API_KEY)}&formato=json`);
-  const d = j && j.UFs && j.UFs[0];
-  const valor = d ? Number(String(d.Valor).replace(/\./g, '').replace(',', '.')) : NaN;
-  if (!valida(valor) || !/^\d{4}-\d{2}-\d{2}$/.test(d.Fecha)) throw new Error('respuesta inesperada');
-  return { valor, fecha: d.Fecha, fuente: 'CMF' };
-}
-
-async function desdeMindicador() {
-  const j = await traer('https://mindicador.cl/api/uf');
-  const d = j && j.serie && j.serie[0];
-  const valor = d ? Number(d.valor) : NaN;
-  if (!valida(valor) || !d.fecha) throw new Error('respuesta inesperada');
-  // La fecha viene en UTC (medianoche de Chile): se pasa a la fecha local.
-  const fecha = new Date(d.fecha).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
-  return { valor, fecha, fuente: 'mindicador.cl' };
+function vigente(res, uf, segundos) {
+  res.setHeader('Cache-Control', `public, max-age=0, s-maxage=${segundos}`);
+  return res.status(200).json({ estado: 'vigente', valor: uf.valor, fecha: uf.fecha, fuente: uf.fuente });
 }
 
 export default async function handler(req, res) {
@@ -53,28 +26,21 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET, HEAD');
     return res.status(405).json({ error: 'Método no permitido' });
   }
-  if (memoria && memoria.hasta > Date.now()) {
-    res.setHeader('Cache-Control', `public, max-age=0, s-maxage=${SEIS_HORAS}, stale-while-revalidate=86400`);
-    const { valor, fecha, fuente } = memoria;
-    return res.status(200).json({ valor, fecha, fuente });
+  const ahora = new Date();
+  const hoy = fechaChile(ahora);
+  const deHoy = memoria && memoria.fecha === hoy;
+  if (deHoy && memoria.hasta > ahora.getTime()) return vigente(res, memoria, Math.max(30, Math.round((memoria.hasta - ahora.getTime()) / 1000)));
+
+  const uf = await obtenerUf({ ahora });
+  if (uf.estado === 'vigente') {
+    const segundos = segundosDeCache(ahora);
+    memoria = { ...uf, hasta: ahora.getTime() + segundos * 1000 };
+    return vigente(res, uf, segundos);
   }
-  for (const fuente of [desdeCmf, desdeMindicador]) {
-    try {
-      const uf = await fuente();
-      memoria = { ...uf, hasta: Date.now() + SEIS_HORAS * 1000 };
-      res.setHeader('Cache-Control', `public, max-age=0, s-maxage=${SEIS_HORAS}, stale-while-revalidate=86400`);
-      return res.status(200).json(uf);
-    } catch (e) {
-      if (fuente !== desdeCmf || CMF_API_KEY) console.error('uf', fuente.name, e instanceof Error ? e.message : e);
-    }
-  }
-  // Sin fuente disponible: sirve el último valor solo si es de hoy.
-  if (memoria && memoria.fecha === hoyEnChile()) {
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300');
-    const { valor, fecha, fuente } = memoria;
-    return res.status(200).json({ valor, fecha, fuente });
-  }
-  // Nada vigente: el navegador muestra solo UF. Se reintenta en 5 minutos.
-  res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300');
-  return res.status(503).json({ error: 'UF no disponible por ahora.' });
+  // La fuente falló, pero la UF de hoy ya estaba en memoria: sigue siendo la de hoy.
+  if (deHoy) return vigente(res, memoria, Math.min(300, segundosDeCache(ahora)));
+
+  console.warn('uf: no disponible', uf.motivo);
+  res.setHeader('Cache-Control', `public, max-age=0, s-maxage=${Math.min(300, segundosDeCache(ahora))}`);
+  return res.status(200).json({ estado: 'no-disponible' });
 }

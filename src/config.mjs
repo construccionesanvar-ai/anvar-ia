@@ -33,19 +33,10 @@ export const SITIO = {
     respuesta: 'Respondemos antes de 24 horas hábiles',
   },
 
-  // UF. Los precios de proyectos se cotizan y facturan en UF.
-  //  - Equivalencia en pesos de los precios: SOLO la del día. La pide el
-  //    navegador a /api/uf (CMF o mindicador.cl, cacheada 6 h en la CDN) y la
-  //    muestra con su fecha. Si /api/uf falla, se muestra solo el precio en UF
-  //    y "Equivalencia en pesos no disponible temporalmente". El HTML nunca
-  //    trae un valor en pesos fijo que pueda quedar viejo.
-  //  - Este valor de referencia se usa únicamente para el cálculo inicial de
-  //    la calculadora de ROI (opción "Piloto"), siempre rotulado con su fecha,
-  //    y se reemplaza por la UF del día apenas carga la página.
-  uf: {
-    valor: 41000,
-    fecha: '2026-09-24',
-  },
+  // UF: los precios de proyectos se cotizan y facturan en UF. No hay un valor
+  // de UF en la configuración: la equivalencia en pesos es solo la UF de HOY en
+  // Chile, que el navegador pide a /api/uf (mindicador.cl, ver src/uf.mjs). Sin
+  // ella, se muestra solo el precio en UF.
 
   // Agenda de la evaluación de 20 minutos. Pega aquí el enlace público de
   // Cal.com, Calendly o Google Calendar (páginas de reserva). Si queda vacío,

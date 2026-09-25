@@ -14,7 +14,7 @@ import { SERVICIOS } from '../src/datos/oferta.mjs';
 import { CASOS, METRICAS } from '../src/datos/casos.mjs';
 import { TESTIMONIOS, publicables } from '../src/datos/testimonios.mjs';
 import { PENDIENTES_PRIVACIDAD } from '../src/paginas/privacidad.mjs';
-import { fechaCorta, rutaOg } from '../src/html.mjs';
+import { rutaOg } from '../src/html.mjs';
 import { PAGINAS } from './build.mjs';
 import { huellaOg, MANIFIESTO } from './og.mjs';
 
@@ -158,9 +158,11 @@ for (const f of paginas) {
   for (const m of txtPrecios.matchAll(/UF (\d+(?:\.\d{3})*)/g)) if (!UF_VALIDOS.has(numero(m[1]))) err(f, `precio "UF ${m[1]}" que no está en src/datos/oferta.mjs`);
   for (const m of txtPrecios.matchAll(/\$(\d{1,3}(?:\.\d{3})+)/g)) if (!CLP_VALIDOS.has(numero(m[1]))) err(f, `monto "$${m[1]}" que no sale de src/datos/oferta.mjs ni de la UF`);
 
-  // UF: el HTML no trae equivalencias en pesos fijas (envejecen). Solo la
-  // calculadora de ROI, dentro de su sección, usa la UF de referencia con fecha.
+  // UF: el HTML no trae ninguna equivalencia en pesos (envejece). La agrega el
+  // navegador solo con la UF de hoy; tampoco hay "UF de referencia" de respaldo.
   if (/data-uf="[^"]*"[^>]*>[^<]*≈/.test(h)) err(f, 'precio en UF con equivalencia en pesos fija en el HTML (la pone el navegador con la UF del día)');
+  if (/≈\s*\$\s*\d/.test(txt)) err(f, 'equivalencia en pesos fija en el HTML ("≈ $…"): solo la agrega el navegador con la UF de hoy');
+  if (/UF de referencia|UF del día anterior/i.test(txt)) err(f, 'UF de respaldo en el texto: sin UF de hoy se muestra solo el precio en UF');
 
   // WhatsApp: todo enlace lleva mensaje y origen del lead.
   for (const m of h.matchAll(/href="(https:\/\/wa\.me\/[^"]*)"/g)) {
@@ -307,8 +309,6 @@ for (const t of TESTIMONIOS) {
 if (!publicables().length) aviso('testimonios', 'no hay testimonios autorizados: la sección no se muestra (correcto)');
 
 // Recordatorios comerciales y legales
-const diasUf = Math.round((Date.now() - new Date(SITIO.uf.fecha + 'T12:00:00-03:00').getTime()) / 86_400_000);
-if (diasUf > 60) aviso('src/config.mjs', `la UF de referencia de la calculadora (${fechaCorta(SITIO.uf.fecha)}) tiene ${diasUf} días. Solo se usa si /api/uf falla y siempre con su fecha, pero conviene actualizarla.`);
 for (const s of Object.values(SERVICIOS)) if (s.hipotesis) aviso('precios', `${s.nombre}: precio aún sin validar con clientes (hipotesis: true)`);
 for (const p of PENDIENTES_PRIVACIDAD) aviso('privacidad (validar)', p);
 if (!SITIO.agenda.url) aviso('agenda', 'sin agenda configurada: el sitio ofrece coordinar por WhatsApp (SITIO.agenda.url)');

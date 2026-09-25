@@ -13,7 +13,8 @@ import { execSync } from 'node:child_process';
 import { iniciar } from './servidor.mjs';
 import { PAGINAS } from './build.mjs';
 import { calcularRoi, puntoPedido, PP_DEFECTO } from '../src/componentes/herramientas.mjs';
-import { roi, pesos as pesosK, textoPayback, porcentaje } from '../src/calculo.mjs';
+import { roi, pesos as pesosK, textoPayback, porcentaje, ufAPesos } from '../src/calculo.mjs';
+import { fechaChile } from '../src/uf.mjs';
 import { SOLUCIONES } from '../src/datos/soluciones.mjs';
 import { SITIO, CALCULADORA } from '../src/config.mjs';
 import { SERVICIOS } from '../src/datos/oferta.mjs';
@@ -74,6 +75,13 @@ const miles = (n) => new Intl.NumberFormat('es-CL').format(n);
 // Fuentes primarias que el contenido cita a propósito (documentación oficial y ley).
 const EXTERNOS_PERMITIDOS = /^https:\/\/(anvartech\.cl|ia\.anvartech\.cl|learn\.microsoft\.com|www\.bcn\.cl|modelcontextprotocol\.io)(\/|$)/;
 const hrefWsp = (href) => decodeURIComponent(String(href).split('text=')[1] || '');
+// /api/uf simulada: la UF de hoy en Chile, una de ayer (vieja) o no disponible.
+const HOY_CL = fechaChile();
+const AYER_CL = fechaChile(new Date(Date.now() - 86_400_000));
+const fechaCortaCL = (iso) => iso.split('-').reverse().join('/');
+const UF_PRUEBA = 41016.28;
+const simularUf = (ctx, cuerpo) => ctx.route('**/api/uf', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(cuerpo) }));
+const ufDeHoy = { estado: 'vigente', valor: UF_PRUEBA, fecha: HOY_CL, fuente: 'mindicador.cl' };
 
 async function prueba(nombre, fn) {
   try { await fn(); ok++; console.log(`  ✓ ${nombre}`); } catch (e) { fallas.push(`${nombre}: ${e instanceof Error ? e.message : e}`); console.log(`  ✗ ${nombre}\n      ${e instanceof Error ? e.message : e}`); }
@@ -145,7 +153,9 @@ await prueba('Autodiagnóstico → resultado → WhatsApp con el resultado y ref
 
 await prueba('Calculadora de ROI: mismo cálculo que el módulo único, inversión editable y casos límite', async () => {
   const ctx = await contexto();
+  await simularUf(ctx, ufDeHoy);
   const { p } = await pagina(ctx, '/calculadora-roi-automatizacion');
+  await p.waitForFunction(() => /≈/.test(document.getElementById('c-piloto-d')?.textContent || ''), null, { timeout: 8000 });
   const fijar = async (v) => p.evaluate((v) => {
     for (const [id, val] of Object.entries(v)) {
       const el = /** @type {HTMLInputElement} */ (document.getElementById(id));
@@ -156,11 +166,12 @@ await prueba('Calculadora de ROI: mismo cálculo que el módulo único, inversi�
   }, v);
   const elegir = async (valor) => { await p.locator(`input[name="c-inv"][value="${valor}"]`).check(); };
   const leer = async (id) => (await p.locator('#' + id).textContent()) || '';
-  // Con la UF de referencia (la API está caída en la prueba), el piloto usa ese valor.
+  // Con la UF de hoy, el piloto es UF 40 × valor, redondeado al peso.
+  exigir(await leer('c-piloto-d') === `desde UF 40 + IVA · ≈ ${pesosK(ufAPesos(40, UF_PRUEBA))} (UF del ${fechaCortaCL(HOY_CL)})`, 'piloto con UF: ' + await leer('c-piloto-d'));
   const esperado = (e, inversion, mensual = 0) => roi({ personas: e.personas, horasSemana: e.horas, costoHora: e.costo, pctAutomatizable: e.auto, inversion, costoMensual: mensual, semanas: CALCULADORA.semanas });
   for (const caso of [{ personas: 12, horas: 9, costo: 11500, auto: 45 }, { personas: 1, horas: 1, costo: 3000, auto: 5 }, { personas: 50, horas: 25, costo: 40000, auto: 100 }]) {
     await fijar({ 'c-personas': caso.personas, 'c-horas': caso.horas, 'c-costo': caso.costo, 'c-auto': caso.auto });
-    const r = esperado(caso, SERVICIOS.piloto.precio.valor * SITIO.uf.valor);
+    const r = esperado(caso, ufAPesos(SERVICIOS.piloto.precio.valor, UF_PRUEBA));
     exigir(await leer('c-valor') === pesosK(r.ahorroBruto), `ahorro ${await leer('c-valor')} ≠ ${pesosK(r.ahorroBruto)}`);
     exigir(await leer('c-payback') === textoPayback(r), `payback ${await leer('c-payback')} ≠ ${textoPayback(r)}`);
     exigir(await leer('c-roi3') === porcentaje(r.roi3), 'ROI 3 años distinto');
@@ -212,23 +223,48 @@ await prueba('Portada: herramientas en tarjetas, sin la experiencia completa ni 
   await ctx.close();
 });
 
-await prueba('UF del día: /api/uf pone los pesos con su fecha; si falla no se muestra un valor viejo', async () => {
+await prueba('UF de hoy: pesos con su fecha; si no hay UF de hoy (caída o de ayer), solo el precio en UF', async () => {
   const ctx = await contexto();
-  await ctx.route('**/api/uf', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ valor: 40000, fecha: '2026-09-25', fuente: 'prueba' }) }));
+  await simularUf(ctx, { ...ufDeHoy, valor: 40000 });
   const { p } = await pagina(ctx, '/diagnostico-ia-empresas');
   await p.waitForFunction(() => /480\.000/.test(document.querySelector('[data-uf="12"]')?.textContent || ''), null, { timeout: 8000 });
-  exigir(/UF del 25\/09\/2026/.test(await p.locator('[data-uf-nota]').first().textContent() || ''), 'la nota no muestra la fecha del día');
+  exigir((await p.locator('[data-uf="12"]').first().textContent()) === '+ IVA · ≈ $480.000', 'formato del precio con UF');
+  exigir((await p.locator('[data-uf-nota]').first().textContent() || '').includes(`UF del ${fechaCortaCL(HOY_CL)}`), 'la nota no muestra la fecha de hoy');
   await ctx.close();
-  const ctx2 = await contexto();
-  await ctx2.route('**/api/uf', (r) => r.fulfill({ status: 503, body: '{}' }));
-  const { p: p2 } = await pagina(ctx2, '/diagnostico-ia-empresas');
-  await p2.waitForFunction(() => /no disponible/.test(document.querySelector('[data-uf-nota]')?.textContent || ''), null, { timeout: 8000 });
-  const txt = await p2.locator('[data-uf="12"]').first().textContent() || '';
-  exigir(txt === '+ IVA', 'tras el fallo debe quedar solo "+ IVA": ' + txt);
-  exigir(!/41\.000|≈/.test(await p2.locator('main').textContent() || ''), 'se muestra una equivalencia vieja');
-  await ctx2.close();
+  // Sin UF de hoy: la fuente cayó, o llegó la de ayer (por ejemplo, desde una caché).
+  for (const cuerpo of [{ estado: 'no-disponible' }, { ...ufDeHoy, fecha: AYER_CL }, { valor: 41000, fecha: HOY_CL }]) {
+    const c = await contexto();
+    await simularUf(c, cuerpo);
+    const { p: q } = await pagina(c, '/diagnostico-ia-empresas');
+    await q.waitForFunction(() => document.querySelector('[data-uf-nota]')?.hasAttribute('data-uf-nota-base'), null, { timeout: 8000 });
+    const precio = await q.locator('[data-uf="12"]').first().textContent() || '';
+    exigir(precio === '+ IVA', `sin UF de hoy debe quedar "UF 12 + IVA" (${JSON.stringify(cuerpo)}): ${precio}`);
+    const main = await q.locator('main').textContent() || '';
+    exigir(!/≈|41\.000|[Nn]o disponible|NaN|undefined|\bnull\b/.test(main), 'sin UF de hoy aparece un monto o un aviso técnico: ' + JSON.stringify(cuerpo));
+    await c.close();
+  }
   // En el HTML (sin JavaScript) no hay pesos derivados de la UF.
   exigir(!readFileSync(join(RAIZ, 'public', 'diagnostico-ia-empresas.html'), 'utf8').includes('≈'), 'el HTML trae una equivalencia en pesos fija');
+});
+
+await prueba('Calculadora sin UF de hoy: el piloto queda sin pesos y pide «Otro monto»; Express y otro monto funcionan', async () => {
+  for (const cuerpo of [{ estado: 'no-disponible' }, { ...ufDeHoy, fecha: AYER_CL }]) {
+    const ctx = await contexto();
+    await simularUf(ctx, cuerpo);
+    const { p } = await pagina(ctx, '/calculadora-roi-automatizacion');
+    await p.waitForFunction(() => /Otro monto/.test(document.getElementById('c-lectura')?.textContent || ''), null, { timeout: 8000 });
+    const leer = async (id) => (await p.locator('#' + id).textContent()) || '';
+    exigir(await leer('c-piloto-d') === 'desde UF 40 + IVA', 'piloto sin UF: ' + await leer('c-piloto-d'));
+    for (const id of ['c-inv', 'c-neto1', 'c-payback', 'c-roi1', 'c-roi3']) exigir(await leer(id) === '—', `${id} sin UF: ${await leer(id)}`);
+    exigir(await leer('c-valor') === pesosK(calcularRoi(CALCULADORA.defecto).ahorroBruto), 'el ahorro debe calcularse igual');
+    await p.locator('input[name="c-inv"][value="express"]').check();
+    exigir(await leer('c-inv') === pesosK(SERVICIOS.express.precio.valor) && /mes/.test(await leer('c-payback')), 'Express sin UF: ' + await leer('c-payback'));
+    await p.fill('#c-monto', '2000000');
+    exigir(await leer('c-inv') === '$2.000.000', 'otro monto sin UF');
+    const todo = await p.locator('main').textContent() || '';
+    exigir(!/41\.000|≈|NaN|Infinity|UF de referencia/.test(todo), 'aparece un valor de respaldo o un error: ' + JSON.stringify(cuerpo));
+    await ctx.close();
+  }
 });
 
 await prueba('Formulario: errores accesibles, envío, y respaldo por WhatsApp si falla', async () => {
@@ -319,6 +355,12 @@ await prueba('Formularios: validación, carga, doble clic, error, reintento, red
   await p.locator('#form-enviar').click();
   await p.locator('#form-msg.ok').waitFor({ timeout: 5000 });
   exigir(envios === 3, `reintento: ${envios} envíos (esperaba 3)`);
+  // Límite de envíos (429) → mensaje claro y alternativa por WhatsApp.
+  respuesta = 429;
+  await p.fill('#f-nombre', 'Ana Soto'); await p.fill('#f-contacto', 'ana@acme.cl');
+  await p.locator('#form-enviar').click();
+  await p.locator('#form-msg', { hasText: 'varios envíos seguidos' }).waitFor({ timeout: 5000 });
+  exigir(await p.locator('#form-msg a', { hasText: 'Envíalo por WhatsApp' }).count() === 1, '429 sin alternativa por WhatsApp');
   // Red caída (sin respuesta) → alternativa, sin quedar colgado.
   respuesta = -1;
   await p.fill('#f-nombre', 'Ana Soto'); await p.fill('#f-contacto', '+56 9 1234 5678');
@@ -326,7 +368,7 @@ await prueba('Formularios: validación, carga, doble clic, error, reintento, red
   await p.locator('#form-msg a', { hasText: 'Envíalo por WhatsApp' }).waitFor({ timeout: 5000 });
   const ev = await eventos(p);
   exigir(ev.filter((x) => x === 'service_lead').length === 2, 'service_lead debe contarse una vez por envío exitoso: ' + ev.join(','));
-  exigir(ev.filter((x) => x === 'form_error').length === 2, 'form_error por cada falla: ' + ev.join(','));
+  exigir(ev.filter((x) => x === 'form_error').length === 3, 'form_error por cada falla: ' + ev.join(','));
   // Honeypot: fuera de la vista, del teclado y del árbol accesible; sin etiqueta visible.
   const box = await p.locator('#f-web').boundingBox();
   exigir(!box || box.x + box.width <= 0, 'el honeypot se ve');
@@ -340,7 +382,7 @@ await prueba('Formularios: validación, carga, doble clic, error, reintento, red
   }
   await ctx.close();
   // El 500 y la red caída de esta prueba son simulados: sus avisos en consola no cuentan.
-  const propios = erroresConsola.splice(antes).filter((e) => !/status of 500|ERR_FAILED/.test(e));
+  const propios = erroresConsola.splice(antes).filter((e) => !/status of (500|429)|ERR_FAILED/.test(e));
   erroresConsola.push(...propios);
 });
 

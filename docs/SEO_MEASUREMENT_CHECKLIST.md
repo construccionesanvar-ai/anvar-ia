@@ -11,6 +11,8 @@ La pregunta es una sola: **qué contenido trae tráfico y qué tráfico se convi
 
 ### Congelamiento (hasta el ~2026-10-16)
 
+Resumen y estado técnico al congelar: [`POST_LAUNCH_FREEZE.md`](../POST_LAUNCH_FREEZE.md).
+
 Producción solo se toca por: **bug, dato incorrecto, problema legal, problema de seguridad o
 error técnico grave.** Nada de rediseños, páginas nuevas ni cambios de URL, title, H1 o canonical
 "por intuición". Si algo parece mejorable, anótalo aquí abajo con la fecha y espera a los datos.
