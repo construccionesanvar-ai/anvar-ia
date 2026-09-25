@@ -1,23 +1,30 @@
 // GET /api/uf
 // Valor de la UF del día, para mostrar la equivalencia en pesos de los precios
 // en UF. El sitio no depende de esta función para cargar: el navegador la pide
-// después, y si falla muestra la UF de referencia con su fecha (o solo UF).
+// después, y si falla muestra solo el precio en UF y avisa que la equivalencia
+// en pesos no está disponible (nunca un valor viejo como si fuera de hoy).
 //
 // Fuentes, en orden:
 //  1. CMF (Comisión para el Mercado Financiero), la oficial. Requiere
 //     CMF_API_KEY (gratis en https://api.cmfchile.cl).
 //  2. mindicador.cl, pública y sin clave.
 // La respuesta se guarda 6 horas en la CDN de Vercel y en la memoria de la
-// función, así casi ninguna visita llega a consultar la fuente.
+// función, así casi ninguna visita llega a consultar la fuente. Si la fuente no
+// responde al renovar, se sigue usando el valor en memoria solo si es de hoy.
 
 const CMF_API_KEY = process.env.CMF_API_KEY;
 const SEIS_HORAS = 6 * 60 * 60;
+const ESPERA_MS = 7000;
 let memoria = null; // { valor, fecha, fuente, hasta }
 
+const hoyEnChile = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
 const valida = (v) => typeof v === 'number' && Number.isFinite(v) && v > 20000 && v < 100000;
 
 async function traer(url) {
-  const r = await fetch(url, { signal: AbortSignal.timeout(4000), headers: { accept: 'application/json' } });
+  const r = await fetch(url, {
+    signal: AbortSignal.timeout(ESPERA_MS),
+    headers: { accept: 'application/json', 'user-agent': 'ANVAR-IA/1.0 (+https://ia.anvartech.cl)' },
+  });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
@@ -61,7 +68,13 @@ export default async function handler(req, res) {
       if (fuente !== desdeCmf || CMF_API_KEY) console.error('uf', fuente.name, e instanceof Error ? e.message : e);
     }
   }
-  // Sin fuente disponible: el navegador usa la UF de referencia. Se reintenta en 5 minutos.
+  // Sin fuente disponible: sirve el último valor solo si es de hoy.
+  if (memoria && memoria.fecha === hoyEnChile()) {
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300');
+    const { valor, fecha, fuente } = memoria;
+    return res.status(200).json({ valor, fecha, fuente });
+  }
+  // Nada vigente: el navegador muestra solo UF. Se reintenta en 5 minutos.
   res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300');
   return res.status(503).json({ error: 'UF no disponible por ahora.' });
 }

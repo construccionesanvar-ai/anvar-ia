@@ -128,7 +128,8 @@ al día siguiente. Funciona así:
 
 1. El HTML muestra el precio en UF y "+ IVA" (por ejemplo, "UF 12 + IVA").
 2. Después de cargar, el navegador pide `/api/uf` (CMF si existe `CMF_API_KEY`, si no mindicador.cl;
-   timeout de 4 s por fuente; caché de 6 horas en la CDN) y agrega "≈ $X + IVA" con la **fecha del
+   timeout de 7 s por fuente; caché de 6 horas en la CDN y en memoria; si la fuente no responde al
+   renovar, sirve el último valor solo si es del mismo día en Chile) y agrega "≈ $X + IVA" con la **fecha del
    valor** a la vista ("Equivalencia en pesos con la UF del 25/09/2026"). La carga de la página
    **nunca** espera esa llamada.
 3. Si `/api/uf` falla, queda solo el precio en UF y la nota dice "Equivalencia en pesos no
