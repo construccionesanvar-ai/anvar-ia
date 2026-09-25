@@ -1,24 +1,31 @@
 // POST /api/diagnostico
-// Opcional. Toma el resultado del cuestionario del sitio y le pide a Claude
-// un párrafo personalizado, en tu voz, con el primer paso concreto.
+// Opcional. Toma el resultado del cuestionario del sitio y le pide a un modelo
+// de lenguaje una lectura personalizada con el primer paso concreto.
 // Si no hay ANTHROPIC_API_KEY, responde 503 y el sitio usa su lectura local.
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const MODELO = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
 
-const SISTEMA = `Eres el asistente de ANVAR IA, la consultora de Andrés Vargas (Santiago, Chile).
-Andrés es estudiante de Ingeniería Civil Industrial, trabaja en prevención de pérdidas en retail
-y construye sistemas reales: una app que genera ocho documentos legales y lee boletas sin internet,
-un sitio de servicios que cotiza con IA y cobra en línea, y planos de AutoCAD dibujados por instrucciones.
+const SISTEMA = `Eres el asistente de ANVAR TECH (IA & Automatización), una empresa chilena de
+automatización e inteligencia operacional. Su especialidad parte desde las operaciones:
+primero entiende el proceso y dónde la empresa pierde tiempo, y después decide si
+corresponde automatización, software, análisis de datos o IA.
 
-Tono: chileno neutro, directo, sin humo, sin anglicismos innecesarios, sin exclamaciones.
-Trata de "tú". Nunca prometas magia ni porcentajes que no te dieron.
+Servicios que puedes sugerir, solo si calzan con el resultado: Automatización Express
+(un proceso pequeño y delimitado), Diagnóstico (varios procesos o datos desordenados),
+Piloto en producción (mucho potencial, datos ordenados y capacidad de decidir),
+ANVAR Intelligence (datos de ventas, stock o costos ya ordenados) o capacitación del equipo
+(poco potencial de automatización).
+
+Tono: chileno profesional, directo, sin humo, sin anglicismos innecesarios, sin exclamaciones.
+Trata de "tú". Habla del resultado para la empresa, no de tecnología. No menciones marcas de
+modelos de IA. Nunca prometas ahorros, porcentajes ni plazos que no estén en los datos.
 Si el diagnóstico muestra poco potencial, dilo con claridad y recomienda algo chico.
 
 Entregas exactamente tres párrafos cortos, sin títulos ni listas:
-1) Qué está pasando en su caso, leyendo los tres ejes.
+1) Qué está pasando en su caso, leyendo los tres ejes y el tipo de problema.
 2) Cuál es el primer paso concreto y por qué ese y no otro.
-3) Qué esperar en las primeras cuatro semanas, en términos medibles.
+3) Qué debería poder medir en las primeras semanas.
 Máximo 140 palabras en total.`;
 
 // Freno contra abuso. Este endpoint es público y cada llamada cuesta plata.
@@ -75,8 +82,9 @@ export default async function handler(req, res) {
     potencial: n(body.potencial, 0),
     base: n(body.base, 0),
     traccion: n(body.traccion, 0),
-    publico: body.publico === 'empresas' ? 'una empresa' : 'una persona',
-    rubro: String(body.rubro || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 120)
+    publico: body.publico === 'personas' ? 'una persona' : 'una empresa',
+    rubro: String(body.rubro || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 120),
+    categoria: String(body.categoria || '').replace(/[\x00-\x1F\x7F]/g, ' ').trim().slice(0, 80)
   };
 
   const prompt = `Resultado del diagnóstico de ${d.publico}${d.rubro ? ` del rubro ${d.rubro}` : ''}:
@@ -84,8 +92,8 @@ export default async function handler(req, res) {
 - Potencial a ganar (horas repetidas y fragilidad del proceso): ${d.potencial}%
 - Base y orden (dónde viven los datos, si está medido): ${d.base}%
 - Tracción para partir (uso actual de IA y capacidad de decidir): ${d.traccion}%
-
-Escribe la lectura para esta persona.`;
+${d.categoria ? `- Tipo de problema que quiere resolver primero: ${d.categoria}\n` : ''}
+Escribe la lectura para esta empresa.`;
 
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {

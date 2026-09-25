@@ -1,279 +1,273 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CL">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Automatización de procesos con IA en Chile | ANVAR IA</title>
-<meta name="description" content="Automatizo procesos que hoy se hacen a mano: documentos que se generan solos, lectura de boletas sin internet, cotizaciones y planos. Un piloto en 3 a 4 semanas, medido antes y después. Santiago, Chile.">
-<meta name="author" content="Andrés Vargas — ANVAR IA">
-<meta name="theme-color" content="#EFF0EC">
+<title>Piloto e implementación de automatización con IA | ANVAR TECH</title>
+<meta name="description" content="Automatizamos procesos en etapas: un piloto medido antes y después, la implementación completa y soporte. El código y la documentación quedan en tu empresa.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#EFF0EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1215" media="(prefers-color-scheme: dark)">
 <meta name="google-site-verification" content="F0wlUHOu0ZbhIH8Lr_W29YTM3gHIGOkzrA9IIeWU8Jw">
 <link rel="canonical" href="https://ia.anvartech.cl/automatizacion-procesos-ia">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_CL">
-<meta property="og:site_name" content="ANVAR IA">
-<meta property="og:title" content="Automatización de procesos con IA — medida antes y después">
-<meta property="og:description" content="Un proceso andando de verdad en 3 a 4 semanas, con tu equipo capacitado y el resultado medido. Si no mejora lo prometido, no seguimos.">
+<meta property="og:site_name" content="ANVAR TECH · IA &amp; Automatización">
+<meta property="og:title" content="Piloto e implementación de automatización con IA | ANVAR TECH">
+<meta property="og:description" content="Automatizamos procesos en etapas: un piloto medido antes y después, la implementación completa y soporte. El código y la documentación quedan en tu empresa.">
 <meta property="og:url" content="https://ia.anvartech.cl/automatizacion-procesos-ia">
 <meta property="og:image" content="https://ia.anvartech.cl/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ANVAR TECH · IA &amp; Automatización">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="twitter:title" content="Piloto e implementación de automatización con IA | ANVAR TECH">
+<meta name="twitter:description" content="Automatizamos procesos en etapas: un piloto medido antes y después, la implementación completa y soporte. El código y la documentación quedan en tu empresa.">
+<meta name="twitter:image" content="https://ia.anvartech.cl/og-image.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="styles.css?v=2">
-<link rel="stylesheet" href="servicio.css?v=2">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
-{"@type":"Service","name":"Automatización de procesos con inteligencia artificial","serviceType":"Automatización de procesos","description":"Implementación de procesos automatizados con IA: generación de documentos, lectura de documentos sin internet, integraciones, cotización y cobro en línea. Se entrega un piloto en producción de tres a cuatro semanas, medido antes y después, y opcionalmente la implementación completa.","areaServed":{"@type":"Country","name":"Chile"},"provider":{"@type":"Organization","name":"ANVAR IA","url":"https://ia.anvartech.cl/","parentOrganization":{"@type":"Organization","name":"ANVAR TECH SpA"},"address":{"@type":"PostalAddress","addressLocality":"Santiago","addressCountry":"CL"}},"offers":{"@type":"Offer","price":"1600000","priceCurrency":"CLP","description":"Piloto en producción desde UF 40 netas más IVA, con el diagnóstico incluido; si ya se hizo el diagnóstico, UF 28 adicionales. Implementación completa desde UF 60."}},
-{"@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"¿Qué procesos se pueden automatizar con IA?","acceptedAnswer":{"@type":"Answer","text":"Los que se repiten con la misma estructura: llenar formularios y documentos oficiales, digitar datos desde boletas o facturas, redactar informes recurrentes, cotizar, responder consultas frecuentes, ordenar planillas y generar dibujos técnicos a partir de instrucciones. Si el proceso cambia por completo cada vez, no es candidato."}},
-{"@type":"Question","name":"¿Cuánto demora un piloto de automatización?","acceptedAnswer":{"@type":"Answer","text":"Entre tres y cuatro semanas desde el inicio: una semana de diseño y acuerdo de medición, dos de construcción y pruebas con usuarios reales, y una de capacitación, medición y cierre."}},
-{"@type":"Question","name":"¿Qué pasa si la IA se equivoca?","acceptedAnswer":{"@type":"Answer","text":"Todos los sistemas incluyen revisión humana antes de que un documento o una decisión tenga efecto: campos marcados cuando el dato es dudoso, validaciones que bloquean lo incompleto y avisos cuando los números no cuadran. La IA propone, una persona firma."}},
-{"@type":"Question","name":"¿El código queda en poder de la empresa?","acceptedAnswer":{"@type":"Answer","text":"Sí. El código, la documentación y los manuales quedan en poder del cliente, y queda por escrito en el contrato. Todo corre en cuentas de la empresa, no en cuentas personales del proveedor."}},
-{"@type":"Question","name":"¿Cuánto cuesta automatizar un proceso?","acceptedAnswer":{"@type":"Answer","text":"El piloto en producción parte en UF 40 netas, alrededor de 1.600.000 pesos más IVA, e incluye el diagnóstico: si la empresa ya lo hizo, paga UF 28 adicionales. La implementación completa se cotiza por alcance y parte en UF 60, siempre después de un diagnóstico o un piloto."}}]},
-{"@type":"BreadcrumbList","itemListElement":[
-{"@type":"ListItem","position":1,"name":"ANVAR IA","item":"https://ia.anvartech.cl/"},
-{"@type":"ListItem","position":2,"name":"Automatización de procesos con IA","item":"https://ia.anvartech.cl/automatizacion-procesos-ia"}]}
-]}
-</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="/styles.css?v=9831a82874">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"ProfessionalService","@id":"https://ia.anvartech.cl/#organizacion","name":"ANVAR TECH","alternateName":"ANVAR TECH · IA & Automatización","legalName":"ANVAR TECH SpA","url":"https://ia.anvartech.cl/","logo":"https://ia.anvartech.cl/apple-touch-icon.png","image":"https://ia.anvartech.cl/og-image.png","description":"Automatización e inteligencia operacional para empresas: automatización de procesos, inteligencia de datos y desarrollo a medida, medidos antes y después.","email":"contacto@anvartech.cl","telephone":"+56926333760","areaServed":{"@type":"Country","name":"Chile"},"address":{"@type":"PostalAddress","addressLocality":"Santiago","addressCountry":"CL"},"founder":{"@type":"Person","name":"Andrés Vargas"},"sameAs":["https://anvartech.cl"]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://ia.anvartech.cl/"},{"@type":"ListItem","position":2,"name":"Piloto e implementación","item":"https://ia.anvartech.cl/automatizacion-procesos-ia"}]},{"@type":"Service","name":"Automatización de procesos con IA","serviceType":"Automatización de procesos","description":"Piloto en producción de tres a cuatro semanas medido antes y después, implementación completa integrada con los sistemas del cliente y soporte mensual.","url":"https://ia.anvartech.cl/automatizacion-procesos-ia","provider":{"@id":"https://ia.anvartech.cl/#organizacion"},"areaServed":{"@type":"Country","name":"Chile"},"offers":[{"@type":"Offer","name":"Piloto en producción","price":"1600000","priceCurrency":"CLP","description":"Desde UF 40, más IVA. UF 28 si ya hiciste el diagnóstico."},{"@type":"Offer","name":"Implementación","price":"2400000","priceCurrency":"CLP","description":"Desde UF 60, más IVA."},{"@type":"Offer","name":"Soporte y evolución","price":"320000","priceCurrency":"CLP","description":"UF 8 al mes, más IVA."}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Y si la IA se equivoca?","acceptedAnswer":{"@type":"Answer","text":"Se equivoca, y por eso todo lo que construimos tiene revisión humana antes de que algo tenga efecto. En el caso C-01, cuando la lectura de un precio es dudosa, la fila queda marcada para revisión y no se puede generar el documento sin revisarla."}},{"@type":"Question","name":"¿Esto va a dejar a alguien sin trabajo?","acceptedAnswer":{"@type":"Answer","text":"Lo que automatizamos es la parte mecánica: digitar, copiar, repetir. La revisión, el criterio y la decisión siguen siendo de las personas. Un piloto planteado como reducción de personal suele fracasar, porque el equipo no lo adopta."}},{"@type":"Question","name":"¿Quién se queda con el código?","acceptedAnswer":{"@type":"Answer","text":"Tu empresa. Lo desarrollado a medida queda en tu poder una vez pagado y así queda en el contrato. Cuando corresponde, todo corre en cuentas de tu empresa y no en las nuestras."}},{"@type":"Question","name":"¿Qué pasa si ANVAR TECH no está disponible más adelante?","acceptedAnswer":{"@type":"Answer","text":"Entregamos un manual técnico escrito para que otra persona pueda tomar el sistema, las cuentas quedan a nombre de tu empresa y el respaldo se prueba restaurándolo. La continuidad no depende de nosotros."}},{"@type":"Question","name":"¿Tenemos que cambiar nuestros sistemas?","acceptedAnswer":{"@type":"Answer","text":"No. Trabajamos sobre lo que ya usas. Si al final conviene cambiar algo, te lo justificamos con números."}},{"@type":"Question","name":"¿Cómo se paga una implementación?","acceptedAnswer":{"@type":"Answer","text":"Por etapas: un anticipo, pagos contra entregables y el saldo contra recepción. Siempre en UF y con el alcance escrito antes de empezar."}}]}]}</script>
 </head>
-<body data-servicio="Automatización de procesos" data-frase="Tengo un proceso que hoy se hace a mano y quiero automatizarlo.">
-
-<header>
-  <div class="sheet nav">
-    <a href="/" class="brand" aria-label="ANVAR IA, inicio">
-      <svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="4" fill="#101A1E"/><path d="M22 76 L50 22 L78 76" fill="none" stroke="#E9EBE4" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 56 L66 56" stroke="#F0A92A" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="22" r="5.5" fill="#F0A92A"/></svg>
-      ANVAR <em>IA</em>
+<body data-wsp-contexto="piloto">
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<header class="cab">
+  <div class="contenedor cab-in">
+    <a class="marca" href="/" aria-label="ANVAR TECH, IA &amp; Automatización: ir al inicio">
+      <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect width="100" height="100" rx="8" fill="#101A1E"/><path d="M22 76 L50 22 L78 76" fill="none" stroke="#E9EBE4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 56 L66 56" stroke="#F0A92A" stroke-width="9" stroke-linecap="round"/><circle cx="50" cy="22" r="6" fill="#F0A92A"/></svg>
+      <span class="marca-txt"><b>ANVAR TECH</b><span>IA &amp; Automatización</span></span>
     </a>
-    <nav class="nav-links" aria-label="Secciones">
-      <a href="/#casos">Casos reales</a>
-      <a href="/#calculadora">Calculadora</a>
-      <a href="/#quien">Quién soy</a>
+    <nav class="menu" id="menu" aria-label="Principal">
+      <ul><li><a href="/#soluciones">Soluciones</a></li><li><a href="/casos">Casos</a></li><li><a href="/inteligencia-datos">Datos</a></li><li><a href="/#contratar">Precios</a></li><li><a href="/#nosotros">Nosotros</a></li></ul>
+      <a class="menu-sec" href="/asesoria-ia-personal">Asesoría personal</a>
+      <a class="btn btn--primario menu-cta" href="#evaluar" data-track="hero_cta_click" data-track-label="menu"><span>Evaluar mi proceso</span></a>
     </nav>
-    <a class="btn btn-amber btn-compacto" data-wsp="nav" href="#contacto">Conversemos</a>
+    <div class="cab-acciones">
+      <a class="btn btn--primario btn--cab" href="#evaluar" data-track="hero_cta_click" data-track-label="cabecera"><span>Evaluar mi proceso</span></a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="sr">Abrir menú</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
   </div>
 </header>
+<main id="contenido">
 
-<main>
-<div class="sheet">
-  <nav class="migas" aria-label="Migas de pan">
-    <a href="/">ANVAR IA</a> <span>/</span> <b>Automatización de procesos con IA</b>
-  </nav>
+<section class="hero hero--servicio" aria-labelledby="hero-tit">
+  <div class="contenedor">
+    <nav class="migas" aria-label="Ruta"><a href="/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Piloto e implementación</span></nav>
+    <div class="hero-servicio">
+      <p class="sobretitulo">Piloto e implementación</p>
+      <h1 id="hero-tit">Automatización de procesos en etapas, medida antes y después</h1>
+      <p class="lead">Partimos por un piloto de un proceso, lo usa tu equipo y lo medimos con el mismo método del inicio. <strong>Solo si generó valor</strong> implementamos el resto. El código, las cuentas y la documentación quedan en tu empresa.</p>
+      <div class="hero-cta">
+        <a class="btn btn--primario btn--grande" href="#evaluar" data-track="hero_cta_click" data-track-label="piloto"><span>Evaluar mi proceso</span></a>
+        <a class="btn btn--secundario btn--grande" href="/casos" data-track="case_study_click" data-track-label="hero-piloto"><span>Ver casos reales</span></a>
+      </div>
+      <dl class="datos-servicio"><div><dt>Piloto</dt><dd>desde UF 40 ≈ $1.600.000 + IVA</dd></div><div><dt>Duración</dt><dd>3 a 4 semanas</dd></div><div><dt>Implementación</dt><dd>desde UF 60</dd></div><div><dt>Código</dt><dd>Queda en tu empresa</dd></div></dl>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="que-tit">
+  <div class="contenedor">
+    <div class="enc">
+  <p class="enc-codigo">Qué se automatiza</p>
+  <h2 id="que-tit">Procesos que se repiten con la misma forma</h2>
+  <p class="enc-bajada">Si cambian los datos pero no la estructura, se puede automatizar. Si cambia todo cada vez, no, y te lo decimos antes de cobrar.</p>
 </div>
-
-<section class="sv-hero">
-  <div class="sheet">
-    <div class="in">
-      <span class="eyebrow"><i></i> Servicios E-02 y E-03 · Empresas</span>
-      <h1>Automatización de procesos con IA, medida antes y después</h1>
-      <p class="lead">Ocho formularios llenados a mano pasaron de 45 minutos a 4. Una boleta de diez productos, de doce minutos a veinte segundos. <strong>Esos números son de sistemas míos que están andando</strong>, no de una presentación. Partimos por un piloto de un proceso, con el resultado medido, y tú decides si seguimos.</p>
-      <div class="cta">
-        <a class="btn btn-amber" data-wsp="hero" href="#contacto">Conversar 30 minutos, sin costo</a>
-        <a class="btn btn-ghost" href="/#casos">Ver los casos reales</a>
-      </div>
-      <div class="ficha">
-        <div class="ac"><b>Piloto</b><span>desde UF 40</span></div>
-        <div><b>Duración</b><span>3 a 4 semanas</span></div>
-        <div><b>Implementación</b><span>desde UF 60</span></div>
-        <div class="ac"><b>Código</b><span>queda contigo</span></div>
-      </div>
+    <div class="si-no">
+      <div class="si-no-col si-no-col--si"><h3>Buenos candidatos</h3><ul class="lista"><li>Documentos y formularios que se llenan con los mismos datos</li><li>Datos que se digitan desde boletas, facturas o guías</li><li>Informes que se arman copiando y pegando</li><li>Cotizaciones, registro de ventas y respuestas frecuentes</li><li>Planos y documentos técnicos con variantes</li></ul></div>
+      <div class="si-no-col"><h3>Malos candidatos</h3><ul class="lista lista--no"><li>Procesos que nadie ha escrito y cada persona hace distinto</li><li>Datos en papel o repartidos sin orden</li><li>Tareas que ocurren dos veces al año</li><li>Decisiones con responsabilidad legal sin revisión humana</li></ul></div>
     </div>
   </div>
 </section>
 
-<section>
-  <div class="sheet">
-    <div class="shead">
-      <div class="code">§ 01 / QUÉ SE AUTOMATIZA</div>
-      <div class="txt">
-        <h2>Procesos que se repiten con la misma forma</h2>
-        <p>La regla es simple: si cambian los datos pero no la estructura, se puede automatizar. Si cambia todo cada vez, no — y te lo voy a decir antes de cobrarte.</p>
-      </div>
-    </div>
-    <div class="quien">
-      <div class="si">
-        <span class="et">Buenos candidatos</span>
-        <h3>Lo que sí rinde</h3>
-        <ul>
-          <li>Llenar formularios o documentos oficiales con los mismos datos repetidos</li>
-          <li>Digitar productos desde boletas, facturas o guías</li>
-          <li>Informes recurrentes que hoy se arman copiando y pegando</li>
-          <li>Cotizar, coordinar y cobrar un servicio</li>
-          <li>Responder las mismas consultas una y otra vez</li>
-          <li>Dibujos y planos técnicos con variantes</li>
-        </ul>
-      </div>
-      <div class="no">
-        <span class="et">Malos candidatos</span>
-        <h3>Lo que no</h3>
-        <ul>
-          <li>Procesos que nadie ha escrito y que cada persona hace distinto</li>
-          <li>Datos sucios o repartidos en archivos sueltos sin orden</li>
-          <li>Trabajo que ocurre dos veces al año</li>
-          <li>Decisiones que requieren criterio y responsabilidad legal sin revisión humana</li>
-        </ul>
-      </div>
-    </div>
+<section class="seccion seccion--panel" aria-labelledby="piloto-tit">
+  <div class="contenedor">
+    <div class="enc">
+  <p class="enc-codigo">El piloto</p>
+  <h2 id="piloto-tit">Tres a cuatro semanas, y en cada una puedes parar</h2>
+  <p class="enc-bajada">El piloto existe para que decidas con datos. Nunca te pedimos firmar un proyecto largo antes de ver un resultado.</p>
+</div>
+    <ol class="etapas">
+      <li class="etapa"><span class="etapa-cuando">Semana 1</span><div><h3>Diseño y acuerdo de medición</h3><p>Cómo va a funcionar, quiénes lo usan y qué indicador se mide, con su valor actual y el método. Se firma antes de construir.</p></div></li><li class="etapa"><span class="etapa-cuando">Semanas 2 y 3</span><div><h3>Construcción y pruebas reales</h3><p>A mitad de camino hay una demostración, aunque esté a medias. Después lo prueban tus personas con casos reales, sin que nosotros toquemos el teclado.</p></div></li><li class="etapa"><span class="etapa-cuando">Semana 4</span><div><h3>Capacitación, medición y cierre</h3><p>Capacitamos a quienes lo operan, medimos el después con el mismo método del antes y firmamos un acta con el resultado.</p></div></li><li class="etapa"><span class="etapa-cuando">Después</span><div><h3>Decides con datos</h3><p>Extender a otro proceso, implementar completo, soporte mensual o nada por ahora. Todas son respuestas válidas.</p></div></li>
+    </ol>
   </div>
 </section>
 
-<section>
-  <div class="sheet">
-    <div class="shead">
-      <div class="code">§ 02 / EL PILOTO</div>
-      <div class="txt">
-        <h2>Tres a cuatro semanas, y en cada una puedes parar</h2>
-        <p>Nunca te voy a pedir que firmes un proyecto largo antes de ver un resultado. El piloto existe justamente para que decidas con datos y no con entusiasmo.</p>
-      </div>
-    </div>
-    <div class="fases">
-      <div class="rv"><span class="cu">Semana 1</span><div><h3>Diseño y acuerdo de medición</h3><p>Cómo va a funcionar, quiénes lo van a usar y — lo más importante — qué indicador se mide, cuál es el valor de hoy y con qué método. Firmado antes de construir, para que al final no haya dos versiones del resultado.</p></div></div>
-      <div class="rv"><span class="cu">Semanas 2-3</span><div><h3>Construcción y pruebas con usuarios reales</h3><p>A mitad de camino hay una demo, aunque esté a medias: es lo que evita construir tres semanas en la dirección equivocada. Después lo prueban tus personas, con casos reales, sin que yo toque el teclado.</p></div></div>
-      <div class="rv"><span class="cu">Semana 4</span><div><h3>Capacitación, medición y cierre</h3><p>Capacito a quienes lo operan, mido el después con el mismo método del antes, y firmamos un acta con el resultado real. Si no mejoró lo prometido, queda escrito igual.</p></div></div>
-      <div class="rv"><span class="cu">Después</span><div><h3>Decides con datos</h3><p>Extender a otro proceso, la implementación completa, acompañamiento mensual, o nada por ahora. Las cuatro respuestas son válidas y la última también te la voy a recomendar cuando corresponda.</p></div></div>
-    </div>
+<section class="seccion" aria-labelledby="impl-tit">
+  <div class="contenedor">
+    <div class="enc">
+  <p class="enc-codigo">Implementación y soporte</p>
+  <h2 id="impl-tit">Cuando el piloto funcionó</h2>
+  
+</div>
+    <ol class="etapas">
+      <li class="etapa"><span class="etapa-cuando">Implementación</span><div><h3>La solución completa</h3><p>Integración con tus sistemas, manual de uso, manual técnico y respaldo probado restaurándolo. Se cotiza <strong>después</strong> de un diagnóstico o un piloto, nunca a ciegas.</p></div></li><li class="etapa"><span class="etapa-cuando">Soporte</span><div><h3>Que siga funcionando</h3><p>Monitoreo, horas de mejora definidas al contratar, plazo de respuesta por escrito y un reporte mensual. Sin permanencia mínima.</p></div></li>
+    </ol>
   </div>
 </section>
 
-<section>
-  <div class="sheet">
-    <div class="shead">
-      <div class="code">§ 03 / CÓMO TRABAJO</div>
-      <div class="txt">
-        <h2>Las cuatro reglas con las que construyo</h2>
-        <p>Son las que hacen que el sistema siga funcionando cuando yo ya no estoy.</p>
+<section class="seccion" aria-labelledby="valor-tit">
+  <div class="contenedor">
+    <div class="enc">
+  <p class="enc-codigo">Valor</p>
+  <h2 id="valor-tit">Cuánto cuesta</h2>
+  
+</div>
+    <div class="precios-servicio">
+      <article class="precio-tarjeta" id="precio-piloto">
+          <div class="precio-tarjeta-cab"><h3>Piloto en producción</h3><p class="precio-plazo">3 a 4 semanas</p><p class="precio precio--grande"><span class="precio-v">desde UF 40</span><span class="precio-d">≈ $1.600.000 + IVA</span><span class="precio-n">UF 28 si ya hiciste el diagnóstico</span></p></div>
+          <p>Un proceso funcionando de verdad, usado por tu equipo y medido antes y después.</p>
+          <ul class="lista lista--check"><li>Incluye el diagnóstico del proceso</li><li>Un proceso automatizado y en uso</li><li>Capacitación a quienes lo operan</li><li>Acta con la medición antes y después</li></ul>
+        </article><article class="precio-tarjeta" id="implementacion">
+          <div class="precio-tarjeta-cab"><h3>Implementación</h3><p class="precio-plazo">Según alcance</p><p class="precio precio--grande"><span class="precio-v">desde UF 60</span><span class="precio-d">≈ $2.400.000 + IVA</span></p></div>
+          <p>La solución completa, integrada con tus sistemas, documentada y traspasada a tu equipo.</p>
+          <ul class="lista lista--check"><li>Desarrollo e integración con lo que ya usas</li><li>Manual de uso, manual técnico y respaldos</li><li>Código y cuentas a nombre de tu empresa</li><li>Se cotiza después de un diagnóstico o piloto</li></ul>
+        </article><article class="precio-tarjeta" id="soporte">
+          <div class="precio-tarjeta-cab"><h3>Soporte y evolución</h3><p class="precio-plazo">Mensual, sin permanencia</p><p class="precio precio--grande"><span class="precio-v">UF 8 / mes</span><span class="precio-d">≈ $320.000 + IVA</span></p></div>
+          <p>Monitoreo, ajustes y nuevas automatizaciones sobre lo que ya está funcionando.</p>
+          <ul class="lista lista--check"><li>Monitoreo de lo entregado</li><li>Horas de mejora definidas al contratar</li><li>Soporte con plazo de respuesta por escrito</li><li>Reporte mensual de una página</li></ul>
+        </article>
+    </div>
+    <p class="nota">Valores netos más IVA, cotizados en UF. El piloto incluye el diagnóstico: si ya lo hiciste, son <strong>UF 28 adicionales</strong>. Las implementaciones se pagan por etapas contra entregables.</p>
+  </div>
+</section>
+<section class="seccion seccion--panel" aria-labelledby="rel-tit">
+  <div class="contenedor">
+    <div class="enc">
+  <p class="enc-codigo">Evidencia</p>
+  <h2 id="rel-tit">Casos relacionados</h2>
+  
+</div>
+    <div class="casos casos--3"><article class="caso" aria-labelledby="caso-documentos-legales">
+  
+  <header class="caso-cab">
+    <p class="caso-meta"><span class="caso-cod">C-01</span><span class="etiqueta etiqueta--propio">Proyecto propio</span><span class="caso-estado">En operación diaria</span></p>
+    <p class="caso-cat">Automatización documental</p>
+    <h3 id="caso-documentos-legales">Ocho documentos oficiales desde un solo ingreso de datos</h3>
+  </header>
+  <p class="caso-problema">Cada procedimiento obligaba a llenar a mano ocho formatos oficiales en Word, repitiendo los mismos datos en cada uno y arriesgando errores de transcripción.</p>
+  <div class="ad-bloques">
+    <div class="ad-bloque"><span class="label">Antes</span><p>45 minutos por procedimiento, llenando ocho documentos a mano.</p></div>
+    <div class="ad-bloque ad-bloque--despues"><span class="label">Después</span><p>4 minutos: los datos se ingresan una vez y se generan los ocho documentos en Word y PDF, más un archivo único listo para imprimir.</p></div>
+  </div>
+  <p class="caso-resultado"><span class="caso-resultado-v">−91%</span><span>de tiempo por procedimiento</span></p>
+  <a class="enlace-flecha" href="/casos#documentos-legales" data-track="case_study_click" data-track-label="documentos-legales"><span>Ver caso completo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="caso" aria-labelledby="caso-venta-en-linea">
+  
+  <header class="caso-cab">
+    <p class="caso-meta"><span class="caso-cod">C-02</span><span class="etiqueta etiqueta--propio">Proyecto propio</span><span class="caso-estado">En producción</span></p>
+    <p class="caso-cat">Proceso comercial</p>
+    <h3 id="caso-venta-en-linea">Un servicio que cotiza, cobra y registra sin intervención manual</h3>
+  </header>
+  <p class="caso-problema">Explicar el servicio, cotizar, cobrar y registrar cada venta se hacía a mano, por WhatsApp y en una planilla que no siempre se actualizaba.</p>
+  <div class="ad-bloques">
+    <div class="ad-bloque"><span class="label">Antes</span><p>Cotización por WhatsApp, cobro por transferencia y registro manual en planilla.</p></div>
+    <div class="ad-bloque ad-bloque--despues"><span class="label">Después</span><p>El cliente describe su problema, un recomendador le sugiere el servicio, paga en línea y recibe su comprobante. La venta queda registrada sola.</p></div>
+  </div>
+  <p class="caso-resultado"><span class="caso-resultado-v">24/7</span><span>cotización, cobro y registro funcionando</span></p>
+  <a class="enlace-flecha" href="/casos#venta-en-linea" data-track="case_study_click" data-track-label="venta-en-linea"><span>Ver caso completo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="caso" aria-labelledby="caso-planos-autocad">
+  
+  <header class="caso-cab">
+    <p class="caso-meta"><span class="caso-cod">C-03</span><span class="etiqueta etiqueta--confidencial">Cliente confidencial</span><span class="caso-estado">Entregado</span></p>
+    <p class="caso-cat">Ingeniería y AutoCAD</p>
+    <h3 id="caso-planos-autocad">Un plano de planta iterado por instrucciones, sobre el archivo real</h3>
+  </header>
+  <p class="caso-problema">Cada cambio de criterio obligaba a redibujar, volver a acotar y rehacer el cuadro de equipos a mano.</p>
+  <div class="ad-bloques">
+    <div class="ad-bloque"><span class="label">Antes</span><p>Cada revisión del plano implicaba redibujar, reacotar y actualizar el cuadro de equipos.</p></div>
+    <div class="ad-bloque ad-bloque--despues"><span class="label">Después</span><p>Los cambios se piden en español y se aplican directamente sobre el archivo .dwg; el cuadro de equipos se exporta a Excel.</p></div>
+  </div>
+  <p class="caso-resultado"><span class="caso-resultado-v">8</span><span>versiones del plano en 5 días</span></p>
+  <a class="enlace-flecha" href="/casos#planos-autocad" data-track="case_study_click" data-track-label="planos-autocad"><span>Ver caso completo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article></div>
+  </div>
+</section>
+<section class="seccion" id="preguntas" aria-labelledby="preguntas-tit">
+  <div class="contenedor contenedor--estrecho">
+    <div class="enc">
+  <p class="enc-codigo">Preguntas frecuentes</p>
+  <h2 id="preguntas-tit">Preguntas sobre piloto e implementación</h2>
+  
+</div>
+    <div class="faq">
+      <details class="faq-item" open><summary>¿Y si la IA se equivoca?</summary><div class="faq-r"><p>Se equivoca, y por eso todo lo que construimos tiene revisión humana antes de que algo tenga efecto. En el caso C-01, cuando la lectura de un precio es dudosa, la fila queda marcada para revisión y no se puede generar el documento sin revisarla.</p></div></details><details class="faq-item"><summary>¿Esto va a dejar a alguien sin trabajo?</summary><div class="faq-r"><p>Lo que automatizamos es la parte mecánica: digitar, copiar, repetir. La revisión, el criterio y la decisión siguen siendo de las personas. Un piloto planteado como reducción de personal suele fracasar, porque el equipo no lo adopta.</p></div></details><details class="faq-item"><summary>¿Quién se queda con el código?</summary><div class="faq-r"><p>Tu empresa. Lo desarrollado a medida queda en tu poder una vez pagado y así queda en el contrato. Cuando corresponde, todo corre en cuentas de tu empresa y no en las nuestras.</p></div></details><details class="faq-item"><summary>¿Qué pasa si ANVAR TECH no está disponible más adelante?</summary><div class="faq-r"><p>Entregamos un manual técnico escrito para que otra persona pueda tomar el sistema, las cuentas quedan a nombre de tu empresa y el respaldo se prueba restaurándolo. La continuidad no depende de nosotros.</p></div></details><details class="faq-item"><summary>¿Tenemos que cambiar nuestros sistemas?</summary><div class="faq-r"><p>No. Trabajamos sobre lo que ya usas. Si al final conviene cambiar algo, te lo justificamos con números.</p></div></details><details class="faq-item"><summary>¿Cómo se paga una implementación?</summary><div class="faq-r"><p>Por etapas: un anticipo, pagos contra entregables y el saldo contra recepción. Siempre en UF y con el alcance escrito antes de empezar.</p></div></details>
+    </div>
+  </div>
+</section>
+<section class="seccion" aria-labelledby="otros-tit">
+  <div class="contenedor">
+    <div class="enc">
+  <p class="enc-codigo">Otras formas de empezar</p>
+  <h2 id="otros-tit">Otros servicios para empresas</h2>
+  
+</div>
+    <ul class="otros">
+      <li><a href="/automatizacion-express" data-track="service_click" data-track-label="otros-express"><span class="otros-t">Automatización Express</span><span class="otros-d">Un proceso pequeño y bien delimitado, resuelto y funcionando en tus herramientas.</span><span class="otros-p">desde $199.900</span></a></li><li><a href="/diagnostico-ia-empresas" data-track="service_click" data-track-label="otros-diagnostico"><span class="otros-t">Diagnóstico de automatización</span><span class="otros-d">Medimos tus procesos en horas y pesos y te decimos qué automatizar primero y qué no tocar.</span><span class="otros-p">UF 12</span></a></li><li><a href="/inteligencia-datos#anvar-intelligence" data-track="service_click" data-track-label="otros-intelligence"><span class="otros-t">ANVAR Intelligence</span><span class="otros-d">Tus datos de ventas, stock y costos convertidos cada mes en un tablero, alertas y un informe ejecutivo.</span><span class="otros-p">desde UF 6 / mes</span></a></li><li><a href="/capacitacion-ia-empresas" data-track="service_click" data-track-label="otros-capacitacion"><span class="otros-t">Capacitación para equipos</span><span class="otros-d">Taller práctico en tus oficinas: cada persona sale con una tarea suya resuelta.</span><span class="otros-p">UF 14</span></a></li>
+    </ul>
+  </div>
+</section>
+<section class="seccion seccion--oscura" id="evaluar" aria-labelledby="evaluar-tit">
+  <div class="contenedor evaluar">
+    <div class="evaluar-txt">
+      <p class="lema">Que la IA haga el trabajo que hoy te come el día.</p>
+      <h2 id="evaluar-tit">Cuéntanos el proceso y te decimos si vale la pena</h2>
+      <p class="lead">Veinte minutos, sin costo. Si tu caso no da los números, te lo decimos en la misma conversación.</p>
+      <div class="evaluar-acciones">
+        <a class="btn btn--primario btn--grande" href="https://wa.me/56926333760?text=Hola%2C%20quiero%20agendar%20una%20evaluaci%C3%B3n%20de%2020%20minutos%20para%20un%20proceso%20de%20mi%20empresa.%20%C2%BFQu%C3%A9%20horarios%20tienen%3F" data-wsp="agenda" data-track="calendar_click" data-track-label="whatsapp" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg><span>Agendar evaluación de 20 min</span></a>
+        <p class="nota-clara">Coordinamos el horario por WhatsApp. Videollamada o presencial en Santiago.</p>
       </div>
+      <ul class="vias">
+        <li><a href="https://wa.me/56926333760?text=Hola%2C%20tengo%20un%20proceso%20manual%20en%20mi%20empresa%20y%20quiero%20evaluar%20un%20piloto%20de%20automatizaci%C3%B3n." data-wsp="piloto" data-track-label="evaluar" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5v-.5c0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2"/></svg><span><b>WhatsApp</b>+56 9 2633 3760</span></a></li>
+        <li><a href="mailto:contacto@anvartech.cl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg><span><b>Correo</b>contacto@anvartech.cl</span></a></li>
+      </ul>
+      <p class="nota-clara">Respondemos antes de 24 horas hábiles · Confidencialidad por escrito antes de ver tus datos.</p>
     </div>
-    <div class="entregables">
-      <div class="rv"><span class="nn">01</span><h3>Siempre hay una persona que revisa</h3><p>Campos marcados cuando el dato es dudoso, validaciones que bloquean lo incompleto, avisos cuando los números no cuadran. La IA propone, alguien firma.</p></div>
-      <div class="rv"><span class="nn">02</span><h3>Todo en cuentas de tu empresa</h3><p>Hosting, claves, repositorio. Nada a mi nombre. Si mañana me revocas el acceso, no se cae nada.</p></div>
-      <div class="rv"><span class="nn">03</span><h3>Sobre lo que ya usas</h3><p>Word, Excel, Drive, WhatsApp, tu ERP, tu AutoCAD. Cambiar de sistema es caro, lento y casi nunca es el problema real.</p></div>
-      <div class="rv"><span class="nn">04</span><h3>Lo sensible no sale de tu red</h3><p>Cuando el dato es delicado, trabajo con herramientas que corren en tus equipos y sin internet. Uno de mis sistemas lee documentos completamente offline por esa razón.</p></div>
-    </div>
+    
+    <form class="form" id="form-contacto" novalidate>
+      <h3 class="form-tit">O déjanos los datos y te escribimos</h3>
+      <div class="form-fila">
+        <div class="campo"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" type="text" autocomplete="name" required></div>
+        <div class="campo"><label for="f-empresa">Empresa <span class="opc">(opcional)</span></label><input id="f-empresa" name="empresa" type="text" autocomplete="organization"></div>
+      </div>
+      <div class="campo"><label for="f-contacto">WhatsApp o correo</label><input id="f-contacto" name="contacto" type="text" autocomplete="email" required aria-describedby="f-contacto-ayuda"><p class="ayuda" id="f-contacto-ayuda">Solo lo usamos para responderte.</p></div>
+      <div class="campo"><label for="f-tipo">Qué necesitas</label><select id="f-tipo" name="tipo"><option value="express">Automatizar un proceso puntual</option><option value="diagnostico" selected>Evaluar varios procesos</option><option value="datos">Datos, reportes o stock</option><option value="capacitacion">Capacitar a mi equipo</option><option value="otro">Otra cosa</option></select></div>
+      <div class="campo"><label for="f-mensaje">Qué proceso te está costando tiempo <span class="opc">(opcional)</span></label><textarea id="f-mensaje" name="mensaje" rows="4" placeholder="Ejemplo: cada semana armamos el mismo informe de ventas desde tres planillas."></textarea></div>
+      <div class="trampa" aria-hidden="true"><label for="f-web">No completar</label><input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off"></div>
+      <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+      <button class="btn btn--primario" type="submit" id="form-enviar"><span>Enviar</span></button>
+    </form>
   </div>
 </section>
 
-<section>
-  <div class="sheet">
-    <div class="shead">
-      <div class="code">§ 04 / VALOR</div>
-      <div class="txt"><h2>Cuánto cuesta</h2></div>
-    </div>
-    <div class="precio">
-      <div class="top">
-        <div>
-          <span class="q">Piloto en producción</span>
-          <div class="v">desde UF 40</div>
-          <span class="u">≈ $1.600.000 netos + IVA · 3 a 4 semanas</span>
-        </div>
-        <a class="btn btn-amber" data-wsp="precio" href="#contacto">Cotizar mi caso</a>
-      </div>
-      <div class="cuerpo">
-        <ul>
-          <li>Incluye el diagnóstico del proceso: si ya lo hiciste, pagas UF 28 adicionales</li>
-          <li>Un proceso completo automatizado y andando</li>
-          <li>Capacitación a quienes lo operan</li>
-          <li>Medición documentada del antes y el después</li>
-          <li>Manual de uso y plan de qué hacer si algo falla</li>
-          <li>Acta de resultado firmada</li>
-        </ul>
-      </div>
-      <div class="pie"><strong>Implementación completa desde UF 60</strong>, cotizada por alcance y siempre después de un diagnóstico o un piloto — nunca a ciegas. <strong>Acompañamiento mensual opcional: UF 8.</strong> Valores netos, en UF. Emito factura.</div>
-    </div>
-  </div>
-</section>
-
-<section id="preguntas">
-  <div class="sheet">
-    <div class="shead">
-      <div class="code">§ 05 / PREGUNTAS</div>
-      <div class="txt"><h2>Lo que todos preguntan</h2></div>
-    </div>
-    <div class="faq" id="faq">
-      <div class="fq" data-open="true">
-        <button type="button" aria-expanded="true">¿Y si la IA se equivoca?<span class="pm" aria-hidden="true">+</span></button>
-        <div class="panel"><div><p>Se equivoca, y por eso todo lo que construyo tiene revisión humana antes de que algo tenga efecto. En uno de mis sistemas, cuando la lectura de un precio es dudosa la fila queda marcada en amarillo y nadie puede generar el documento sin revisarla. La IA propone, una persona firma.</p></div></div>
-      </div>
-      <div class="fq" data-open="false">
-        <button type="button" aria-expanded="false">¿Esto va a dejar a alguien sin trabajo?<span class="pm" aria-hidden="true">+</span></button>
-        <div class="panel"><div><p>Es la pregunta que todos piensan y casi nadie hace en voz alta. Lo que automatizo es la parte mecánica: digitar, copiar, repetir. La revisión, el criterio y la decisión siguen siendo de las personas. Y si un piloto se plantea como reducción de personal, el equipo lo sabotea sin decirlo y no funciona — así que además de ser lo correcto, es lo práctico.</p></div></div>
-      </div>
-      <div class="fq" data-open="false">
-        <button type="button" aria-expanded="false">¿Quién se queda con el código?<span class="pm" aria-hidden="true">+</span></button>
-        <div class="panel"><div><p>Tú. Código, documentación y manuales quedan en tu poder y queda por escrito en el contrato. Todo corre en cuentas de la empresa, no mías. Un proveedor que hace indispensable su propio acceso está protegiendo su facturación, no a su cliente.</p></div></div>
-      </div>
-      <div class="fq" data-open="false">
-        <button type="button" aria-expanded="false">¿Y si tú te vas?<span class="pm" aria-hidden="true">+</span></button>
-        <div class="panel"><div><p>Entrego manual técnico escrito para que otra persona pueda tomar el sistema, todo en cuentas de tu empresa, y el respaldo probado restaurando de verdad — no solo configurado. Es la pregunta correcta y hay que tenerla contestada antes de que la hagas.</p></div></div>
-      </div>
-      <div class="fq" data-open="false">
-        <button type="button" aria-expanded="false">¿Tengo que cambiar mis sistemas?<span class="pm" aria-hidden="true">+</span></button>
-        <div class="panel"><div><p>No. Trabajo sobre lo que ya tienes. Si al final hay que cambiar algo, te lo voy a justificar con números y no con una recomendación genérica.</p></div></div>
-      </div>
-      <div class="fq" data-open="false">
-        <button type="button" aria-expanded="false">¿Puedo ver algo que ya hayas hecho?<span class="pm" aria-hidden="true">+</span></button>
-        <div class="panel"><div><p>Sí, y es lo primero que te voy a mostrar. Una aplicación que genera ocho documentos legales y lee boletas sin internet, un sitio que cotiza con IA y cobra en línea, planos de AutoCAD dibujados por instrucciones en español. Están todos <a href="/#casos">en la portada, con sus números</a>.</p></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="contacto">
-  <div class="sheet">
-    <div class="cierre">
-      <img class="cierre-foto" src="andres-vargas-mini.jpg" width="320" height="320"
-           alt="Andrés Vargas" loading="lazy" decoding="async">
-      <p class="cierre-quien">Te atiende Andrés Vargas, directamente</p>
-      <h2>Cuéntame el proceso y te digo si vale la pena</h2>
-      <p>Treinta minutos, sin costo. Si tu caso no da los números, te lo voy a decir en la misma llamada en vez de venderte un proyecto que no iba a rendir.</p>
-      <div class="cta">
-        <a class="btn btn-amber" data-wsp="cierre" href="#contacto">Escribir por WhatsApp</a>
-        <a class="btn btn-ghost" href="/#calculadora">Calcular mi ahorro primero</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="sheet">
-    <div class="shead">
-      <div class="code">§ 06 / OTROS</div>
-      <div class="txt"><h2>Los otros servicios</h2></div>
-    </div>
-    <div class="otros">
-      <a href="/diagnostico-ia-empresas"><span class="nn">E-01</span><h3>Diagnóstico IA</h3><p>Una semana midiendo. Qué automatizar, cuánto ahorras y qué no tocar.</p></a>
-      <a href="/capacitacion-ia-empresas"><span class="nn">E-04</span><h3>Capacitación in-company</h3><p>Taller de 4 horas donde cada persona sale con una tarea suya resuelta.</p></a>
-      <a href="/asesoria-ia-personal"><span class="nn">S-01 · S-02</span><h3>Asesoría personal</h3><p>Para una persona que quiere dejar de perder horas en su trabajo.</p></a>
-    </div>
-  </div>
-</section>
 </main>
-
-<footer>
-  <div class="sheet fgrid2">
-    <div class="legal">
-      <strong class="pie-marca">ANVAR IA</strong><br>
-      Unidad de asesoría en inteligencia artificial de ANVAR TECH SpA<br>
-      RUT 77.982.517-5 · Santiago, Chile<br>
-      &copy; <span id="year">2026</span> ANVAR TECH SpA. Todos los derechos reservados.
+<footer class="pie">
+  <div class="contenedor">
+    <div class="pie-grid">
+      <div class="pie-marca">
+        <a class="marca" href="/" aria-label="ANVAR TECH: inicio"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect width="100" height="100" rx="8" fill="#101A1E"/><path d="M22 76 L50 22 L78 76" fill="none" stroke="#E9EBE4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 56 L66 56" stroke="#F0A92A" stroke-width="9" stroke-linecap="round"/><circle cx="50" cy="22" r="6" fill="#F0A92A"/></svg><span class="marca-txt"><b>ANVAR TECH</b><span>IA &amp; Automatización</span></span></a>
+        <p>Automatización e inteligencia operacional para empresas. Medimos cada proceso antes y después.</p>
+        <dl class="pie-legal">
+          <div><dt>Razón social</dt><dd>ANVAR TECH SpA</dd></div>
+          <div><dt>RUT</dt><dd>77.982.517-5</dd></div>
+          <div><dt>Empresa</dt><dd>Chilena · emitimos factura</dd></div>
+          <div><dt>Atención</dt><dd>Presencial en la Región Metropolitana y remota en todo Chile</dd></div>
+        </dl>
+      </div>
+      <div class="pie-col"><h2 class="pie-tit">Soluciones</h2><ul><li><a href="/automatizacion-express">Automatización Express</a></li><li><a href="/diagnostico-ia-empresas">Diagnóstico</a></li><li><a href="/automatizacion-procesos-ia">Piloto e implementación</a></li><li><a href="/inteligencia-datos">Inteligencia de datos</a></li><li><a href="/capacitacion-ia-empresas">Capacitación para equipos</a></li></ul></div>
+      <div class="pie-col"><h2 class="pie-tit">Empresa</h2><ul><li><a href="/casos">Casos reales</a></li><li><a href="/#metodo">Cómo trabajamos</a></li><li><a href="/#seguridad">Seguridad y propiedad</a></li><li><a href="/#nosotros">Quiénes somos</a></li><li><a href="/#preguntas">Preguntas frecuentes</a></li></ul></div>
+      <div class="pie-col"><h2 class="pie-tit">Contacto</h2><ul><li><a href="#evaluar">Evaluar mi proceso</a></li><li><a href="https://wa.me/56926333760">WhatsApp +56 9 2633 3760</a></li><li><a href="mailto:contacto@anvartech.cl">contacto@anvartech.cl</a></li><li><a href="/asesoria-ia-personal">Asesoría personal</a></li></ul></div>
     </div>
-    <nav aria-label="Enlaces del pie">
-      <a href="/">Inicio</a>
-      <a href="/diagnostico-ia-empresas">Diagnóstico</a>
-      <a href="/automatizacion-procesos-ia">Automatización</a>
-      <a href="/capacitacion-ia-empresas">Capacitación</a>
-      <a href="/asesoria-ia-personal">Personas</a>
-    </nav>
+    <p class="pie-base">© <span data-anio>2026</span> ANVAR TECH SpA · <a href="https://anvartech.cl">anvartech.cl</a></p>
   </div>
 </footer>
-
-<a class="wsp" data-wsp="flotante" href="#contacto" aria-label="Escribir por WhatsApp">
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2"/></svg>
-  <span>Hablemos</span>
-</a>
-
+<a class="wsp-flotante" href="https://wa.me/56926333760?text=Hola%2C%20tengo%20un%20proceso%20manual%20en%20mi%20empresa%20y%20quiero%20evaluar%20un%20piloto%20de%20automatizaci%C3%B3n." data-wsp="piloto" data-track-label="flotante" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5v-.5c0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2"/></svg><span>WhatsApp</span></a>
+<script type="application/json" id="config">{"wsp":"56926333760","mensajes":{"general":"Hola, quiero evaluar si un proceso de mi empresa se puede automatizar.","agenda":"Hola, quiero agendar una evaluación de 20 minutos para un proceso de mi empresa. ¿Qué horarios tienen?","express":"Hola, quiero evaluar si uno de mis procesos puede resolverse con Automatización Express.","datos":"Hola, quiero evaluar una solución de datos para mi empresa.","intelligence":"Hola, quiero saber más de ANVAR Intelligence para mi empresa.","diagnostico":"Hola, quiero cotizar un diagnóstico de automatización para mi empresa.","piloto":"Hola, tengo un proceso manual en mi empresa y quiero evaluar un piloto de automatización.","capacitacion":"Hola, quiero cotizar una capacitación en IA para mi equipo.","personal":"Hola, quiero agendar una sesión de asesoría personal en IA.","caso":"Hola, vi sus casos y quiero evaluar si algo parecido sirve para mi empresa."},"agenda":"","uf":40000,"semanas":44,"precios":{"express":199900,"piloto":1600000},"diagnostico":{"categorias":[{"id":"documental","opcion":"Documentos, informes y formularios","solucion":"Automatización documental","frase":"documentos y formularios"},{"id":"comercial","opcion":"Cotizaciones, ventas y atención","solucion":"Automatización comercial","frase":"cotizaciones y ventas"},{"id":"datos","opcion":"Ventas, stock, costos y reportes","solucion":"Inteligencia de datos","frase":"datos y reportes"},{"id":"operacional","opcion":"Trabajo manual entre planillas y sistemas","solucion":"Automatización operacional","frase":"trabajo manual entre sistemas"}],"preguntas":[{"t":"¿Cuánto de la semana se va en tareas que se repiten casi igual?","eje":"potencial","o":["Casi nada, cada día es distinto","Entre 1 y 3 horas por persona","Entre 4 y 8 horas por persona","Más de 8 horas por persona"]},{"t":"Si mañana faltara la persona que hace ese trabajo, ¿qué pasa?","eje":"potencial","invertir":true,"o":["Está documentado y alguien sigue sin problema","Alguien lo toma, con esfuerzo","Se atrasa todo varios días","Se cae: nadie más sabe hacerlo"]},{"t":"¿Dónde vive hoy la información con la que trabajan?","eje":"base","o":["En papel o en la cabeza de alguien","Archivos sueltos en distintos computadores","Carpetas ordenadas o Drive compartido","Un sistema, ERP o base de datos"]},{"t":"¿Saben cuánto cuesta hoy ese proceso?","eje":"base","o":["No, nunca lo hemos medido","Tenemos una estimación gruesa","Sabemos cuántas horas toma","Sabemos las horas y los pesos"]},{"t":"¿Ya usan IA o automatizaciones en el trabajo?","eje":"traccion","o":["No, nunca","Preguntas sueltas, de vez en cuando","Casi todos los días, de forma individual","Ya tenemos algo automatizado funcionando"]},{"t":"¿Quién decide invertir en mejorar esto?","eje":"traccion","o":["Nadie lo ha planteado todavía","Hay que convencer a alguien arriba","Yo puedo decidir con un buen caso","Ya hay presupuesto asignado"]}],"servicios":{"express":{"id":"express","nombre":"Automatización Express","precio":"desde $199.900","url":"/automatizacion-express"},"diagnostico":{"id":"diagnostico","nombre":"Diagnóstico de automatización","precio":"UF 12","url":"/diagnostico-ia-empresas"},"piloto":{"id":"piloto","nombre":"Piloto en producción","precio":"desde UF 40","url":"/automatizacion-procesos-ia"},"capacitacion":{"id":"capacitacion","nombre":"Capacitación para equipos","precio":"UF 14","url":"/capacitacion-ia-empresas"},"intelligence":{"id":"intelligence","nombre":"ANVAR Intelligence","precio":"desde UF 6 / mes","url":"/inteligencia-datos#anvar-intelligence"}}}}</script>
 <script defer src="/_vercel/insights/script.js"></script>
-<script src="servicio.js?v=2"></script>
+<script defer src="/app.js?v=8cf4f841d6"></script>
 </body>
 </html>

@@ -4,15 +4,17 @@
 // no rompe: responde 503 y el front cae solo al respaldo por WhatsApp.
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM = process.env.CONTACTO_FROM || 'ANVAR IA <contacto@anvartech.cl>';
+const FROM = process.env.CONTACTO_FROM || 'ANVAR TECH <contacto@anvartech.cl>';
 const TO = process.env.NOTIFY_EMAIL || 'contacto@anvartech.cl';
 const SHEETS_WEBHOOK_URL = process.env.SHEETS_WEBHOOK_URL;
 
 const TIPOS = {
-  personal: 'Uso personal de IA',
-  diagnostico: 'Diagnóstico para empresa',
+  express: 'Automatizar un proceso puntual',
+  diagnostico: 'Evaluar varios procesos',
+  datos: 'Datos, reportes o stock',
+  capacitacion: 'Capacitar a su equipo',
   piloto: 'Automatizar un proceso',
-  capacitacion: 'Capacitación al equipo',
+  personal: 'Uso personal de IA',
   otro: 'Otra cosa'
 };
 
@@ -41,10 +43,11 @@ export default async function handler(req, res) {
 
   const datos = {
     nombre: limpiar(body.nombre, 120),
+    empresa: limpiar(body.empresa, 160),
     contacto: limpiar(body.contacto, 160),
     tipo: TIPOS[body.tipo] || 'Sin especificar',
     mensaje: limpiar(body.mensaje, 2000, true),
-    publico: body.publico === 'empresas' ? 'Empresas' : 'Personas',
+    origen: limpiar(body.origen, 80) || '/',
     fecha: new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })
   };
 
@@ -62,12 +65,13 @@ export default async function handler(req, res) {
     ['Nombre', datos.nombre],
     ['Contacto', datos.contacto],
     ['Necesita', datos.tipo],
-    ['Público', datos.publico],
+    ['Empresa', datos.empresa || '—'],
+    ['Página', datos.origen],
     ['Fecha', datos.fecha]
   ].map(([k, v]) => `<tr><td style="padding:6px 14px 6px 0;color:#6b7280;font:12px/1.5 monospace;white-space:nowrap">${escapar(k)}</td><td style="padding:6px 0;font:14px/1.5 system-ui">${escapar(v)}</td></tr>`).join('');
 
   const html = `<div style="font-family:system-ui,sans-serif;max-width:560px">
-    <p style="font:12px/1.5 monospace;letter-spacing:.12em;color:#8A5400;margin:0 0 6px">NUEVO CONTACTO · ANVAR IA</p>
+    <p style="font:12px/1.5 monospace;letter-spacing:.12em;color:#8A5400;margin:0 0 6px">NUEVO CONTACTO · ANVAR TECH · IA &amp; AUTOMATIZACIÓN</p>
     <h2 style="margin:0 0 18px;font-size:20px">${escapar(datos.nombre)}</h2>
     <table style="border-collapse:collapse;margin-bottom:18px">${filas}</table>
     ${datos.mensaje ? `<div style="border-left:3px solid #D98A0B;padding:4px 0 4px 14px;white-space:pre-wrap;font:14px/1.6 system-ui">${escapar(datos.mensaje)}</div>` : ''}
@@ -83,7 +87,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         from: FROM,
         to: [TO],
-        subject: `ANVAR IA · ${datos.nombre} — ${datos.tipo}`,
+        subject: `Nuevo contacto · ${datos.nombre}${datos.empresa ? ' (' + datos.empresa + ')' : ''} — ${datos.tipo}`,
         html,
         reply_to: datos.contacto.includes('@') ? datos.contacto : undefined
       })
