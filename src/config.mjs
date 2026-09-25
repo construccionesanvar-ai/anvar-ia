@@ -29,7 +29,7 @@ export const SITIO = {
 
   // Valor UF de referencia para mostrar equivalencias en pesos. Actualízalo
   // de vez en cuando: los precios se cotizan en UF y el peso es solo una guía.
-  uf: 40000,
+  uf: 41000,
 
   // Agenda de la evaluación de 20 minutos. Pega aquí el enlace público de
   // Cal.com, Calendly o Google Calendar (páginas de reserva). Si queda vacío,
