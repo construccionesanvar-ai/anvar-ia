@@ -83,7 +83,7 @@ export const SITIO = {
   fundador: {
     nombre: 'Andrés Vargas',
     cargo: 'Fundador de ANVAR TECH',
-    formacion: 'Estudiante de Ingeniería Civil Industrial · Universidad de Santiago de Chile',
+    formacion: 'Estudiante de Ingeniería de Ejecución Industrial · Universidad de Santiago de Chile',
     experiencia: 'Operaciones de retail · prevención de pérdidas',
     /** Página de perfil (autor de guías y casos). */
     perfil: '/equipo/andres-vargas',

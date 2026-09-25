@@ -179,11 +179,11 @@ test('calculadora: sin el ejemplo fijo antiguo ($1.640.000, 2,8 meses, 335%)', (
   assert.match(html, /Los resultados se actualizan automáticamente cuando cambias los datos/);
 });
 
-test('formación del fundador: Ingeniería Civil Industrial en la USACH, sin la carrera anterior como actual', () => {
-  assert.equal(SITIO.fundador.formacion, 'Estudiante de Ingeniería Civil Industrial · Universidad de Santiago de Chile');
+test('formación del fundador: Ingeniería de Ejecución Industrial en la USACH, sin otra carrera', () => {
+  assert.equal(SITIO.fundador.formacion, 'Estudiante de Ingeniería de Ejecución Industrial · Universidad de Santiago de Chile');
   for (const f of ['index', 'equipo/andres-vargas']) {
     const html = readFileSync(new URL(`../public/${f}.html`, import.meta.url), 'utf8');
-    assert.match(html, /<dt>Formación<\/dt>\s*<dd>Estudiante de Ingeniería Civil Industrial · Universidad de Santiago de Chile<\/dd>/, f);
-    assert.doesNotMatch(html, /Ejecución Industrial/, f);
+    assert.match(html, /<dt>Formación<\/dt>\s*<dd>Estudiante de Ingeniería de Ejecución Industrial · Universidad de Santiago de Chile<\/dd>/, f);
+    assert.doesNotMatch(html, /Civil Industrial/, f);
   }
 });
