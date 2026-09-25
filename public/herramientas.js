@@ -228,7 +228,7 @@
 
     // UF para pasar el piloto a pesos: la del día si llegó; si no, la de referencia (con su fecha a la vista).
     var uf = { valor: C.ufRef.valor, fecha: C.ufRef.fecha, deHoy: false };
-    var leerMonto = function (el) { var n = Number(String(el.value).replace(/[^\d]/g, '')); return Number.isFinite(n) ? n : 0; };
+    var leerMonto = function (el) { return K.leerPesos(el.value); };
     var escribirMonto = function (el) { var n = leerMonto(el); el.value = n ? M(n) : ''; };
     var inversionElegida = function () { var r = radios.filter(function (x) { return x.checked; })[0]; return r ? r.value : 'piloto'; };
     var montoInversion = function (tipo) {
@@ -327,8 +327,8 @@
       });
       var inv = q.get('inv');
       if (inv && radios.some(function (r) { return r.value === inv; })) { radios.forEach(function (r) { r.checked = r.value === inv; }); traidos = true; }
-      if (q.get('monto')) { cMonto.value = String(Math.min(1e12, Number(q.get('monto').replace(/[^\d]/g, '')) || 0)); escribirMonto(cMonto); traidos = true; }
-      if (q.get('mensual')) { cMensual.value = String(Math.min(1e11, Number(q.get('mensual').replace(/[^\d]/g, '')) || 0)); escribirMonto(cMensual); traidos = true; }
+      if (q.get('monto')) { cMonto.value = String(K.leerPesos(q.get('monto'))); escribirMonto(cMonto); traidos = true; }
+      if (q.get('mensual')) { cMensual.value = String(K.leerPesos(q.get('mensual'), 1e11)); escribirMonto(cMensual); traidos = true; }
       if (traidos) { empezo = true; marcarTuya(true); }
       var cMsg = $('#c-compartir-msg');
       cCompartir.addEventListener('click', function () {

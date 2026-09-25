@@ -269,6 +269,116 @@ await prueba('Formulario: errores accesibles, envío, y respaldo por WhatsApp si
   await ctx.close();
 });
 
+await prueba('Formularios: validación, carga, doble clic, error, reintento, red caída y honeypot', async () => {
+  const antes = erroresConsola.length;
+  const ctx = await contexto(390, 844);
+  let respuesta = 200, envios = 0, espera = 0;
+  await ctx.route('**/api/contacto', async (r) => {
+    envios++;
+    if (respuesta === -1) return r.abort('failed');
+    if (espera) await new Promise((ok) => setTimeout(ok, espera));
+    await r.fulfill({ status: respuesta, contentType: 'application/json', body: respuesta === 200 ? '{"ok":true}' : '{"error":"Falta tu nombre."}' });
+  });
+  const { p } = await pagina(ctx, '/automatizacion-express');
+  const err = async (id) => p.locator(`#f-${id}-err`).isVisible();
+  // Contacto vacío: se marca solo ese campo.
+  await p.fill('#f-nombre', 'Ana Soto');
+  await p.locator('#form-enviar').click();
+  exigir(await err('contacto') && !(await err('nombre')), 'contacto vacío mal validado');
+  // Correo y teléfono, válidos e inválidos. Con el nombre vacío la app valida
+  // ambos campos y no envía nada: así se prueba la validación real, sin envíos.
+  await p.fill('#f-nombre', '');
+  for (const [valor, valido] of [['ana@', false], ['ana@acme', false], ['ana@acme.cl', true], ['1234', false], ['+56 9 12', false], ['+56 9 1234 5678', true], ['912345678', true]]) {
+    await p.fill('#f-contacto', /** @type {string} */ (valor));
+    await p.locator('#form-enviar').click();
+    exigir((await err('contacto')) === !valido, `validación de "${valor}": ${valido ? 'rechazó uno válido' : 'aceptó uno inválido'}`);
+  }
+  exigir(envios === 0, 'se envió con el nombre vacío');
+  await p.fill('#f-nombre', 'Ana Soto');
+  // Carga + doble clic: un solo envío, botón ocupado mientras tanto.
+  espera = 700;
+  await p.fill('#f-contacto', 'ana@acme.cl');
+  await p.locator('#form-enviar').dblclick();
+  await p.locator('#form-enviar').click({ force: true }).catch(() => {});
+  exigir(await p.locator('#form-contacto[aria-busy="true"]').count() === 1, 'no quedó en estado de carga');
+  exigir(await p.locator('#form-enviar').isDisabled(), 'el botón no se desactivó durante el envío');
+  exigir(((await p.locator('#form-enviar').textContent()) || '').includes('Enviando'), 'el botón no dice "Enviando…"');
+  await p.locator('#form-msg.ok').waitFor({ timeout: 5000 });
+  exigir(envios === 1, `doble clic envió ${envios} veces`);
+  exigir(!(await p.locator('#form-enviar').isDisabled()), 'el botón quedó desactivado después del éxito');
+  // Éxito: el formulario queda limpio; enviar de nuevo sin datos no manda nada.
+  await p.locator('#form-enviar').click();
+  exigir(envios === 1 && await err('nombre'), 'reenvío accidental después del éxito');
+  // Error del servidor → alternativa por WhatsApp; se puede reintentar y funciona.
+  espera = 0; respuesta = 500;
+  await p.fill('#f-nombre', 'Ana Soto'); await p.fill('#f-contacto', 'ana@acme.cl');
+  await p.locator('#form-enviar').click();
+  await p.locator('#form-msg a', { hasText: 'Envíalo por WhatsApp' }).waitFor({ timeout: 5000 });
+  exigir(!(await p.locator('#form-enviar').isDisabled()), 'tras el error no se puede reintentar');
+  respuesta = 200;
+  await p.locator('#form-enviar').click();
+  await p.locator('#form-msg.ok').waitFor({ timeout: 5000 });
+  exigir(envios === 3, `reintento: ${envios} envíos (esperaba 3)`);
+  // Red caída (sin respuesta) → alternativa, sin quedar colgado.
+  respuesta = -1;
+  await p.fill('#f-nombre', 'Ana Soto'); await p.fill('#f-contacto', '+56 9 1234 5678');
+  await p.locator('#form-enviar').click();
+  await p.locator('#form-msg a', { hasText: 'Envíalo por WhatsApp' }).waitFor({ timeout: 5000 });
+  const ev = await eventos(p);
+  exigir(ev.filter((x) => x === 'service_lead').length === 2, 'service_lead debe contarse una vez por envío exitoso: ' + ev.join(','));
+  exigir(ev.filter((x) => x === 'form_error').length === 2, 'form_error por cada falla: ' + ev.join(','));
+  // Honeypot: fuera de la vista, del teclado y del árbol accesible; sin etiqueta visible.
+  const box = await p.locator('#f-web').boundingBox();
+  exigir(!box || box.x + box.width <= 0, 'el honeypot se ve');
+  const arbol = await p.locator('#form-contacto').ariaSnapshot();
+  exigir((arbol.match(/textbox/g) || []).length === 4, 'el árbol accesible tiene campos de más:\n' + arbol);
+  exigir(!/no complet|web/i.test(arbol), 'el honeypot se anuncia');
+  await p.locator('#f-nombre').focus();
+  for (let i = 0; i < 8; i++) {
+    await p.keyboard.press('Tab');
+    exigir(await p.evaluate(() => document.activeElement?.id) !== 'f-web', 'el honeypot se alcanza con Tab');
+  }
+  await ctx.close();
+  // El 500 y la red caída de esta prueba son simulados: sus avisos en consola no cuentan.
+  const propios = erroresConsola.splice(antes).filter((e) => !/status of 500|ERR_FAILED/.test(e));
+  erroresConsola.push(...propios);
+});
+
+await prueba('Contacto según la página: completo en comerciales, plegado en editoriales y herramientas', async () => {
+  const ctx = await contexto(1280, 900);
+  await ctx.route('**/api/contacto', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }));
+  // Editorial: WhatsApp a la vista, formulario plegado bajo "Prefiero que me contacten".
+  const { p } = await pagina(ctx, '/recursos/cuanto-cuesta-automatizar-proceso-chile');
+  const wspBtn = p.locator('#evaluar a[data-wsp]', { hasText: 'Conversar por WhatsApp' });
+  exigir(await wspBtn.isVisible(), 'sin WhatsApp visible en la página editorial');
+  exigir(!(await p.locator('#f-nombre').isVisible()), 'el formulario debería estar plegado');
+  const resumen = p.locator('#evaluar details.form-desplegable > summary');
+  exigir(((await resumen.textContent()) || '').includes('Prefiero que me contacten'), 'texto del desplegable');
+  await resumen.click();
+  exigir(await p.locator('#f-nombre').isVisible(), 'el formulario no se abrió');
+  await resumen.click(); await resumen.click();
+  await p.fill('#f-nombre', 'Ana Soto'); await p.fill('#f-contacto', 'ana@acme.cl');
+  await p.locator('#form-enviar').click();
+  await p.locator('#form-msg.ok').waitFor({ timeout: 5000 });
+  const ev = await eventos(p);
+  exigir(ev.filter((x) => x === 'form_open').length === 1 && ev.filter((x) => x === 'service_lead').length === 1, 'eventos del plegado: ' + ev.join(','));
+  // Teclado: el desplegable se abre con Enter.
+  const { p: p2 } = await pagina(ctx, '/equipo/andres-vargas');
+  await p2.locator('#evaluar details > summary').focus();
+  await p2.keyboard.press('Enter');
+  exigir(await p2.locator('#f-nombre').isVisible(), 'Enter no abre el formulario');
+  // Herramienta: CTA contextual a la vista, formulario plegado bajo "Prefiero dejar mis datos".
+  const { p: p3 } = await pagina(ctx, '/calculadora-roi-automatizacion');
+  exigir(await p3.locator('#evaluar a', { hasText: 'Coordinar evaluación por WhatsApp' }).isVisible(), 'la calculadora perdió su CTA');
+  exigir(((await p3.locator('#evaluar summary').textContent()) || '').includes('Prefiero dejar mis datos'), 'texto del desplegable en la herramienta');
+  exigir(!(await p3.locator('#f-nombre').isVisible()), 'el formulario de la calculadora debería estar plegado');
+  // Comercial: formulario a la vista sin tocar nada.
+  const { p: p4 } = await pagina(ctx, '/automatizacion-express');
+  await p4.locator('#evaluar').scrollIntoViewIfNeeded();
+  exigir(await p4.locator('#f-nombre').isVisible() && await p4.locator('#evaluar details').count() === 0, 'la página comercial debe mostrar el formulario completo');
+  await ctx.close();
+});
+
 await prueba('Formulario contra la API real (sin claves → 503 → respaldo)', async () => {
   const ctx = await contexto();
   const { p } = await pagina(ctx, '/');

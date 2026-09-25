@@ -57,6 +57,9 @@ ya existe una página para esa búsqueda. Si existe, mejórala.
   tarjetas (la experiencia completa vive solo en su URL: una intención, una página).
 - Las guías y el caso largo enlazan al perfil del autor (`/equipo/andres-vargas`).
 - El pie enlaza a servicios, soluciones y recursos gratuitos (todas las páginas).
+- Contacto al final: formulario completo en páginas comerciales; en guías, casos y perfil, WhatsApp
+  y el formulario plegado; en herramientas, su CTA contextual y el formulario plegado (README ›
+  "Contacto según el tipo de página").
 - El QA (`npm run check`) falla si una página indexable queda huérfana.
 
 ## Candidatos para contenido nuevo (solo si los datos lo justifican)

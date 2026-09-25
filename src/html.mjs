@@ -87,9 +87,16 @@ export const absoluta = (ruta) => SITIO.dominio + (ruta === '/' ? '/' : ruta);
 const BLOQUES = 'address|article|aside|blockquote|dd|details|div|dl|dt|figcaption|figure|footer|form|fieldset|h[1-6]|header|legend|li|main|nav|ol|p|section|summary|table|tbody|thead|tfoot|tr|td|th|ul';
 const CIERRE_BLOQUE = new RegExp(`(</(?:${BLOQUES})>)(?=<)`, 'g');
 const ANTES_DE_BLOQUE = new RegExp(`>(?=<(?:${BLOQUES})[\\s>])`, 'g');
+// Elementos en línea que, pegados a otro elemento o a una palabra, juntan el texto
+// al extraerlo ("C-01Proyecto propio", "Correocontacto@…"). Entre hermanos de un
+// contenedor flex o grid el espacio no se dibuja; en texto corrido, separa palabras.
+const EN_LINEA = 'a|abbr|b|bdi|cite|code|data|em|i|kbd|label|mark|q|s|small|span|strong|sub|sup|time|u';
+const ENTRE_EN_LINEA = new RegExp(`(</(?:${EN_LINEA})>)(?=<(?:${EN_LINEA})[\\s>])`, 'g');
+const CIERRE_Y_PALABRA = /(<\/(?:b|em|small|span|strong)>)(?=[\p{L}\p{N}$¿¡(+−])/gu;
 export function separarBloques(html) {
   // No se toca el interior de <script>, <pre> ni <textarea>: ahí el texto es literal.
   return html.split(/(<(?:script|pre|textarea)\b[\s\S]*?<\/(?:script|pre|textarea)>)/).map((parte, i) => (i % 2
     ? parte
-    : parte.replace(CIERRE_BLOQUE, '$1\n').replace(ANTES_DE_BLOQUE, '>\n'))).join('');
+    : parte.replace(CIERRE_BLOQUE, '$1\n').replace(ANTES_DE_BLOQUE, '>\n')
+      .replace(ENTRE_EN_LINEA, '$1 ').replace(CIERRE_Y_PALABRA, '$1 '))).join('');
 }

@@ -9,6 +9,16 @@ permite saber qué funcionó.
 
 La pregunta es una sola: **qué contenido trae tráfico y qué tráfico se convierte en negocio.**
 
+### Congelamiento (hasta el ~2026-10-16)
+
+Producción solo se toca por: **bug, dato incorrecto, problema legal, problema de seguridad o
+error técnico grave.** Nada de rediseños, páginas nuevas ni cambios de URL, title, H1 o canonical
+"por intuición". Si algo parece mejorable, anótalo aquí abajo con la fecha y espera a los datos.
+
+Para revisar el estado técnico sin tocar nada: `npm run seo-check` (robots, sitemap, canonicals,
+meta robots, H1 y JSON-LD de las 25 URL contra producción). Corre solo después de cada deploy;
+el reporte queda en GitHub → Actions → "Verificación post-deploy" → resumen.
+
 Fuentes: Google Search Console (`docs/SEARCH_CONSOLE_SETUP.md`), Bing Webmaster Tools
 (`docs/BING_WEBMASTER_SETUP.md`) y Vercel Analytics (eventos en README › Analítica).
 
@@ -36,6 +46,9 @@ Fuentes: Google Search Console (`docs/SEARCH_CONSOLE_SETUP.md`), Bing Webmaster 
       por `herramienta`; `diagnostic_view` → `diagnostic_start` → `diagnostic_complete`;
       `template_download`.
 - [ ] **Portada**: `home_roi_tool_click` vs. `home_diagnostic_tool_click`.
+- [ ] **Formulario plegado** (guías, casos, perfil y herramientas): `form_open` vs. `service_lead`
+      por `pagina`. Si muchos lo abren y pocos lo envían, el problema es el formulario; si casi
+      nadie lo abre pero los `*_lead` de WhatsApp siguen llegando, el plegado cumple su función.
 
 ## Día 30 (≈ 2026-10-25)
 

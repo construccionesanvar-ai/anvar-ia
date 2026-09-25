@@ -57,7 +57,7 @@ export default {
     ${prosa([
       { id: 'enfoque', titulo: 'Enfoque', html: `
     <p>Parte desde las operaciones, no desde la tecnología: primero entender el proceso y dónde se pierde el tiempo; después decidir si corresponde automatización, software, análisis de datos o IA. A veces la respuesta correcta es una planilla bien hecha.</p>
-    <p>Cada proyecto se mide antes y después. Si no se puede mostrar la hora que se recuperó, el trabajo no está terminado.</p>` },
+    <p>Cada proyecto se mide antes y después, con el indicador que corresponde a ese proceso: tiempo, errores, trazabilidad o rapidez de respuesta. Si no podemos mostrarte qué mejoró y medirlo, el trabajo no está terminado.</p>` },
       { id: 'areas', titulo: 'Áreas de trabajo', html: `<ul class="chips">${AREAS.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` },
     ], { indice: false })}
   </div>
@@ -78,6 +78,6 @@ export default {
     ], { indice: false })}
   </div>
 </section>
-${evaluar({ contexto: 'general', tipo: 'express', titulo: 'Conversemos tu proceso', bajada: 'Veinte minutos, sin costo. Te decimos si conviene automatizarlo, cómo lo haríamos y cuánto costaría.' })}
+${evaluar({ contexto: 'general', tipo: 'express', modo: 'compacto', titulo: '¿Tienes un proceso en mente?' })}
 `,
 };

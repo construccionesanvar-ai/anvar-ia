@@ -106,6 +106,15 @@ for (const f of paginas) {
     if (/\d(?:min|mes|h)\b|\b\d+(?:x|px)\b|v=|\d{3,}[a-f]/.test(trozo)) continue;
     err(f, `texto pegado en el DOM: "${trozo}" (agrega un espacio real entre los elementos)`);
   }
+  // Palabras de dos elementos en línea sin espacio entre ellos ("C-01Proyecto propio",
+  // "Correocontacto@…"): separarBloques() los separa; esto avisa si algo se escapa.
+  const cuerpoSinCodigo = sinScripts(h.replace(/<head>[\s\S]*?<\/head>/, '').replace(/<(svg|style)\b[\s\S]*?<\/\1>/g, ''));
+  for (const m of cuerpoSinCodigo.matchAll(/([\p{L}\p{N}%)])((?:<\/?(?:a|abbr|b|cite|code|em|i|label|mark|small|span|strong|time)\b[^>]*>)+)([\p{L}\p{N}$(¿¡])/gu)) {
+    const i = m.index ?? 0;
+    const trozo = (cuerpoSinCodigo.slice(Math.max(0, i - 60), i + 1) + '|' + cuerpoSinCodigo.slice(i + 1 + m[2].length, i + 40 + m[2].length))
+      .replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').slice(-50);
+    err(f, `palabras pegadas entre elementos: "${trozo}" (falta un espacio en el DOM)`);
+  }
 
   // Jerarquía de títulos: nunca saltar un nivel hacia abajo (h1 → h3).
   let previo = 0;

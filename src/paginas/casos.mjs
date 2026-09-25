@@ -41,6 +41,6 @@ export default {
   </div>
 </section>
 ${testimonios()}
-${evaluar({ contexto: 'caso', titulo: '¿Un proceso parecido en tu empresa?', bajada: 'Cuéntanos cuál es y te decimos en 20 minutos si se puede automatizar, cómo y cuánto costaría. Sin costo.' })}
+${evaluar({ contexto: 'caso', modo: 'compacto' })}
 `,
 };

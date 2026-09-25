@@ -16,7 +16,8 @@
      Contenido:  hero_cta_click · content_cta_click · case_cta_click · service_click
                  template_download · email_click
      Leads:      whatsapp_lead · express_lead · data_lead · diagnostic_lead
-                 case_lead · service_lead (formulario) · form_start · form_error
+                 case_lead · service_lead (envío del formulario)
+     Formulario: form_open (abrió el formulario plegado) · form_start · form_error
      Herramientas (herramientas.js): calculator_view · calculator_start ·
                  calculator_complete · diagnostic_view · diagnostic_start ·
                  diagnostic_complete
@@ -236,6 +237,9 @@
     var btnTxt = btn ? $('span', btn) : null;
     if (form.elements.t) form.elements.t.value = String(Date.now());
     var iniciar = function () { medir('form_start', {}, true); };
+    // Formulario plegado (páginas editoriales y herramientas): cuántos lo abren.
+    var plegado = form.closest('details');
+    if (plegado) plegado.addEventListener('toggle', function () { if (plegado.open) medir('form_open', {}, true); });
     form.addEventListener('focusin', iniciar);
     form.addEventListener('input', iniciar);
 
@@ -247,17 +251,23 @@
       if (err) err.hidden = !malo;
       return malo;
     };
-    ['nombre', 'contacto'].forEach(function (n) {
-      form.elements[n].addEventListener('blur', function () {
-        if (form.elements[n].getAttribute('aria-invalid') === 'true') validar();
-      });
-    });
     var campo = function (n) { return (form.elements[n] && form.elements[n].value || '').trim(); };
+    var malo = {
+      nombre: function () { return campo('nombre').length < 2; },
+      contacto: function () { var c = campo('contacto'); return !(esCorreo(c) || esFono(c)); }
+    };
+    // Un campo ya marcado con error se revisa mientras se escribe: el aviso se va al
+    // corregirlo, antes del clic en "Enviar". Si se fuera recién al salir del campo,
+    // el botón se movería bajo el cursor y el clic se perdería.
+    ['nombre', 'contacto'].forEach(function (n) {
+      var revisar = function () { if (form.elements[n].getAttribute('aria-invalid') === 'true') marcar(n, malo[n]()); };
+      form.elements[n].addEventListener('input', revisar);
+      form.elements[n].addEventListener('blur', revisar);
+    });
     var validar = function () {
       var malos = [];
-      if (marcar('nombre', campo('nombre').length < 2)) malos.push(form.elements.nombre);
-      var c = campo('contacto');
-      if (marcar('contacto', !(esCorreo(c) || esFono(c)))) malos.push(form.elements.contacto);
+      if (marcar('nombre', malo.nombre())) malos.push(form.elements.nombre);
+      if (marcar('contacto', malo.contacto())) malos.push(form.elements.contacto);
       return malos;
     };
     var ocupado = function (si) {
@@ -268,6 +278,8 @@
 
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
+      // Un envío a la vez: ni el doble clic ni Enter repetido mandan dos veces.
+      if (form.getAttribute('aria-busy') === 'true') return;
       var malos = validar();
       if (malos.length) {
         msg.className = 'form-msg err';

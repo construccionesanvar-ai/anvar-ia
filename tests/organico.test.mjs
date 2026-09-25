@@ -12,6 +12,7 @@ import { FUENTES } from '../src/datos/whatsapp.mjs';
 import { rutaOg } from '../src/html.mjs';
 import { PAGINAS } from '../scripts/build.mjs';
 import { urlDeArchivo } from '../scripts/indexnow.mjs';
+import { huellaContenido } from '../scripts/huella.mjs';
 import { urlUtm, limpiarUtm } from '../scripts/utm.mjs';
 
 const RUTAS = new Set(PAGINAS.map((p) => p.ruta));
@@ -118,5 +119,56 @@ test('feed y llms.txt: generados, con los recursos y sin enlaces a páginas inex
   for (const m of llms.matchAll(/\]\((https:\/\/ia\.anvartech\.cl[^)]*)\)/g)) {
     const ruta = m[1].replace(SITIO.dominio, '') || '/';
     if (!/\.(xml|txt|xlsx)$/.test(ruta)) assert.ok(RUTAS.has(ruta), `llms.txt enlaza ${ruta}, que no existe`);
+  }
+});
+
+test('contacto según la página: formulario completo en comerciales, plegado en editoriales y herramientas', () => {
+  const html = (/** @type {string} */ f) => readFileSync(new URL(`../public/${f}.html`, import.meta.url), 'utf8');
+  const MODOS = {
+    completo: ['index', 'automatizacion-express', 'diagnostico-ia-empresas', 'automatizacion-procesos-ia', 'inteligencia-datos',
+      'capacitacion-ia-empresas', 'automatizacion-procesos-pymes', 'automatizacion-documental', 'automatizar-excel',
+      'automatizar-cotizaciones', 'automatizacion-autocad'],
+    compacto: ['recursos', 'casos', 'casos/automatizacion-documental-retail', 'equipo/andres-vargas',
+      ...RECURSOS.filter((r) => r.ruta.startsWith('/recursos/')).map((r) => r.ruta.slice(1))],
+    herramienta: ['calculadora-roi-automatizacion', 'diagnostico-automatizacion', 'herramientas/punto-de-pedido'],
+  };
+  for (const [modo, archivos] of Object.entries(MODOS)) {
+    for (const f of archivos) {
+      const h = html(f);
+      assert.equal((h.match(/id="form-contacto"/g) || []).length, 1, `${f}: un solo formulario`);
+      const plegado = /<details class="form-desplegable">[\s\S]*id="form-contacto"[\s\S]*<\/details>/.test(h);
+      if (modo === 'completo') assert.ok(!plegado, `${f}: página comercial con el formulario plegado`);
+      else {
+        assert.ok(plegado, `${f}: el formulario debería estar plegado`);
+        const resumen = modo === 'compacto' ? 'Prefiero que me contacten' : 'Prefiero dejar mis datos';
+        assert.ok(h.includes(`<summary><span>${resumen}</span>`), `${f}: texto del desplegable`);
+        if (modo === 'compacto') assert.match(h, /data-wsp="[a-z]+" data-track-label="evaluar-compacto"/, `${f}: sin WhatsApp a la vista`);
+      }
+    }
+  }
+});
+
+test('huella de contenido: espacios, plantilla y texto para lectores no cuentan; el contenido sí', () => {
+  const pag = (/** @type {string} */ main, titulo = 'Título') => `<html><head><title>${titulo}</title><meta name="description" content="D"><link rel="canonical" href="https://x/a"></head><body><header>Cabecera</header><main>${main}</main><footer>Pie</footer></body></html>`;
+  const base = huellaContenido(pag('<p><b>C-01</b><span>Proyecto propio</span></p>'));
+  assert.equal(huellaContenido(pag('<p>\n<b>C-01</b> <span>Proyecto propio</span></p>')), base, 'espacios');
+  assert.equal(huellaContenido(pag('<p><b>C-01<span class="sr">:</span></b> <span>Proyecto propio</span></p>')), base, 'texto .sr');
+  assert.equal(huellaContenido(pag('<p><b>C-01</b><span>Proyecto propio</span></p>').replace('Cabecera', 'Otra cabecera')), base, 'cabecera');
+  assert.notEqual(huellaContenido(pag('<p><b>C-01</b><span>Cliente confidencial</span></p>')), base, 'texto de main');
+  assert.notEqual(huellaContenido(pag('<p><b>C-01</b><span>Proyecto propio</span></p>', 'Otro título')), base, 'title');
+});
+
+test('JSON-LD de cada página: se puede leer, cada entidad una vez y ningún @id colgando', () => {
+  for (const p of PAGINAS.filter((x) => !x.noindex)) {
+    const h = readFileSync(new URL(`../public/${p.archivo}`, import.meta.url), 'utf8');
+    const bloque = h.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    assert.ok(bloque, `${p.ruta}: sin JSON-LD`);
+    const nodos = [];
+    const recorrer = (/** @type {any} */ x) => { if (Array.isArray(x)) x.forEach(recorrer); else if (x && typeof x === 'object') { nodos.push(x); Object.values(x).forEach(recorrer); } };
+    recorrer(JSON.parse(bloque[1]));
+    const definidos = nodos.filter((n) => n['@id'] && n['@type']).map((n) => n['@id']);
+    assert.equal(new Set(definidos).size, definidos.length, `${p.ruta}: entidades repetidas`);
+    for (const n of nodos) if (n['@id'] && !n['@type']) assert.ok(definidos.includes(n['@id']), `${p.ruta}: @id colgando ${n['@id']}`);
+    for (const n of nodos) if (n.legalName) assert.equal(n.legalName, SITIO.empresa.razonSocial);
   }
 });

@@ -88,6 +88,6 @@ ${cabeceraArticulo({ r, migas: [['Recursos', '/recursos'], ['Plantilla de ROI', 
   </div>
 </section>
 ${relacionados(['/calculadora-roi-automatizacion', '/recursos/cuanto-cuesta-automatizar-proceso-chile', '/recursos/como-detectar-proceso-automatizable', 'express'])}
-${evaluar({ contexto: 'general', tipo: 'express' })}
+${evaluar({ contexto: 'general', tipo: 'express', modo: 'compacto', titulo: '¿Tienes un proceso en mente?' })}
 `,
 };

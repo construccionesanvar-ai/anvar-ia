@@ -116,7 +116,7 @@ export default {
 </section>
 ${preguntas(FAQ_CALC, { titulo: 'Preguntas sobre la calculadora', codigo: 'Preguntas' })}
 ${relacionados(['/recursos/plantilla-roi-automatizacion', '/recursos/cuanto-cuesta-automatizar-proceso-chile', '/diagnostico-automatizacion', 'express'])}
-${evaluar({ contexto: 'general', tipo: 'express', titulo: 'Evaluemos el proceso que calculaste', bajada: 'Veinte minutos, sin costo. Trae el número de la calculadora: con eso partimos la conversación.' })}
+${evaluar({ contexto: 'general', tipo: 'express', modo: 'herramienta', titulo: 'Evaluemos el proceso que calculaste', bajada: 'Veinte minutos, sin costo. Trae el número de la calculadora: con eso partimos la conversación.' })}
 `,
 };
 

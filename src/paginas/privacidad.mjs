@@ -20,6 +20,7 @@ export const PENDIENTES_PRIVACIDAD = [
   'Revisión por abogado frente a la Ley 19.628 y la Ley 21.719 (nueva ley de datos personales, con entrada en vigencia prevista para diciembre de 2026).',
   'Confirmar el proveedor de la casilla que recibe los formularios (variable NOTIFY_MAIL en Vercel) y nombrarlo en la sección de proveedores si corresponde.',
   'Si se activa el CRM en Google Sheets (SHEETS_WEBHOOK_URL) o una agenda externa, revisar esta política.',
+  'Si se configura CMF_API_KEY, nombrar a la CMF como fuente del valor de la UF.',
 ];
 
 const e = SITIO.empresa;
@@ -38,7 +39,7 @@ const SECCIONES = [
       <li><b>Correo electrónico.</b> Lo que nos escribas a ${esc(c.email)}.</li>
       <li><b>Autodiagnóstico y calculadoras.</b> Se calculan en tu navegador y no piden datos personales. Si usas "Copiar enlace con estos valores", los números de la calculadora quedan en el enlace que copias; no los guardamos. Si el resultado del autodiagnóstico se muestra con una lectura escrita por IA, enviamos solo los puntajes, el tipo de problema elegido y el primer paso sugerido, sin datos que te identifiquen. Si eliges "Conversar este resultado por WhatsApp", el mensaje prellenado incluye tu resultado y algunas de tus respuestas; lo ves antes de enviarlo.</li>
       <li><b>Medición de visitas.</b> Usamos Vercel Web Analytics para contar visitas y clics en botones (por ejemplo, "abrió WhatsApp desde la página de casos"). No usa cookies y no enviamos nombres, correos, teléfonos ni textos que escribas. Para saber qué contenido genera contactos, el navegador recuerda durante la visita la primera página que abriste y el canal por el que llegaste (por ejemplo, un buscador o una campaña con parámetros UTM, nunca la dirección completa de la página anterior); se guarda en el almacenamiento de sesión del navegador, se borra al cerrar la pestaña y solo acompaña a esos clics, sin identificarte.</li>
-      <li><b>Valor de la UF.</b> Para mostrar la equivalencia en pesos de los precios en UF, el navegador consulta a nuestro servidor el valor del día, que lo obtiene de la CMF o de mindicador.cl. Esa consulta no incluye datos tuyos.</li>
+      <li><b>Valor de la UF.</b> Para mostrar la equivalencia en pesos de los precios en UF, el navegador consulta a nuestro servidor el valor del día, que lo obtiene de mindicador.cl, un servicio público de indicadores económicos. Esa consulta no incluye datos tuyos.</li>
       <li><b>Registros técnicos.</b> Como todo sitio web, el servidor registra datos técnicos de cada solicitud, como la dirección IP y el navegador, para operar y proteger el sitio. También usamos la IP, solo en memoria y por poco tiempo, para frenar envíos abusivos del formulario.</li>
     </ul>`],
 

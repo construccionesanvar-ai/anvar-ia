@@ -73,11 +73,14 @@ test('evaluar: sin agenda configurada no promete "Agendar"', () => {
   assert.match(html, /name="fuente" value="home"/);
 });
 
-test('cabecera: el logo no concatena "ANVAR TECHIA"', () => {
-  const html = documento({ ruta: '/x', titulo: 't', descripcion: 'd', cuerpo: '<h1>x</h1>', fuente: 'home', hashes: { css: '1', js: '1' }, cliente: {} });
+test('cabecera y contacto: el texto extraído es natural ("ANVAR TECH · IA & Automatización", "Correo: …")', () => {
+  const cuerpo = `<h1>x</h1>${evaluar({ contexto: 'general' })}`;
+  const html = documento({ ruta: '/x', titulo: 't', descripcion: 'd', cuerpo, fuente: 'home', hashes: { css: '1', js: '1' }, cliente: {} });
   const txt = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ');
   assert.doesNotMatch(txt, /ANVAR TECHIA/);
-  assert.match(txt, /ANVAR TECH IA &amp; Automatización/);
+  assert.match(txt, /ANVAR TECH · IA &amp; Automatización/);
+  assert.match(txt, /Correo: contacto@anvartech\.cl/);
+  assert.doesNotMatch(txt, /Correocontacto/);
   assert.doesNotMatch(html, /fonts\.googleapis/);
 });
 

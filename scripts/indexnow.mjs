@@ -10,7 +10,8 @@
 //   --simular                                    muestra lo que enviaría, sin enviar
 //
 // Lo corre .github/workflows/indexnow.yml después de cada push a main que toca
-// public/. Nunca bloquea el deploy: es un paso aparte y, si falla, el sitio
+// public/. Solo cuenta una página si cambió su contenido (scripts/huella.mjs):
+// un ajuste de cabecera, pie o espacios no notifica todo el sitio. Nunca bloquea el deploy: es un paso aparte y, si falla, el sitio
 // sigue igual. La clave es pública por diseño (public/<clave>.txt); no es un
 // secreto. Para rotarla: nueva clave en src/config.mjs → npm run build.
 import { readFileSync, existsSync } from 'node:fs';
@@ -19,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 import { SITIO } from '../src/config.mjs';
+import { huellaContenido } from './huella.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(RAIZ, 'public');
@@ -40,7 +42,21 @@ export function urlDeArchivo(archivo) {
   return SITIO.dominio + ruta;
 }
 
-/** URL a notificar entre dos commits: páginas cambiadas + URL que salieron del sitemap. */
+/**
+ * ¿Cambió el contenido de la página entre el commit base y ahora? Un cambio solo
+ * de plantilla, espacios o texto para lectores de pantalla no cuenta.
+ * @param {string} base  commit
+ * @param {string} archivo  ruta en el repo (public/…)
+ */
+function contenidoCambio(base, archivo) {
+  let antes;
+  try { antes = git('show', `${base}:${archivo}`); } catch { return true; }
+  const ruta = join(RAIZ, archivo);
+  if (!existsSync(ruta)) return true;
+  return huellaContenido(antes) !== huellaContenido(readFileSync(ruta, 'utf8'));
+}
+
+/** URL a notificar entre dos commits: páginas con contenido cambiado + URL que salieron del sitemap. */
 export function urlsDesde(ref) {
   const enSitemap = new Set(locs(sitemapActual()));
   let base = ref;
@@ -51,7 +67,9 @@ export function urlsDesde(ref) {
   const cambiados = git('diff', '--name-only', base, 'HEAD', '--', 'public/').split('\n').filter(Boolean);
   let anterior;
   try { anterior = git('show', `${base}:public/sitemap.xml`); } catch { anterior = ''; }
-  const actualizadas = cambiados.map(urlDeArchivo).filter((u) => u && enSitemap.has(u));
+  const actualizadas = cambiados
+    .filter((f) => { const u = urlDeArchivo(f); return u && enSitemap.has(u) && contenidoCambio(base, f); })
+    .map(urlDeArchivo);
   const retiradas = locs(anterior).filter((u) => !enSitemap.has(u));
   return [...new Set([...actualizadas, ...retiradas])];
 }

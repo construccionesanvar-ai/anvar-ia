@@ -1,7 +1,9 @@
 # Verificación post-deploy: después de cada push a main, espera a que
 # ia.anvartech.cl sirva exactamente el HTML de ese commit y revisa, contra la
 # web pública, redirecciones, cabeceras, imágenes OG, CSS/JS, la descarga XLSX,
-# robots, sitemap, feed, llms.txt, la clave de IndexNow y el 404.
+# robots, sitemap, feed, llms.txt, la clave de IndexNow y el 404. Después,
+# scripts/seo-check.mjs revisa el SEO técnico de cada URL del sitemap y deja el
+# reporte en el resumen de la ejecución.
 # No bloquea el deploy (Vercel publica por su cuenta): si falla, avisa en
 # la pestaña Actions y por correo a quien hizo el push.
 name: Verificación post-deploy
@@ -29,3 +31,5 @@ jobs:
           node-version: 24
       - name: Verificar la web pública
         run: node scripts/smoke.mjs
+      - name: SEO técnico (robots, sitemap, canonicals, meta robots, H1, JSON-LD)
+        run: node scripts/seo-check.mjs --reporte "$RUNNER_TEMP/seo-check.md" && cat "$RUNNER_TEMP/seo-check.md" >> "$GITHUB_STEP_SUMMARY"
