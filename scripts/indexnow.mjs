@@ -6,7 +6,8 @@
 //   node scripts/indexnow.mjs --desde <commit>   URL cuyas páginas cambiaron desde ese commit
 //   node scripts/indexnow.mjs --urls /a,/b       URL puntuales (rutas o absolutas)
 //   node scripts/indexnow.mjs --todas            todo el sitemap (solo la primera vez o tras un cambio grande)
-//   node scripts/indexnow.mjs --esperar          espera a que producción sirva el sitemap de este commit
+//   node scripts/indexnow.mjs --esperar [--desde <commit>]  espera a que producción sirva este commit
+//                                                (el sitemap y las páginas que cambiaron desde <commit>)
 //   --simular                                    muestra lo que enviaría, sin enviar
 //
 // Lo corre .github/workflows/indexnow.yml después de cada push a main que toca
@@ -29,7 +30,7 @@ const MAX_URLS = 10_000;
 
 const arg = (n) => { const i = process.argv.indexOf(n); return i > -1 ? process.argv[i + 1] : null; };
 const bandera = (n) => process.argv.includes(n);
-const git = (...a) => execFileSync('git', a, { cwd: RAIZ, encoding: 'utf8' });
+const git = (...a) => execFileSync('git', a, { cwd: RAIZ, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
 
 const locs = (xml) => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 const sitemapActual = () => readFileSync(join(PUBLIC, 'sitemap.xml'), 'utf8');
@@ -74,17 +75,40 @@ export function urlsDesde(ref) {
   return [...new Set([...actualizadas, ...retiradas])];
 }
 
-async function esperarProduccion(minutos = 12) {
-  const local = sitemapActual();
+/**
+ * Archivos que prueban que producción ya sirve este commit: el sitemap y las
+ * páginas que cambiaron desde `ref` (si el sitemap no cambió, esperar solo por
+ * él terminaría antes de que Vercel publique).
+ * @param {string | null} ref
+ */
+export function archivosAEsperar(ref) {
+  const enSitemap = new Set(locs(sitemapActual()));
+  let cambiados = [];
+  if (ref) {
+    try {
+      cambiados = git('diff', '--name-only', ref, 'HEAD', '--', 'public/').split('\n')
+        .filter((f) => { const u = urlDeArchivo(f); return u && enSitemap.has(u) && existsSync(join(RAIZ, f)); });
+    } catch { /* commit desconocido: solo el sitemap */ }
+  }
+  return ['public/sitemap.xml', ...cambiados.slice(0, 5)];
+}
+
+async function esperarProduccion(ref, minutos = 12) {
+  const archivos = archivosAEsperar(ref);
+  const url = (/** @type {string} */ f) => (f === 'public/sitemap.xml' ? `${SITIO.dominio}/sitemap.xml` : /** @type {string} */ (urlDeArchivo(f)));
   const fin = Date.now() + minutos * 60_000;
   while (Date.now() < fin) {
-    try {
-      const r = await fetch(`${SITIO.dominio}/sitemap.xml`, { headers: { 'cache-control': 'no-cache' } });
-      if (r.ok && (await r.text()) === local) { console.log('Producción ya sirve el sitemap de este commit.'); return true; }
-    } catch { /* reintenta */ }
+    let listos = 0;
+    for (const f of archivos) {
+      try {
+        const r = await fetch(url(f), { headers: { 'cache-control': 'no-cache' } });
+        if (r.ok && (await r.text()) === readFileSync(join(RAIZ, f), 'utf8')) listos++;
+      } catch { /* reintenta */ }
+    }
+    if (listos === archivos.length) { console.log(`Producción ya sirve este commit (${archivos.length} archivos comparados).`); return true; }
     await new Promise((ok) => setTimeout(ok, 20_000));
   }
-  console.log(`Producción no mostró el sitemap nuevo en ${minutos} minutos.`);
+  console.log(`Producción no mostró este commit en ${minutos} minutos.`);
   return false;
 }
 
@@ -114,7 +138,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const simular = bandera('--simular');
   try {
     if (bandera('--esperar')) {
-      const listo = await esperarProduccion();
+      const listo = await esperarProduccion(arg('--desde'));
       if (!listo) process.exit(1);
     } else if (bandera('--todas')) {
       await enviar(locs(sitemapActual()), simular);

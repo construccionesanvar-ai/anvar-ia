@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: 24
       - name: Esperar a que producción sirva este commit
-        run: node scripts/indexnow.mjs --esperar
+        run: node scripts/indexnow.mjs --esperar --desde "${{ github.event.before || 'HEAD~1' }}"
       - name: Notificar las páginas que cambiaron
         if: ${{ github.event_name == 'push' }}
         run: node scripts/indexnow.mjs --desde "${{ github.event.before }}"
