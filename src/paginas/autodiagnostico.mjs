@@ -98,6 +98,6 @@ export default {
 </section>
 ${preguntas(FAQ_DIAG, { titulo: 'Preguntas sobre el autodiagnóstico', codigo: 'Preguntas' })}
 ${relacionados(['/recursos/como-detectar-proceso-automatizable', '/calculadora-roi-automatizacion', '/recursos/procesos-que-no-deberias-automatizar', 'diagnostico'])}
-${evaluar({ contexto: 'general', tipo: 'express', titulo: 'Conversemos tu resultado', bajada: 'Veinte minutos, sin costo. Con tu resultado a la vista partimos directo por lo que importa: qué proceso, cuánto cuesta hoy y qué conviene hacer primero.' })}
+${evaluar({ contexto: 'general', tipo: 'express', modo: 'herramienta', titulo: 'Conversemos tu resultado', bajada: 'Veinte minutos, sin costo. Con tu resultado a la vista partimos directo por lo que importa: qué proceso, cuánto cuesta hoy y qué conviene hacer primero.' })}
 `,
 };

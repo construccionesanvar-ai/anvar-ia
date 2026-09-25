@@ -18,6 +18,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { SITIO, CALCULADORA } from '../src/config.mjs';
+import { huellaContenido } from './huella.mjs';
 import { SERVICIOS } from '../src/datos/oferta.mjs';
 import { CASOS } from '../src/datos/casos.mjs';
 import { TESTIMONIOS } from '../src/datos/testimonios.mjs';
@@ -30,7 +31,7 @@ import { SOLUCIONES } from '../src/datos/soluciones.mjs';
 import { fijarPagina } from '../src/contexto.mjs';
 import { documento } from '../src/componentes/base.mjs';
 import { opcionesInversion } from '../src/componentes/herramientas.mjs';
-import { organizacion } from '../src/paginas/ld.mjs';
+import { organizacion, sitioWeb } from '../src/paginas/ld.mjs';
 
 import inicio from '../src/paginas/inicio.mjs';
 import casos from '../src/paginas/casos.mjs';
@@ -242,6 +243,51 @@ function sitemapAnterior() {
   return Object.fromEntries([...xml.matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)].map((m) => [m[1], m[2]]));
 }
 
+/**
+ * Grafo JSON-LD de una página: la organización siempre; el sitio (WebSite) solo
+ * si la página lo referencia (isPartOf) y no lo trae, para que ninguna
+ * referencia quede apuntando a un nodo que no está en la página.
+ * @param {object[]} propios
+ */
+function grafo(propios) {
+  const idSitio = sitioWeb()['@id'];
+  const texto = JSON.stringify(propios);
+  const falta = texto.includes(`"${idSitio}"`) && !propios.some((n) => /** @type {any} */ (n)['@type'] === 'WebSite');
+  return unaVez([organizacion(), ...(falta ? [sitioWeb()] : []), ...propios]);
+}
+
+/**
+ * Cada entidad (nodo con identificador y tipo) se define una sola vez en la
+ * página: la primera aparición lleva todas sus propiedades y las siguientes
+ * quedan como una referencia a su identificador.
+ * Así el autor de una guía y el fundador de la organización no son dos nodos
+ * Person repetidos.
+ * @param {any[]} nodos
+ */
+function unaVez(nodos) {
+  /** @type {Map<string, any>} */
+  const juntos = new Map();
+  const reunir = (/** @type {any} */ x) => {
+    if (Array.isArray(x)) return x.forEach(reunir);
+    if (!x || typeof x !== 'object') return;
+    if (x['@id'] && x['@type']) juntos.set(x['@id'], { ...x, ...(juntos.get(x['@id']) ?? {}) });
+    Object.values(x).forEach(reunir);
+  };
+  reunir(nodos);
+  const puestos = new Set();
+  const armar = (/** @type {any} */ x) => {
+    if (Array.isArray(x)) return x.map(armar);
+    if (!x || typeof x !== 'object') return x;
+    if (x['@id'] && x['@type']) {
+      if (puestos.has(x['@id'])) return { '@id': x['@id'] };
+      puestos.add(x['@id']);
+      x = juntos.get(x['@id']);
+    }
+    return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, armar(v)]));
+  };
+  return armar(nodos);
+}
+
 export function construir({ silencioso = false } = {}) {
   validarArchivos();
   const calculo = generarCalculo();
@@ -264,7 +310,7 @@ export function construir({ silencioso = false } = {}) {
       descripcion: p.descripcion,
       cuerpo,
       herramientas: herr,
-      jsonld: p.noindex ? [] : [organizacion(), ...(p.jsonld ?? [])],
+      jsonld: p.noindex ? [] : grafo(p.jsonld ?? []),
       noindex: p.noindex,
       contextoWsp: p.contextoWsp,
       fuente: p.fuente,
@@ -280,7 +326,8 @@ export function construir({ silencioso = false } = {}) {
     generados.add(p.archivo);
     if (p.enSitemap !== false && !p.noindex) {
       const loc = absoluta(p.ruta);
-      const cambio = previo !== html;
+      // lastmod cambia solo si cambió el contenido (no por un ajuste de plantilla o de espacios).
+      const cambio = !previo || huellaContenido(previo) !== huellaContenido(html);
       urls.push({ loc, lastmod: cambio || !anteriores[loc] ? hoy : anteriores[loc], prioridad: p.prioridad ?? '0.5' });
     }
     if (!silencioso) console.log(`  ${p.archivo.padEnd(34)} ${previo === html ? 'sin cambios' : 'actualizada'}`);

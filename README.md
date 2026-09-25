@@ -218,6 +218,27 @@ WhatsApp, ya redactado. Los registros de error no incluyen datos personales.
 
 Junto al formulario va "Al enviar este formulario aceptas nuestra Política de Privacidad".
 
+En el navegador: un envío a la vez (el botón se desactiva y dice "Enviando…"; un doble clic
+no manda dos veces), los errores se marcan en el campo y se quitan mientras se corrige, y si
+el servidor o la red fallan, el mismo mensaje queda listo para WhatsApp y se puede reintentar.
+El campo trampa no se ve, no se anuncia (`aria-hidden`), no se alcanza con Tab (`inert`,
+`tabindex=-1`) y el autocompletado no lo llena.
+
+### Contacto según el tipo de página
+
+Un solo formulario (`formularioContacto()` en `src/componentes/base.mjs`), presentado según la
+página con la opción `modo` de `evaluar()`:
+
+| Modo | Páginas | Qué se ve |
+|---|---|---|
+| `completo` (por defecto) | Portada, servicios (Express, diagnóstico, piloto, datos, capacitación) y las 5 soluciones | Acción principal, correo y formulario a la vista |
+| `herramienta` | Calculadora de ROI, autodiagnóstico, punto de pedido | El CTA contextual de siempre; el formulario plegado en "Prefiero dejar mis datos →" |
+| `compacto` | /recursos, las guías, la plantilla, /casos, el caso C-01 y el perfil | "¿Tienes un proceso…?", botón de WhatsApp y el formulario plegado en "Prefiero que me contacten →" |
+
+El plegado es un `<details>` nativo: funciona con teclado y lector de pantalla y sin JavaScript.
+El evento `form_open` cuenta cuántos lo abren; compáralo con `service_lead` antes de decidir si
+plegarlo afecta los contactos.
+
 ## Variables de entorno
 
 Se cargan solo en Vercel (Settings → Environment Variables). Nunca en el repositorio.
@@ -258,6 +279,7 @@ registra Vercel solo. Los eventos propios requieren un plan de Vercel que los in
 | Lead | `case_lead` | "Tengo un proceso parecido" en un caso | ídem |
 | Lead | `whatsapp_lead` | Cualquier otro WhatsApp (general, agenda, piloto…) | ídem |
 | Lead | `service_lead` | Formulario enviado | `tipo` + atribución |
+| Formulario | `form_open` | Abrió el formulario plegado (páginas editoriales y herramientas), una vez por página | — |
 | Formulario | `form_start` / `form_error` | Primer uso del formulario / falló | `motivo` |
 
 Todos llevan `pagina` y `fuente`. Los de lead llevan la **atribución de la visita**: `landing`
@@ -341,13 +363,23 @@ y `SITIO.privacidad.actualizada`.
   y fechas en guías y caso largo, `CollectionPage` en /recursos, `FAQPage` **solo con preguntas
   visibles** y `BreadcrumbList`. Sin reseñas ni calificaciones: el QA falla si aparecen.
 - El QA también exige: ninguna página indexable huérfana, `og:image` existente, feed y llms.txt sin
-  enlaces rotos, clave de IndexNow publicada.
+  enlaces rotos, clave de IndexNow publicada, y que cada entidad del JSON-LD se defina una sola
+  vez por página, sin referencias colgando (el build las une: el autor de una guía es el mismo
+  nodo que el fundador).
+- **`npm run seo-check`** revisa un sitio servido (por defecto producción; `--base <url>` para
+  otro): robots.txt, sitemap válido y igual a las páginas indexables del build, y por cada URL
+  HTTP 200 sin redirección, title, description, un canonical propio (https, host, sin
+  parámetros), robots sin `noindex`, un `<h1>` y JSON-LD legible con la razón social correcta.
+  Imprime un reporte y sale con error si algo falla. Corre solo después de cada deploy.
 - `vercel.json`: `cleanUrls`, `trailingSlash: false`, redirecciones (`/index`, alias de privacidad,
   `/calculadora`, `/autodiagnostico`, `/herramientas`, `/blog`, `/guias`, `/rss`), `noindex` para
   `/api/*` y `/descargas/*`, CSP estricto.
 - **IndexNow** (Bing y otros): clave pública en `src/config.mjs` → `public/<clave>.txt`. Después de
   cada push a `main` que toca `public/`, `.github/workflows/indexnow.yml` espera a que producción
-  sirva el sitemap nuevo y avisa solo las URL que cambiaron. Manual: `npm run indexnow -- --urls /a,/b`.
+  sirva el sitemap nuevo y avisa solo las URL cuyo **contenido** cambió: title, description,
+  canonical, robots, JSON-LD o el texto de `<main>` (`scripts/huella.mjs`). Un ajuste de cabecera,
+  pie, espacios o texto solo para lectores de pantalla no notifica el sitio entero, y tampoco
+  mueve el `lastmod` del sitemap. Manual: `npm run indexnow -- --urls /a,/b`.
   Rotar la clave: poner una nueva de 32 caracteres hex en `SITIO.indexnow.clave` y `npm run build`
   (el build borra la anterior).
 - Guías completas: `docs/SEARCH_CONSOLE_SETUP.md`, `docs/BING_WEBMASTER_SETUP.md`,
@@ -424,6 +456,9 @@ cada referencia un `?v=` con el hash del contenido. `vercel.json` sirve:
 - WhatsApp: todo enlace lleva mensaje y `(ref: …)`.
 - Sin "Agendar" mientras no haya agenda real.
 - Formularios con enlace a la privacidad; pie con enlace a la privacidad.
+- Sin palabras pegadas entre elementos ("C-01Proyecto propio", "Correocontacto@…"): lo que leen
+  un lector de pantalla, un buscador o un extractor debe tener espacios reales, no solo `gap` de
+  CSS. `separarBloques()` los agrega en el build; el QA falla si algo se escapa.
 - Frases vetadas: "desde UF 28" como precio del piloto, "el más elegido", "no vengo del mundo del
   software", "revolucionamos", "el futuro de la IA", "sin límites", "clase mundial", "potencia tu
   empresa", promesas de seguridad absoluta y propiedad intelectual absoluta ("queda en tu poder").
@@ -444,7 +479,8 @@ push a `main` corren dos workflows de GitHub Actions (pestaña Actions):
 - **Verificación post-deploy** (`scripts/smoke.mjs`): espera a que `ia.anvartech.cl` sirva
   exactamente el HTML del commit y revisa contra la web pública todas las páginas del sitemap, redirecciones,
   cabeceras de seguridad, imágenes OG, CSS/JS, la descarga XLSX, robots, sitemap, feed,
-  llms.txt, la clave de IndexNow y el 404. Si falla, GitHub avisa por correo.
+  llms.txt, la clave de IndexNow y el 404. Después corre `scripts/seo-check.mjs` y deja su
+  reporte en el resumen de la ejecución. Si falla, GitHub avisa por correo.
 - **IndexNow**: avisa a Bing y compañía solo las páginas que cambiaron (ver SEO técnico).
 
 Ninguno bloquea el deploy. Para correr la verificación a mano: `npm run smoke`.

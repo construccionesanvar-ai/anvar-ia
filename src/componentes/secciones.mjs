@@ -450,7 +450,7 @@ export function nosotros() {
           <li>Ingeniería</li><li>Operaciones</li><li>Software</li><li>Automatización</li><li>IA</li>
         </ul>
         <p>ANVAR TECH nace de construir soluciones para problemas propios: un sistema documental que hoy se usa en operación diaria, un negocio que cotiza y cobra en línea, planos de ingeniería iterados sobre el archivo real. Ese mismo criterio es el que aplicamos en tu empresa.</p>
-        <blockquote class="cita"><p>Si no podemos mostrarte la hora que te ahorramos, el trabajo no está terminado.</p><footer>— ${esc(f.nombre)}</footer></blockquote>
+        <blockquote class="cita"><p>Si no podemos mostrarte qué mejoró y medirlo, el trabajo no está terminado.</p><footer>— ${esc(f.nombre)}</footer></blockquote>
         <p class="nota">Cada proyecto lo lidera directamente el fundador. Por eso trabajamos con pocos proyectos en paralelo y te damos la fecha real de inicio antes de cotizar. <a href="${esc(f.perfil)}">Perfil de ${esc(f.nombre)}</a>.</p>
       </div>
     </div>

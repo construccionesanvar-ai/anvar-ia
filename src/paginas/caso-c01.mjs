@@ -70,7 +70,7 @@ const SECCIONES = [
       <li>Lo que la lectura no reconoce con seguridad <b>no se adivina</b>: se marca para revisión humana.</li>
     </ul>` },
   { id: 'antes-despues', titulo: 'Antes y después', html: `
-    <div class="tabla-envoltorio" tabindex="0" role="region" aria-label="Antes y después">
+    <div class="tabla-envoltorio" tabindex="0" role="region" aria-label="Tabla: tiempo por procedimiento, antes y después">
     <table class="tabla">
       <thead><tr><th scope="col">Aspecto</th><th scope="col">Antes</th><th scope="col">Después</th></tr></thead>
       <tbody>
@@ -142,6 +142,6 @@ ${cabeceraArticulo({ r, migas: [['Casos reales', '/casos'], ['C-01', r.ruta]], s
   </div>
 </section>
 ${relacionados(['/automatizacion-documental', '/calculadora-roi-automatizacion', '/recursos/como-detectar-proceso-automatizable', 'express'])}
-${evaluar({ contexto: 'caso', tipo: 'express', titulo: '¿Un proceso parecido en tu empresa?', bajada: 'Cuéntanos cuál es y te decimos en 20 minutos si se puede automatizar, cómo y cuánto costaría. Sin costo.' })}
+${evaluar({ contexto: 'caso', tipo: 'express', modo: 'compacto' })}
 `,
 };

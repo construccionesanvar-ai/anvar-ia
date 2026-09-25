@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { roi, miles, pesos, porcentaje, textoPayback, lecturaRoi } from '../src/calculo.mjs';
+import { roi, miles, pesos, porcentaje, textoPayback, lecturaRoi, leerPesos, MONTO_MAXIMO } from '../src/calculo.mjs';
 
 const casi = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6, `${msg}: ${a} ≠ ${b}`);
 const base = { personas: 5, horasSemana: 6, costoHora: 9000, pctAutomatizable: 60, inversion: 1_640_000, costoMensual: 0, semanas: 44 };
@@ -127,4 +127,49 @@ test('formato: miles, pesos y porcentajes sin -0', () => {
   assert.equal(porcentaje(-0.0001), '0%');
   assert.equal(porcentaje(null), 'No aplica');
   assert.equal(porcentaje(Infinity), 'No aplica');
+});
+
+test('personas = 0 o campos vacíos: sin ahorro, sin NaN y con mensajes legibles', () => {
+  for (const e of [
+    { personas: 0, horasSemana: 6, costoHora: 9000, pctAutomatizable: 60, inversion: 199_900, costoMensual: 0 },
+    { personas: '', horasSemana: '', costoHora: '', pctAutomatizable: '', inversion: '', costoMensual: '' },
+  ]) {
+    const r = roi(/** @type {any} */ (e));
+    for (const v of Object.values(r)) if (typeof v === 'number') assert.ok(Number.isFinite(v));
+    assert.equal(r.estado, 'sin-ahorro');
+    assert.equal(textoPayback(r), 'No aplica');
+    assert.ok(!/NaN|Infinity|-0\b/.test(lecturaRoi(r)));
+  }
+});
+
+test('mantención 0 vs. mantención igual al ahorro: el límite exacto no recupera', () => {
+  const base = { personas: 5, horasSemana: 6, costoHora: 9000, pctAutomatizable: 60, inversion: 1_640_000 };
+  const sinMantencion = roi({ ...base, costoMensual: 0 });
+  assert.equal(sinMantencion.recurrenteAnual, 0);
+  assert.equal(sinMantencion.ahorroNetoAnual, sinMantencion.ahorroBruto);
+  const empate = roi({ ...base, costoMensual: sinMantencion.ahorroBruto / 12 });
+  assert.equal(empate.ahorroNetoAnual, 0);
+  assert.equal(empate.estado, 'sin-recuperacion');
+  assert.equal(textoPayback(empate), 'Sin recuperación');
+});
+
+test('NaN, Infinity y -0 como entradas: nunca aparecen en el resultado ni en el texto', () => {
+  const r = roi({ personas: -0, horasSemana: NaN, costoHora: -Infinity, pctAutomatizable: Infinity, inversion: NaN, costoMensual: -0 });
+  for (const v of Object.values(r)) if (typeof v === 'number') assert.ok(Number.isFinite(v) && !Object.is(v, -0));
+  const textos = [pesos(r.ahorroBruto), porcentaje(r.roi1), porcentaje(r.roi3), textoPayback(r), lecturaRoi(r)].join(' ');
+  assert.ok(!/NaN|Infinity|-0\b|−0\b/.test(textos), textos);
+});
+
+test('montos escritos a mano: separador de miles, signo $, decimales, vacíos y tope', () => {
+  assert.equal(leerPesos('1.500.000'), 1_500_000);
+  assert.equal(leerPesos('$ 1.500.000'), 1_500_000);
+  assert.equal(leerPesos('1500000'), 1_500_000);
+  assert.equal(leerPesos('1.500.000,50'), 1_500_000);
+  assert.equal(leerPesos(''), 0);
+  assert.equal(leerPesos('   '), 0);
+  assert.equal(leerPesos('abc'), 0);
+  assert.equal(leerPesos(null), 0);
+  assert.equal(leerPesos('-200.000'), 200_000);
+  assert.equal(leerPesos('9'.repeat(40)), MONTO_MAXIMO);
+  assert.equal(leerPesos('500.000', 100_000), 100_000);
 });

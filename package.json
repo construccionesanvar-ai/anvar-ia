@@ -1,6 +1,6 @@
 {
   "name": "anvar-ia",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "private": true,
   "description": "ANVAR TECH · IA & Automatización — sitio de automatización e inteligencia operacional para empresas.",
   "type": "module",
@@ -18,7 +18,8 @@
     "og": "node scripts/og.mjs",
     "indexnow": "node scripts/indexnow.mjs",
     "utm": "node scripts/utm.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "seo-check": "node scripts/seo-check.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

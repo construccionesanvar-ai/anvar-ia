@@ -60,7 +60,11 @@ la URL que pegaste. Si no coincide, anótalo y revísalo con `docs/SEO_GROWTH_LO
 
 Estado verificado al publicar (2026-09-25): las 25 URL del sitemap responden 200, tienen canonical
 propia, no tienen `noindex` y robots.txt las permite; ninguna página indexable queda sin enlaces
-internos (`npm run check` y la verificación post-deploy lo revisan en cada push).
+internos (`npm run check` y la verificación post-deploy lo revisan en cada push). Para volver a
+comprobarlo contra producción: `npm run seo-check`.
+
+Las URL ya se enviaron a indexación: **no volver a solicitarla** ni cambiar URL o títulos para
+"apurar" a Google. Solo se vuelve a pedir si una página cambia de verdad su contenido principal.
 
 ## 4. Qué revisar y cuándo
 

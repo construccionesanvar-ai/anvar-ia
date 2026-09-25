@@ -62,6 +62,22 @@ export function roi(e) {
 /* ------------------------------------------------------------ formato */
 
 /** Miles con punto, sin decimales y sin "-0": 1234567 → "1.234.567"; −5 → "−5". */
+/** Tope de un monto escrito a mano: un billón de pesos. */
+export const MONTO_MAXIMO = 1e12;
+
+/**
+ * Monto en pesos escrito por una persona: "$ 1.500.000", "1500000" o
+ * "1.500.000,50" → 1500000. Sin signo ni decimales (los pesos no los usan), y con
+ * tope, para que un número pegado por error no rompa el resultado.
+ * @param {unknown} texto
+ * @param {number} [tope]
+ */
+export function leerPesos(texto, tope = MONTO_MAXIMO) {
+  const entero = String(texto ?? '').split(',')[0].replace(/\D/g, '');
+  const n = entero ? Number(entero) : 0;
+  return Number.isFinite(n) ? Math.min(n, tope) : 0;
+}
+
 export function miles(n) {
   const r = Math.round(Number(n) || 0);
   const s = String(Math.abs(r)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');

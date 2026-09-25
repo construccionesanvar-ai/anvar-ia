@@ -115,6 +115,6 @@ export default {
 </section>
 ${preguntas(FAQ_PP, { titulo: 'Preguntas sobre punto de pedido', codigo: 'Preguntas' })}
 ${relacionados(['intelligence', '/calculadora-roi-automatizacion', '/recursos/ia-vs-automatizacion-tradicional', '/recursos/como-detectar-proceso-automatizable'])}
-${evaluar({ contexto: 'datos', tipo: 'datos', titulo: 'Revisemos tu inventario', bajada: 'En 20 minutos vemos qué datos tienes, cómo están y qué alertas podrían salir de ellos. Sin costo.' })}
+${evaluar({ contexto: 'datos', tipo: 'datos', modo: 'herramienta', titulo: 'Revisemos tu inventario', bajada: 'En 20 minutos vemos qué datos tienes, cómo están y qué alertas podrían salir de ellos. Sin costo.' })}
 `,
 };

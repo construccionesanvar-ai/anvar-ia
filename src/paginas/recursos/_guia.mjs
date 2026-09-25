@@ -4,7 +4,7 @@
 // Los datos de cada guía (título, fechas, descripción) salen de
 // src/datos/recursos.mjs, así el índice, el feed y el JSON-LD coinciden.
 import { recurso } from '../../datos/recursos.mjs';
-import { rutaOg, esc } from '../../html.mjs';
+import { rutaOg } from '../../html.mjs';
 import { evaluar } from '../../componentes/base.mjs';
 import { cabeceraArticulo, enCorto, prosa, ctaContenido, relacionados, cajaAutor } from '../../componentes/articulo.mjs';
 import { preguntas } from '../../componentes/secciones.mjs';
@@ -38,7 +38,7 @@ export function guia(g) {
     ],
     cuerpo: () => `
 ${cabeceraArticulo({ r, lead: g.lead, migas: [['Recursos', '/recursos'], [r.tituloCorto, r.ruta]] })}
-<section class="seccion" aria-label="${esc(r.titulo)}">
+<section class="seccion" aria-label="Texto de la guía">
   <div class="contenedor contenedor--prosa">
     ${enCorto(g.corto)}
     ${prosa(g.secciones)}
@@ -48,7 +48,7 @@ ${cabeceraArticulo({ r, lead: g.lead, migas: [['Recursos', '/recursos'], [r.titu
 </section>
 ${g.preguntas?.length ? preguntas(g.preguntas, { titulo: 'Preguntas frecuentes', codigo: 'Preguntas' }) : ''}
 ${relacionados(g.relacionados)}
-${evaluar({ contexto: g.contexto ?? 'general', tipo: g.tipo ?? 'express' })}
+${evaluar({ contexto: g.contexto ?? 'general', tipo: g.tipo ?? 'express', modo: 'compacto', titulo: '¿Tienes un proceso en mente?' })}
 `,
   };
 }

@@ -25,7 +25,8 @@ export const icono = (n) => ICONOS[n] ?? '';
  * (el contenedor es flex en columna) pero evita que el texto accesible o un
  * rastreador lea "ANVAR TECHIA & Automatización".
  */
-const marcaTexto = () => `<span class="marca-txt"><b>${esc(SITIO.marca)}</b> <span>${esc(SITIO.linea)}</span></span>`;
+// El separador oculto hace que el texto extraído diga "ANVAR TECH · IA & Automatización".
+const marcaTexto = () => `<span class="marca-txt"><b>${esc(SITIO.marca)}</b><span class="sr"> · </span><span>${esc(SITIO.linea)}</span></span>`;
 
 /**
  * Botón o enlace con estilo de botón.
@@ -148,13 +149,19 @@ function pie(evaluar) {
 export const avisoPrivacidad = (clase = 'form-aviso') => `<p class="${clase}">Al enviar este formulario aceptas nuestra <a href="/privacidad">Política de Privacidad</a>.</p>`;
 
 /**
- * Bloque final "Evaluar mi proceso": agenda o WhatsApp, correo y formulario.
+ * Bloque final de contacto. Un solo formulario, presentado según la página:
+ *  - 'completo' (páginas comerciales): acción principal, vías y formulario a la vista.
+ *  - 'herramienta' (calculadora, autodiagnóstico, punto de pedido): la misma acción
+ *    contextual, con el formulario plegado en "Prefiero dejar mis datos →".
+ *  - 'compacto' (guías, recursos, casos, perfil): WhatsApp a la vista y el
+ *    formulario plegado en "Prefiero que me contacten →".
  * @param {{ contexto?: string, titulo?: string, bajada?: string, tipo?: string, conFormulario?: boolean,
- *   accion?: { texto: string, nota: string } }} o
+ *   modo?: 'completo'|'herramienta'|'compacto', accion?: { texto: string, nota: string } }} o
  */
 export function evaluar(o = {}) {
   const contexto = o.contexto ?? 'general';
   const f = PAGINA.fuente;
+  if (o.modo === 'compacto') return evaluarCompacto(o);
   // Páginas que no venden una evaluación (asesoría personal) cambian la
   // acción principal por un WhatsApp con su propio mensaje.
   if (o.accion) {
@@ -171,13 +178,77 @@ export function evaluar(o = {}) {
 }
 
 /**
- * @param {{ contexto?: string, titulo?: string, bajada?: string, tipo?: string, conFormulario?: boolean }} o
+ * @param {{ contexto?: string, titulo?: string, bajada?: string, tipo?: string, conFormulario?: boolean, modo?: string }} o
  * @param {string} accionPrincipal
  * @param {string} notaAccion
  * @param {boolean} conWsp  mostrar WhatsApp como vía adicional (cuando la acción principal no lo es)
  */
 function evaluarBloque(o, accionPrincipal, notaAccion, conWsp) {
   const contexto = o.contexto ?? 'general';
+  const plegado = o.modo === 'herramienta';
+  const formulario = o.conFormulario === false ? '' : formularioContacto(o.tipo, !plegado);
+  const alFinal = plegado ? desplegable('Prefiero dejar mis datos', formulario) : formulario;
+
+  return `<section class="seccion seccion--oscura" id="evaluar" aria-labelledby="evaluar-tit">
+  <div class="contenedor evaluar${plegado ? ' evaluar--compacto' : ''}">
+    <div class="evaluar-txt">
+      <p class="lema">Que la IA haga el trabajo que hoy te come el día.</p>
+      <h2 id="evaluar-tit">${esc(o.titulo ?? 'Evaluemos un proceso de tu empresa')}</h2>
+      <p class="lead">${esc(o.bajada ?? 'Veinte minutos, sin costo. Nos cuentas el proceso y te decimos si conviene automatizarlo, cómo lo haríamos y cuánto costaría. Si no conviene, también te lo decimos.')}</p>
+      <div class="evaluar-acciones">
+        ${accionPrincipal}
+        <p class="nota-clara">${esc(notaAccion)}</p>
+      </div>
+      <ul class="vias">
+        ${conWsp ? `<li><a href="${esc(wsp(contexto, PAGINA.fuente))}" data-wsp="${esc(contexto)}" data-track-label="evaluar" target="_blank" rel="noopener">${icono('whatsapp')}<span><b>WhatsApp<span class="sr">:</span></b>${esc(SITIO.contacto.whatsappVisible)}</span></a></li>` : ''}
+        <li><a href="mailto:${esc(SITIO.contacto.email)}" data-track="email_click" data-track-label="evaluar">${icono('correo')}<span><b>Correo<span class="sr">:</span></b>${esc(SITIO.contacto.email)}</span></a></li>
+      </ul>
+      <p class="nota-clara">${esc(SITIO.contacto.respuesta)} · Confidencialidad por escrito antes de ver tus datos.</p>
+    </div>
+    ${alFinal}
+  </div>
+</section>`;
+}
+
+/**
+ * Cierre de páginas editoriales: una invitación corta, WhatsApp y el mismo
+ * formulario plegado. No repite el bloque comercial completo en cada guía.
+ * @param {{ contexto?: string, titulo?: string, bajada?: string, tipo?: string }} o
+ */
+function evaluarCompacto(o) {
+  const contexto = o.contexto ?? 'general';
+  const btn = `<a class="btn btn--primario btn--grande" href="${esc(wsp(contexto, PAGINA.fuente))}" data-wsp="${esc(contexto)}" data-track-label="evaluar-compacto" target="_blank" rel="noopener">${icono('whatsapp')}<span>Conversar por WhatsApp</span></a>`;
+  return `<section class="seccion seccion--oscura" id="evaluar" aria-labelledby="evaluar-tit">
+  <div class="contenedor evaluar evaluar--compacto">
+    <div class="evaluar-txt">
+      <h2 id="evaluar-tit">${esc(o.titulo ?? '¿Tienes un proceso parecido?')}</h2>
+      <p class="lead">${esc(o.bajada ?? 'Cuéntanos en qué consiste y te decimos si vale la pena automatizarlo.')}</p>
+      <div class="evaluar-acciones">
+        ${btn}
+        <p class="nota-clara">WhatsApp ${esc(SITIO.contacto.whatsappVisible)} · ${esc(SITIO.contacto.respuesta)}</p>
+      </div>
+    </div>
+    ${desplegable('Prefiero que me contacten', formularioContacto(o.tipo, false))}
+  </div>
+</section>`;
+}
+
+/**
+ * Formulario plegado: <details> nativo (teclado, lector de pantalla y sin JS).
+ * @param {string} texto
+ * @param {string} formulario
+ */
+const desplegable = (texto, formulario) => `<details class="form-desplegable">
+      <summary><span>${esc(texto)}</span> <span class="form-desplegable-flecha" aria-hidden="true">→</span></summary>
+      ${formulario}
+    </details>`;
+
+/**
+ * El formulario de contacto (uno solo para todo el sitio; lo maneja app.js).
+ * @param {string} [tipo]  opción preseleccionada en "Qué necesitas"
+ * @param {boolean} [conTitulo]  el título sobra cuando el formulario está plegado
+ */
+function formularioContacto(tipo, conTitulo = true) {
   const tipos = [
     ['express', 'Automatizar un proceso puntual'],
     ['diagnostico', 'Evaluar varios procesos'],
@@ -185,11 +256,10 @@ function evaluarBloque(o, accionPrincipal, notaAccion, conWsp) {
     ['capacitacion', 'Capacitar a mi equipo'],
     ['otro', 'Otra cosa'],
   ];
-  const opciones = tipos.map(([v, t]) => `<option value="${v}"${v === (o.tipo ?? 'express') ? ' selected' : ''}>${esc(t)}</option>`).join('');
-
-  const formulario = o.conFormulario === false ? '' : `
+  const opciones = tipos.map(([v, t]) => `<option value="${v}"${v === (tipo ?? 'express') ? ' selected' : ''}>${esc(t)}</option>`).join('');
+  return `
     <form class="form" id="form-contacto" action="/api/contacto" method="post" novalidate>
-      <h3 class="form-tit">O déjanos los datos y te escribimos</h3>
+      ${conTitulo ? '<h3 class="form-tit">O déjanos los datos y te escribimos</h3>' : ''}
       <div class="form-fila">
         <div class="campo"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" type="text" autocomplete="name" maxlength="120" required aria-describedby="f-nombre-err"><p class="campo-err" id="f-nombre-err" hidden>Escribe tu nombre.</p></div>
         <div class="campo"><label for="f-empresa">Empresa <span class="opc">(opcional)</span></label><input id="f-empresa" name="empresa" type="text" autocomplete="organization" maxlength="160"></div>
@@ -204,26 +274,6 @@ function evaluarBloque(o, accionPrincipal, notaAccion, conWsp) {
       <button class="btn btn--primario" type="submit" id="form-enviar"><span>Enviar</span></button>
       ${avisoPrivacidad()}
     </form>`;
-
-  return `<section class="seccion seccion--oscura" id="evaluar" aria-labelledby="evaluar-tit">
-  <div class="contenedor evaluar">
-    <div class="evaluar-txt">
-      <p class="lema">Que la IA haga el trabajo que hoy te come el día.</p>
-      <h2 id="evaluar-tit">${esc(o.titulo ?? 'Evaluemos un proceso de tu empresa')}</h2>
-      <p class="lead">${esc(o.bajada ?? 'Veinte minutos, sin costo. Nos cuentas el proceso y te decimos si conviene automatizarlo, cómo lo haríamos y cuánto costaría. Si no conviene, también te lo decimos.')}</p>
-      <div class="evaluar-acciones">
-        ${accionPrincipal}
-        <p class="nota-clara">${esc(notaAccion)}</p>
-      </div>
-      <ul class="vias">
-        ${conWsp ? `<li><a href="${esc(wsp(contexto, PAGINA.fuente))}" data-wsp="${esc(contexto)}" data-track-label="evaluar" target="_blank" rel="noopener">${icono('whatsapp')}<span><b>WhatsApp</b>${esc(SITIO.contacto.whatsappVisible)}</span></a></li>` : ''}
-        <li><a href="mailto:${esc(SITIO.contacto.email)}" data-track="email_click" data-track-label="evaluar">${icono('correo')}<span><b>Correo</b>${esc(SITIO.contacto.email)}</span></a></li>
-      </ul>
-      <p class="nota-clara">${esc(SITIO.contacto.respuesta)} · Confidencialidad por escrito antes de ver tus datos.</p>
-    </div>
-    ${formulario}
-  </div>
-</section>`;
 }
 
 /**
@@ -288,7 +338,7 @@ ${cabecera(p.ruta, tieneEvaluar)}
 ${p.cuerpo}
 </main>
 ${pie(tieneEvaluar)}
-<a class="wsp-flotante" href="${esc(wsp(contexto, p.fuente))}" data-wsp="${esc(contexto)}" data-track-label="flotante" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">${icono('whatsapp')}<span>WhatsApp</span></a>
+<aside aria-label="Contacto rápido"><a class="wsp-flotante" href="${esc(wsp(contexto, p.fuente))}" data-wsp="${esc(contexto)}" data-track-label="flotante" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">${icono('whatsapp')}<span>WhatsApp</span></a></aside>
 <script type="application/json" id="config">${JSON.stringify(p.cliente).replace(/</g, '\\u003c')}</script>
 <script defer src="${esc(SITIO.analitica.script)}"></script>${p.herramientas?.calculo ? `\n<script defer src="/calculo.js?v=${p.hashes.calculo}"></script>` : ''}
 <script defer src="/app.js?v=${p.hashes.js}"></script>${p.herramientas?.alguna ? `\n<script defer src="/herramientas.js?v=${p.hashes.herramientas}"></script>` : ''}

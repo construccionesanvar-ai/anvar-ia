@@ -53,6 +53,6 @@ export default {
     <p class="nota">Suscríbete a las guías nuevas con cualquier lector RSS: <a href="/feed.xml">ia.anvartech.cl/feed.xml</a>.</p>
   </div>
 </section>
-${evaluar({ contexto: 'general', tipo: 'express' })}
+${evaluar({ contexto: 'general', tipo: 'express', modo: 'compacto', titulo: '¿Tienes un proceso en mente?' })}
 `,
 };
