@@ -5,7 +5,7 @@
   "description": "ANVAR TECH · IA & Automatización — sitio de automatización e inteligencia operacional para empresas.",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   },
   "scripts": {
     "build": "node scripts/build.mjs",

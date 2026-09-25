@@ -9,7 +9,7 @@ e IA aplicada a las operaciones de empresas. Sitio estático generado en
 
 ## Puesta en marcha
 
-Requiere Node 20 o superior.
+Requiere Node 22 (el mismo que usa Vercel).
 
 ```bash
 npm install          # herramientas de desarrollo (lint, typecheck); el sitio no tiene dependencias
