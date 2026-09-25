@@ -9,7 +9,7 @@ e IA aplicada a las operaciones de empresas. Sitio estático generado en
 
 ## Puesta en marcha
 
-Requiere Node 22 (el mismo que usa Vercel).
+Requiere Node 22 o superior. En Vercel, la versión la define Project Settings → Node.js Version (hoy 24.x); por eso `package.json` no fija `engines`.
 
 ```bash
 npm install          # herramientas de desarrollo (lint, typecheck); el sitio no tiene dependencias
