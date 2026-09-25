@@ -172,3 +172,18 @@ test('JSON-LD de cada página: se puede leer, cada entidad una vez y ningún @id
     for (const n of nodos) if (n.legalName) assert.equal(n.legalName, SITIO.empresa.razonSocial);
   }
 });
+
+test('calculadora: sin el ejemplo fijo antiguo ($1.640.000, 2,8 meses, 335%)', () => {
+  const html = readFileSync(new URL('../public/calculadora-roi-automatizacion.html', import.meta.url), 'utf8');
+  assert.doesNotMatch(html, /1\.640\.000|335%|2,8 meses/);
+  assert.match(html, /Los resultados se actualizan automáticamente cuando cambias los datos/);
+});
+
+test('formación del fundador: Ingeniería Civil Industrial en la USACH, sin la carrera anterior como actual', () => {
+  assert.equal(SITIO.fundador.formacion, 'Estudiante de Ingeniería Civil Industrial · Universidad de Santiago de Chile');
+  for (const f of ['index', 'equipo/andres-vargas']) {
+    const html = readFileSync(new URL(`../public/${f}.html`, import.meta.url), 'utf8');
+    assert.match(html, /<dt>Formación<\/dt>\s*<dd>Estudiante de Ingeniería Civil Industrial · Universidad de Santiago de Chile<\/dd>/, f);
+    assert.doesNotMatch(html, /Ejecución Industrial/, f);
+  }
+});

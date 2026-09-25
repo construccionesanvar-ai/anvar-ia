@@ -5,7 +5,7 @@ import { CALCULADORA } from '../config.mjs';
 import { FUENTES } from '../datos/whatsapp.mjs';
 import { recurso } from '../datos/recursos.mjs';
 import { ej, precioTexto } from '../html.mjs';
-import { pesos, miles, porcentaje, textoPayback } from '../calculo.mjs';
+import { pesos, miles } from '../calculo.mjs';
 import { evaluar } from '../componentes/base.mjs';
 import { preguntas, migasVisibles } from '../componentes/secciones.mjs';
 import { calculadora, calcularRoi, CALC_DEFECTO } from '../componentes/herramientas.mjs';
@@ -14,10 +14,6 @@ import { migas, faq, aplicacionWeb } from './ld.mjs';
 
 const r = recurso('/calculadora-roi-automatizacion');
 const ejemplo = calcularRoi(CALC_DEFECTO);
-// Payback y ROI del texto: con un monto fijo de ejemplo (el mismo de la plantilla
-// Excel), no con el piloto, que depende de la UF del día.
-const INVERSION_EJEMPLO = 1_640_000;
-const ejemploInv = calcularRoi({ ...CALC_DEFECTO, inversion: 'otro', monto: INVERSION_EJEMPLO });
 const ex = SERVICIOS.express;
 
 const FAQ_CALC = [
@@ -39,7 +35,7 @@ const SECCIONES = [
   { id: 'que-significa', titulo: 'Qué significa el resultado', html: `
     <p><b>Ahorro bruto anual estimado</b> es cuánto le cuestan hoy a tu empresa, en un año, las horas que se van en la parte automatizable de la tarea. Con el ejemplo que trae la calculadora (${CALC_DEFECTO.personas} personas, ${CALC_DEFECTO.horas} horas a la semana cada una, ${ej(pesos(CALC_DEFECTO.costo))} la hora y ${CALC_DEFECTO.auto}% automatizable) son ${ej(pesos(ejemplo.ahorroBruto))} al año, sobre un costo anual del proceso de ${ej(pesos(ejemplo.costoAnual))}.</p>
     <p><b>Horas potencialmente recuperadas</b> es ese mismo tiempo en horas: ${miles(ejemplo.horasRecuperadas)} en el ejemplo. Es la cifra que conviene mirar primero, porque se entiende sin discutir el costo por hora.</p>
-    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. En el ejemplo, con una inversión de ${ej(pesos(INVERSION_EJEMPLO))}: payback ${ej(textoPayback(ejemploInv, CALCULADORA.mesesMaximos).toLowerCase())}, ROI año 1 ${ej(porcentaje(ejemploInv.roi1))}.</p>
+    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. Los resultados se actualizan automáticamente cuando cambias los datos.</p>
     <p>Cuando algo no se puede calcular, la calculadora lo dice en vez de mostrar un número engañoso: "No aplica" si no hay inversión o no hay ahorro, y "Sin recuperación" si el costo mensual iguala o supera el ahorro.</p>` },
   { id: 'como-se-calcula', titulo: 'Cómo calculamos esto', html: `
     <p>Sin cajas negras. Estas son las operaciones, en el mismo orden que la calculadora. La <a href="/recursos/plantilla-roi-automatizacion">plantilla Excel</a> usa exactamente las mismas:</p>

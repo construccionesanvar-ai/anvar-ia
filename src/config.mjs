@@ -83,7 +83,7 @@ export const SITIO = {
   fundador: {
     nombre: 'Andrés Vargas',
     cargo: 'Fundador de ANVAR TECH',
-    formacion: 'Ingeniería de Ejecución Industrial (en curso)',
+    formacion: 'Estudiante de Ingeniería Civil Industrial · Universidad de Santiago de Chile',
     experiencia: 'Operaciones de retail · prevención de pérdidas',
     /** Página de perfil (autor de guías y casos). */
     perfil: '/equipo/andres-vargas',
@@ -106,7 +106,9 @@ export const CALCULADORA = {
    * Valores de ejemplo con que parte. `inversion`: 'express' | 'piloto' | 'otro'
    * (con 'otro' se usa `monto`). Coinciden con el ejemplo de la plantilla Excel.
    */
-  defecto: { personas: 5, horas: 6, costo: 9000, auto: 60, inversion: 'piloto', monto: 0, mensual: 0 },
+  // El ejemplo abre con Automatización Express: su precio está en pesos (src/datos/oferta.mjs),
+  // así el HTML trae resultados completos aunque no haya UF del día para el piloto.
+  defecto: { personas: 5, horas: 6, costo: 9000, auto: 60, inversion: 'express', monto: 0, mensual: 0 },
 };
 
 /** Compatibilidad: algunos módulos importan este nombre. */

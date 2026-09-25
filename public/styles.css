@@ -559,7 +559,7 @@ input[type=range]:focus-visible{outline:2px solid var(--focus);outline-offset:4p
 .calc-opcion-t b{display:block;font-weight:600}
 .calc-opcion-d{display:block;font-size:var(--fs-sm);color:var(--ink-3)}
 .calc-monto label{display:block;font-weight:500;margin-bottom:var(--s-2)}
-.calc-monto .ayuda{color:var(--ink-3)}
+.calc-monto .ayuda,.calc-inv-nota{color:var(--ink-3)}
 .campo-pesos{display:flex;align-items:center;border:1px solid var(--rule-2);border-radius:var(--radio);background:var(--paper)}
 .campo-pesos:focus-within{outline:2px solid var(--focus);outline-offset:1px}
 .campo-pesos span{padding-left:var(--s-3);font-family:var(--mono);color:var(--ink-3)}

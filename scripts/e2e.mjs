@@ -166,8 +166,13 @@ await prueba('Calculadora de ROI: mismo cálculo que el módulo único, inversi�
   }, v);
   const elegir = async (valor) => { await p.locator(`input[name="c-inv"][value="${valor}"]`).check(); };
   const leer = async (id) => (await p.locator('#' + id).textContent()) || '';
+  // Abre con Express también con UF (el HTML no depende de ella) y sin eventos: nadie eligió nada.
+  exigir(await p.locator('input[name="c-inv"][value="express"]').isChecked(), 'el ejemplo debe abrir con Express');
+  exigir(!(await eventos(p)).some((x) => /calculator_(start|complete)|investment/.test(x)), 'la selección por defecto no es una interacción');
   // Con la UF de hoy, el piloto es UF 40 × valor, redondeado al peso.
   exigir(await leer('c-piloto-d') === `desde UF 40 + IVA · ≈ ${pesosK(ufAPesos(40, UF_PRUEBA))} (UF del ${fechaCortaCL(HOY_CL)})`, 'piloto con UF: ' + await leer('c-piloto-d'));
+  await elegir('piloto');
+  exigir(await leer('c-inv') === pesosK(ufAPesos(40, UF_PRUEBA)) && await p.locator('#c-inv-nota').isHidden(), 'piloto con UF: inversión convertida y sin aviso');
   const esperado = (e, inversion, mensual = 0) => roi({ personas: e.personas, horasSemana: e.horas, costoHora: e.costo, pctAutomatizable: e.auto, inversion, costoMensual: mensual, semanas: CALCULADORA.semanas });
   for (const caso of [{ personas: 12, horas: 9, costo: 11500, auto: 45 }, { personas: 1, horas: 1, costo: 3000, auto: 5 }, { personas: 50, horas: 25, costo: 40000, auto: 100 }]) {
     await fijar({ 'c-personas': caso.personas, 'c-horas': caso.horas, 'c-costo': caso.costo, 'c-auto': caso.auto });
@@ -200,7 +205,7 @@ await prueba('Calculadora de ROI: mismo cálculo que el módulo único, inversi�
   await p.locator('#c-reiniciar').click();
   exigir(await leer('c-estado') === 'Ejemplo ilustrativo', 'reinicio no volvió al ejemplo');
   exigir(await leer('c-valor') === pesosK(calcularRoi(CALCULADORA.defecto).ahorroBruto), 'reinicio no restauró valores');
-  exigir(await p.locator('input[name="c-inv"][value="piloto"]').isChecked(), 'reinicio no restauró la inversión');
+  exigir(await p.locator('input[name="c-inv"][value="express"]').isChecked(), 'reinicio no restauró la inversión (Express)');
   const ev = await eventos(p);
   exigir(ev.filter((x) => x === 'calculator_start').length === 1 && ev.filter((x) => x === 'calculator_complete').length === 1, 'eventos de calculadora duplicados o faltantes: ' + ev.join(','));
   exigir(ev.includes('calculator_view'), 'sin calculator_view');
@@ -247,22 +252,33 @@ await prueba('UF de hoy: pesos con su fecha; si no hay UF de hoy (caída o de ay
   exigir(!readFileSync(join(RAIZ, 'public', 'diagnostico-ia-empresas.html'), 'utf8').includes('≈'), 'el HTML trae una equivalencia en pesos fija');
 });
 
-await prueba('Calculadora sin UF de hoy: el piloto queda sin pesos y pide «Otro monto»; Express y otro monto funcionan', async () => {
+await prueba('Calculadora sin UF de hoy: abre con Express y resultados completos; el piloto sigue en UF y pide «Otro monto»', async () => {
   for (const cuerpo of [{ estado: 'no-disponible' }, { ...ufDeHoy, fecha: AYER_CL }]) {
     const ctx = await contexto();
     await simularUf(ctx, cuerpo);
     const { p } = await pagina(ctx, '/calculadora-roi-automatizacion');
-    await p.waitForFunction(() => /Otro monto/.test(document.getElementById('c-lectura')?.textContent || ''), null, { timeout: 8000 });
+    await p.waitForFunction(() => /** @type {any} */ (window).ANVAR?.ufEstado() === 'no-disponible', null, { timeout: 8000 });
     const leer = async (id) => (await p.locator('#' + id).textContent()) || '';
+    // Express, con el precio de la fuente única y todo calculado.
+    exigir(await p.locator('input[name="c-inv"][value="express"]').isChecked(), 'debe abrir con Express');
+    const r = calcularRoi(CALCULADORA.defecto);
+    exigir(await leer('c-inv') === pesosK(SERVICIOS.express.precio.valor), 'inversión Express: ' + await leer('c-inv'));
+    exigir(await leer('c-payback') === textoPayback(r) && await leer('c-roi1') === porcentaje(r.roi1) && await leer('c-roi3') === porcentaje(r.roi3), `resultados incompletos: ${await leer('c-payback')} · ${await leer('c-roi1')} · ${await leer('c-roi3')}`);
+    exigir(await leer('c-neto1') === pesosK(r.ahorroNetoAno1) && await leer('c-valor') === pesosK(r.ahorroBruto), 'ahorro');
+    exigir(!(await eventos(p)).some((x) => /calculator_(start|complete)|investment/.test(x)), 'la selección por defecto disparó eventos');
+    exigir(await p.locator('#c-inv-nota').isHidden(), 'el aviso del piloto no debe verse con Express');
+    // El piloto sigue, solo en UF; al elegirlo, aviso y sin pesos inventados.
     exigir(await leer('c-piloto-d') === 'desde UF 40 + IVA', 'piloto sin UF: ' + await leer('c-piloto-d'));
-    for (const id of ['c-inv', 'c-neto1', 'c-payback', 'c-roi1', 'c-roi3']) exigir(await leer(id) === '—', `${id} sin UF: ${await leer(id)}`);
-    exigir(await leer('c-valor') === pesosK(calcularRoi(CALCULADORA.defecto).ahorroBruto), 'el ahorro debe calcularse igual');
-    await p.locator('input[name="c-inv"][value="express"]').check();
-    exigir(await leer('c-inv') === pesosK(SERVICIOS.express.precio.valor) && /mes/.test(await leer('c-payback')), 'Express sin UF: ' + await leer('c-payback'));
+    await p.locator('input[name="c-inv"][value="piloto"]').check();
+    exigir(await p.locator('#c-inv-nota').isVisible() && /«Otro monto»/.test(await leer('c-inv-nota')), 'sin aviso al elegir el piloto sin UF');
+    for (const id of ['c-inv', 'c-neto1', 'c-payback', 'c-roi1', 'c-roi3']) exigir(await leer(id) === '—', `${id} con piloto sin UF: ${await leer(id)}`);
+    // Otro monto y Express siguen funcionando.
     await p.fill('#c-monto', '2000000');
-    exigir(await leer('c-inv') === '$2.000.000', 'otro monto sin UF');
+    exigir(await leer('c-inv') === '$2.000.000' && /mes/.test(await leer('c-payback')) && await p.locator('#c-inv-nota').isHidden(), 'otro monto sin UF');
+    await p.locator('input[name="c-inv"][value="express"]').check();
+    exigir(await leer('c-inv') === pesosK(SERVICIOS.express.precio.valor), 'volver a Express');
     const todo = await p.locator('main').textContent() || '';
-    exigir(!/41\.000|≈|NaN|Infinity|UF de referencia/.test(todo), 'aparece un valor de respaldo o un error: ' + JSON.stringify(cuerpo));
+    exigir(!/41\.000|≈|NaN|Infinity|UF de referencia|1\.640\.000|335%/.test(todo), 'aparece un valor de respaldo, el ejemplo viejo o un error: ' + JSON.stringify(cuerpo));
     await ctx.close();
   }
 });

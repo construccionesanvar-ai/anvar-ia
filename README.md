@@ -170,11 +170,15 @@ payback, ROI año 1 y ROI a 3 años. Las fórmulas están a la vista en la pági
 - **Casos límite:** sin ahorro o sin inversión → "No aplica"; costos recurrentes ≥ ahorro →
   "Sin recuperación"; payback > 36 meses → "Más de 36 meses". Nunca Infinity, NaN ni -0
   (`tests/calculo.test.mjs`, con casos calculados a mano).
-- **Piloto y UF:** el piloto (UF 40) se pasa a pesos solo con la UF de hoy. Sin ella, la inversión
-  queda sin monto (`inversion: null`, estado `sin-monto`): el ahorro se calcula igual, y la
-  inversión, el ahorro neto del año 1, el payback y el ROI muestran "—" con la indicación de elegir
-  Express u «Otro monto». El ejemplo del texto de la página usa un monto fijo ($1.640.000, el mismo
-  de la plantilla Excel), no la UF.
+- **Ejemplo inicial:** abre con Automatización Express (`CALCULADORA.defecto`), cuyo precio en pesos
+  sale de `src/datos/oferta.mjs`. Así el HTML trae el resultado completo (inversión, payback, ROI)
+  sin depender de la UF, y nada cambia ni parpadea al cargar. La selección por defecto no genera
+  eventos: `calculator_start` y `calculator_complete` solo miden interacción real.
+- **Piloto y UF:** el piloto (UF 40) se pasa a pesos solo con la UF de hoy ("desde UF 40 + IVA ·
+  ≈ $X"). Sin ella, si el visitante elige el piloto, la inversión queda sin monto (`inversion: null`,
+  estado `sin-monto`): el ahorro se calcula igual, payback y ROI muestran "—" y un aviso junto a las
+  opciones pide ingresar el monto de la propuesta en «Otro monto». El texto de la página no repite
+  cifras del ejemplo: los resultados se ven en la calculadora.
 - **Plantilla Excel** (`scripts/plantillas/roi.py`): mismas fórmulas y mismas etiquetas; con el
   ejemplo (5 personas, 6 h/semana, $9.000, 60 %, $1.640.000) da exactamente lo mismo que la web
   (payback 2,76 meses, ROI 335 %, ROI 3 años 1.204 %).
