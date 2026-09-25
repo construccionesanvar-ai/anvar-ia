@@ -1,0 +1,31 @@
+# Verificación post-deploy: después de cada push a main, espera a que
+# ia.anvartech.cl sirva exactamente el HTML de ese commit y revisa, contra la
+# web pública, redirecciones, cabeceras, imágenes OG, CSS/JS, la descarga XLSX,
+# robots, sitemap, feed, llms.txt, la clave de IndexNow y el 404.
+# No bloquea el deploy (Vercel publica por su cuenta): si falla, avisa en
+# la pestaña Actions y por correo a quien hizo el push.
+name: Verificación post-deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verificacion
+  cancel-in-progress: true
+
+jobs:
+  produccion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Verificar la web pública
+        run: node scripts/smoke.mjs

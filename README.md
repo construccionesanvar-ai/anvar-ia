@@ -63,6 +63,7 @@ scripts/
   build.mjs  check.mjs  servidor.mjs  e2e.mjs
   og.mjs                  imágenes para compartir (npm run og)
   indexnow.mjs            aviso a Bing/IndexNow (lo corre .github/workflows/indexnow.yml)
+  smoke.mjs               verificación de la web pública (lo corre .github/workflows/verificacion.yml)
   utm.mjs                 enlaces con UTM (npm run utm)
   plantillas/roi.py       genera public/descargas/plantilla-roi-automatizacion.xlsx
 docs/                     SEO, Search Console, Bing, distribución, Google Business Profile, lanzamiento
@@ -380,6 +381,16 @@ lleva su etiqueta y, si la cifra tiene límites, su "alcance de la cifra".
 Cada `git push` a `main` publica solo en Vercel (proyecto `anvar-ia`, equipo
 ANVAR TECH): Vercel corre `npm install` y `npm run build`. Lo que Vercel no corre
 es `npm run check` ni las pruebas: hazlo tú antes del push (`npm run qa`).
+
+Después de cada push a `main` corren dos workflows de GitHub Actions (pestaña Actions):
+
+- **Verificación post-deploy** (`scripts/smoke.mjs`): espera a que `ia.anvartech.cl` sirva
+  exactamente el HTML del commit y revisa contra la web pública las 24 páginas, redirecciones,
+  cabeceras de seguridad, imágenes OG, CSS/JS, la descarga XLSX, robots, sitemap, feed,
+  llms.txt, la clave de IndexNow y el 404. Si falla, GitHub avisa por correo.
+- **IndexNow**: avisa a Bing y compañía solo las páginas que cambiaron (ver SEO técnico).
+
+Ninguno bloquea el deploy. Para correr la verificación a mano: `npm run smoke`.
 
 ## Documentos publicados
 

@@ -46,10 +46,14 @@ Cómo está armado:
 No envía todo el sitio en cada deploy, a propósito: avisar URL que no cambiaron es spam para
 el protocolo y puede hacer que Bing ignore los avisos.
 
-### Primer envío (una vez, después del lanzamiento)
+### Primer envío (ya hecho)
 
-GitHub → pestaña **Actions** → **IndexNow** → **Run workflow** → marca "Enviar todas las URL
-del sitemap" → **Run**. En el registro debe aparecer `Respuesta IndexNow: 200` o `202`.
+El 2026-09-25, al publicar la versión 2.2.0, el workflow envió las 24 URL del sitemap (todas
+cambiaron en ese deploy) y IndexNow respondió `202 Accepted`. No hace falta repetirlo.
+
+Si algún día necesitas reenviar todo (por ejemplo, después de rotar la clave): GitHub → pestaña
+**Actions** → **IndexNow** → **Run workflow** → marca "Enviar todas las URL del sitemap" →
+**Run**. En el registro debe aparecer `Respuesta IndexNow: 200` o `202`.
 
 ### Envío manual desde tu computador
 
