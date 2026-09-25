@@ -6,7 +6,7 @@
    Sin dependencias.
 
    Configuración: <script type="application/json" id="config">, que genera el
-   build desde src/ (mensajes, WhatsApp, agenda, UF de referencia y, solo donde
+   build desde src/ (mensajes, WhatsApp, agenda y, solo donde
    hace falta, los datos de las herramientas).
 
    Eventos (Vercel Web Analytics; page_view lo registra Vercel solo). Un clic
@@ -124,42 +124,50 @@
   }
 
   /* ------------------------------------------------------------------ UF */
-  // El HTML trae los precios en UF sin pesos (una cifra fija envejece). Aquí
-  // se pide la UF del día a /api/uf (cacheada en la CDN) y se muestra la
-  // equivalencia con su fecha. Si no llega, se dice que no está disponible.
-  // La página nunca espera esta llamada.
-  var ufDia = null; // { valor, fecha } de /api/uf
+  // El HTML trae los precios en UF sin pesos. Después de cargar se pide la UF a
+  // /api/uf (nuestro servidor; la fuente es mindicador.cl, ver src/uf.mjs) y,
+  // solo si es la UF de HOY en Chile, se agrega "· ≈ $X". Si no, queda el
+  // precio en UF, sin más texto. Nunca hay un valor de respaldo en pesos.
+  var ufDia = null; // { valor, fecha } solo si es la UF de hoy
+  var ufEstado = 'pendiente'; // pendiente | vigente | no-disponible
   var ufListeners = [];
   var fechaCorta = function (iso) { var p = String(iso).slice(0, 10).split('-'); return p[2] + '/' + p[1] + '/' + p[0]; };
   var textoIva = function (iva) { return iva === 'incluido' ? 'IVA incluido' : '+ IVA'; };
+  // Hoy en Chile, según el reloj del navegador (misma regla que el servidor).
+  var hoyChile = function () {
+    try { return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' }); } catch (e) { return null; }
+  };
+  var ufDeHoy = function (j) {
+    if (!j || j.estado !== 'vigente' || typeof j.valor !== 'number' || !(j.valor >= 10000 && j.valor <= 1000000)) return false;
+    var hoy = hoyChile();
+    return /^\d{4}-\d{2}-\d{2}$/.test(j.fecha || '') && (hoy === null || j.fecha === hoy);
+  };
   function pintarUf() {
     $$('[data-uf]').forEach(function (el) {
       var uf = +el.getAttribute('data-uf'), iva = el.getAttribute('data-iva');
-      el.textContent = ufDia ? '≈ ' + pesos(uf * ufDia.valor) + ' ' + textoIva(iva) : textoIva(iva);
+      el.textContent = textoIva(iva) + (ufDia ? ' · ≈ ' + pesos(uf * ufDia.valor) : '');
     });
     $$('[data-uf-nota]').forEach(function (el) {
-      el.textContent = ufDia
-        ? 'Equivalencia en pesos con la UF del ' + fechaCorta(ufDia.fecha) + ' (' + pesos(ufDia.valor) + '). Los precios en UF se facturan con la UF del día de la factura.'
-        : 'Equivalencia en pesos no disponible temporalmente. Los precios en UF se facturan con la UF del día de la factura.';
+      var condicion = el.getAttribute('data-uf-nota-base') || el.textContent;
+      el.setAttribute('data-uf-nota-base', condicion);
+      el.textContent = ufDia ? 'Equivalencia en pesos con la UF del ' + fechaCorta(ufDia.fecha) + ' (' + pesos(ufDia.valor) + '). ' + condicion : condicion;
     });
     ufListeners.forEach(function (fn) { fn(ufDia); });
   }
   function traerUf() {
     if (!$('[data-uf],[data-uf-nota],[data-necesita-uf]')) return;
-    if (!window.fetch) { pintarUf(); return; }
+    var listo = function (j) { ufDia = ufDeHoy(j) ? { valor: j.valor, fecha: j.fecha } : null; ufEstado = ufDia ? 'vigente' : 'no-disponible'; pintarUf(); };
+    if (!window.fetch) { listo(null); return; }
     var ctrl = window.AbortController ? new AbortController() : null;
-    var corte = setTimeout(function () { if (ctrl) ctrl.abort(); }, 5000);
+    var corte = setTimeout(function () { if (ctrl) ctrl.abort(); }, 8000);
     fetch('/api/uf', { signal: ctrl ? ctrl.signal : undefined })
-      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-      .then(function (j) {
-        clearTimeout(corte);
-        if (!j || !(j.valor > 20000 && j.valor < 100000) || !/^\d{4}-\d{2}-\d{2}/.test(j.fecha || '')) throw 0;
-        ufDia = { valor: j.valor, fecha: j.fecha };
-        pintarUf();
-      })
-      .catch(function () { clearTimeout(corte); ufDia = null; pintarUf(); });
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { clearTimeout(corte); listo(j); })
+      .catch(function () { clearTimeout(corte); listo(null); });
   }
-  if ('requestIdleCallback' in window) window.requestIdleCallback(traerUf, { timeout: 1500 });
+  // La calculadora la necesita para el piloto: se pide de inmediato. En el resto, cuando el navegador esté libre.
+  if ($('[data-necesita-uf]')) traerUf();
+  else if ('requestIdleCallback' in window) window.requestIdleCallback(traerUf, { timeout: 1500 });
   else setTimeout(traerUf, 600);
 
   /* ---------------------------------------------------------- menú móvil */
@@ -227,6 +235,7 @@
     $: $, $$: $$, cfg: CFG, esc: esc, pesos: pesos, medir: medir, pagina: pagina, fuente: fuente,
     conRef: conRef, enlaceWsp: enlaceWsp, fechaCorta: fechaCorta,
     ufDia: function () { return ufDia; },
+    ufEstado: function () { return ufEstado; },
     alCambiarUf: function (fn) { ufListeners.push(fn); }
   };
 

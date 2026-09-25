@@ -3,11 +3,11 @@
 // el estado ya resuelto (primera pregunta, ejemplo calculado), así nada aparece
 // vacío ni en cero mientras carga el JavaScript. Las fórmulas viven en
 // src/calculo.mjs, que también usa el navegador (public/calculo.js).
-import { SITIO, CALCULADORA } from '../config.mjs';
+import { CALCULADORA } from '../config.mjs';
 import { SERVICIOS } from '../datos/oferta.mjs';
 import { DIAGNOSTICO } from '../datos/contenido.mjs';
-import { esc, precioTexto, fechaCorta } from '../html.mjs';
-import { roi, puntoPedido, NIVELES_SERVICIO, textoPayback, lecturaRoi, miles, pesos, porcentaje } from '../calculo.mjs';
+import { esc, precioTexto } from '../html.mjs';
+import { roi, puntoPedido, NIVELES_SERVICIO, resumenRoi, ufAPesos, miles, pesos } from '../calculo.mjs';
 import { encabezado } from './base.mjs';
 
 export { puntoPedido, NIVELES_SERVICIO };
@@ -17,13 +17,14 @@ export const CALC_DEFECTO = CALCULADORA.defecto;
 
 /**
  * Montos que la calculadora ofrece comparar, desde la fuente única de precios.
- * Los precios en UF se pasan a pesos con la UF que se indique (en el
- * navegador, la del día; en el HTML inicial, la de referencia, con su fecha).
+ * Un precio en UF se pasa a pesos solo con la UF de hoy; sin ella, su monto es
+ * null (el HTML inicial no la tiene: la agrega el navegador desde /api/uf).
+ * @param {number|null} [uf]  valor de la UF de hoy
  */
-export function opcionesInversion(uf = SITIO.uf.valor) {
+export function opcionesInversion(uf = null) {
   const op = (id) => {
     const p = SERVICIOS[id].precio;
-    return { id, nombre: SERVICIOS[id].nombre, etiqueta: `${precioTexto(p).principal} + IVA`, moneda: p.moneda, valor: p.valor, monto: p.moneda === 'UF' ? p.valor * uf : p.valor };
+    return { id, nombre: SERVICIOS[id].nombre, etiqueta: `${precioTexto(p).principal} + IVA`, moneda: p.moneda, valor: p.valor, monto: p.moneda === 'UF' ? ufAPesos(p.valor, uf) : p.valor };
   };
   return { express: op('express'), piloto: op('piloto') };
 }
@@ -31,9 +32,9 @@ export function opcionesInversion(uf = SITIO.uf.valor) {
 /**
  * Entradas de la calculadora → resultado (ver src/calculo.mjs).
  * @param {{ personas: number, horas: number, costo: number, auto: number, inversion: string, monto: number, mensual: number }} d
- * @param {number} [uf]
+ * @param {number|null} [uf]  UF de hoy; sin ella, el piloto queda sin monto
  */
-export function calcularRoi(d, uf = SITIO.uf.valor) {
+export function calcularRoi(d, uf = null) {
   const ops = opcionesInversion(uf);
   const inversion = d.inversion === 'otro' ? d.monto : (ops[d.inversion] ?? ops.piloto).monto;
   return roi({ personas: d.personas, horasSemana: d.horas, costoHora: d.costo, pctAutomatizable: d.auto, inversion, costoMensual: d.mensual, semanas: CALCULADORA.semanas });
@@ -90,8 +91,8 @@ export function diagnostico() {
 export function calculadora({ compartir = false, formulas = '' } = {}) {
   const d = CALC_DEFECTO;
   const r = calcularRoi(d);
+  const t = resumenRoi(r, CALCULADORA.mesesMaximos);
   const ops = opcionesInversion();
-  const refUf = `≈ ${pesos(ops.piloto.monto)} con UF de referencia (${pesos(SITIO.uf.valor)} al ${fechaCorta(SITIO.uf.fecha)})`;
   const deslizador = (id, etiquetaTxt, min, max, paso, valor, mostrar, hablado, ayuda) => `<div class="control">
     <div class="control-cab"><label for="${id}">${esc(etiquetaTxt)}</label> <output id="${id}-v" for="${id}">${esc(mostrar)}</output></div>
     <input type="range" id="${id}" min="${min}" max="${max}" step="${paso}" value="${valor}" data-defecto="${valor}" aria-valuetext="${esc(hablado)}"${ayuda ? ` aria-describedby="${id}-ayuda"` : ''}>
@@ -113,7 +114,7 @@ export function calculadora({ compartir = false, formulas = '' } = {}) {
     <fieldset class="calc-inversion">
       <legend>Inversión a comparar</legend>
       ${opcion('express', ops.express.nombre, ops.express.etiqueta)}
-      ${opcion('piloto', ops.piloto.nombre, `${ops.piloto.etiqueta} · ${refUf}`, 'c-piloto-d')}
+      ${opcion('piloto', ops.piloto.nombre, ops.piloto.etiqueta, 'c-piloto-d')}
       ${opcion('otro', 'Otro monto', 'Tu cotización o presupuesto')}
       ${monto('c-monto', 'Monto de la inversión, neto', d.inversion === 'otro' ? d.monto : 0, 'Al escribir un monto se elige "Otro monto".')}
     </fieldset>
@@ -123,23 +124,23 @@ export function calculadora({ compartir = false, formulas = '' } = {}) {
   <div class="calc-resultado">
     <p class="calc-estado"><span class="insignia" id="c-estado">Ejemplo ilustrativo</span></p>
     <p class="label">Ahorro bruto anual estimado</p>
-    <p class="calc-valor" id="c-valor">${esc(pesos(r.ahorroBruto))}</p>
+    <p class="calc-valor" id="c-valor">${esc(t.ahorroBruto)}</p>
     <div class="barras" role="img" aria-label="Horas al año antes y después">
-      <div class="barra-fila"><span>Hoy</span> <span class="barra-pista"><i class="barra-hoy"></i></span> <span id="c-hoy">${esc(miles(r.horasAnuales))} h</span></div>
-      <div class="barra-fila"><span>Después</span> <span class="barra-pista"><i class="barra-despues" id="c-barra-despues"></i></span> <span id="c-despues">${esc(miles(r.horasAnuales - r.horasRecuperadas))} h</span></div>
+      <div class="barra-fila"><span>Hoy</span> <span class="barra-pista"><i class="barra-hoy"></i></span> <span id="c-hoy">${esc(t.horasAnuales)}</span></div>
+      <div class="barra-fila"><span>Después</span> <span class="barra-pista"><i class="barra-despues" id="c-barra-despues"></i></span> <span id="c-despues">${esc(t.horasDespues)}</span></div>
     </div>
     <dl class="calc-datos calc-datos--roi">
-      ${fila('c-horas-ano', 'Horas manuales al año', `${miles(r.horasAnuales)} h`)}
-      ${fila('c-costo-ano', 'Costo anual actual del proceso', pesos(r.costoAnual))}
-      ${fila('c-horas-lib', 'Horas potencialmente recuperadas', `${miles(r.horasRecuperadas)} h`)}
-      ${fila('c-inv', 'Inversión inicial', pesos(r.inversion))}
-      ${fila('c-recurrente', 'Costos recurrentes al año', pesos(r.recurrenteAnual))}
-      ${fila('c-neto1', 'Ahorro neto estimado, año 1', pesos(r.ahorroNetoAno1))}
-      ${fila('c-payback', 'Payback estimado', textoPayback(r, CALCULADORA.mesesMaximos), 'calc-dato-clave')}
-      ${fila('c-roi1', 'ROI año 1', porcentaje(r.roi1))}
-      ${fila('c-roi3', 'ROI a 3 años', porcentaje(r.roi3))}
+      ${fila('c-horas-ano', 'Horas manuales al año', t.horasAnuales)}
+      ${fila('c-costo-ano', 'Costo anual actual del proceso', t.costoAnual)}
+      ${fila('c-horas-lib', 'Horas potencialmente recuperadas', t.horasRecuperadas)}
+      ${fila('c-inv', 'Inversión inicial', t.inversion)}
+      ${fila('c-recurrente', 'Costos recurrentes al año', t.recurrente)}
+      ${fila('c-neto1', 'Ahorro neto estimado, año 1', t.neto1)}
+      ${fila('c-payback', 'Payback estimado', t.payback, 'calc-dato-clave')}
+      ${fila('c-roi1', 'ROI año 1', t.roi1)}
+      ${fila('c-roi3', 'ROI a 3 años', t.roi3)}
     </dl>
-    <p class="calc-lectura" id="c-lectura">${esc(lecturaRoi(r, CALCULADORA.mesesMaximos))}</p>
+    <p class="calc-lectura" id="c-lectura">${esc(r.estado === 'sin-monto' ? 'El piloto se pasa a pesos con la UF de hoy. Si no está disponible, elige «Otro monto» y escribe el valor de tu propuesta.' : t.lectura)}</p>
     <p class="calc-aviso">Estimación referencial basada en los valores ingresados. El resultado real depende del proceso, alcance e implementación.</p>
     <p class="sr" id="c-anuncio" aria-live="polite" aria-atomic="true"></p>
     ${compartir ? `<div class="compartir"><button type="button" class="btn btn--secundario" id="c-compartir">Copiar enlace con estos valores</button> <span class="compartir-msg" id="c-compartir-msg" role="status" aria-live="polite"></span></div>` : ''}

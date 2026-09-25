@@ -25,14 +25,19 @@ const positivo = (v) => { const n = Number(v); return Number.isFinite(n) && n > 
  *   ROI año 1               = ahorro neto año 1 ÷ inversión
  *   ROI a 3 años            = (ahorro neto anual × 3 − inversión) ÷ inversión
  * `estado` dice cuándo payback y ROI no aplican, para no mostrar Infinity ni NaN.
+ * `inversion: null` significa "monto en pesos desconocido" (por ejemplo, un
+ * piloto en UF cuando no hay UF del día): el ahorro se calcula igual, pero la
+ * inversión, el ahorro neto del año 1, el payback y el ROI quedan en null
+ * (estado 'sin-monto'). Nunca se inventa un monto.
  * @param {{ personas: number, horasSemana: number, costoHora: number, pctAutomatizable: number,
- *   inversion: number, costoMensual?: number, semanas?: number }} e
+ *   inversion: number|null, costoMensual?: number, semanas?: number }} e
  */
 export function roi(e) {
   const personas = positivo(e.personas);
   const horasSemana = positivo(e.horasSemana);
   const costoHora = positivo(e.costoHora);
   const pct = Math.min(100, positivo(e.pctAutomatizable)) / 100;
+  const sinMonto = e.inversion === null;
   const inversion = positivo(e.inversion);
   const costoMensual = positivo(e.costoMensual);
   const semanas = e.semanas === undefined ? 44 : positivo(e.semanas);
@@ -44,6 +49,10 @@ export function roi(e) {
   const recurrenteAnual = costoMensual * 12;
   const ahorroNetoAnual = ahorroBruto - recurrenteAnual;
   const ahorroNetoAno1 = ahorroNetoAnual - inversion;
+
+  if (sinMonto) {
+    return { horasAnuales, costoAnual, horasRecuperadas, ahorroBruto, inversion: null, recurrenteAnual, ahorroNetoAnual, ahorroNetoAno1: null, paybackMeses: null, roi1: null, roi3: null, estado: /** @type {const} */ ('sin-monto') };
+  }
 
   /** @type {'ok'|'sin-ahorro'|'sin-recuperacion'|'sin-inversion'} */
   let estado = 'ok';
@@ -96,8 +105,24 @@ export const porcentaje = (x) => (x === null || !Number.isFinite(x) ? 'No aplica
 /** Un decimal con coma: 2,76 → "2,8". */
 const unDecimal = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
 
+/**
+ * Precio en UF pasado a pesos, redondeado al peso: 40 × 41.016,28 → 1.640.651.
+ * Sin UF válida devuelve null (la interfaz muestra solo el precio en UF).
+ * @param {number} cantidad  UF
+ * @param {number|null|undefined} valorUf  pesos por UF
+ */
+export function ufAPesos(cantidad, valorUf) {
+  const c = Number(cantidad), v = Number(valorUf);
+  if (valorUf === null || valorUf === undefined || !Number.isFinite(c) || !Number.isFinite(v) || c < 0 || v <= 0) return null;
+  return Math.round(c * v);
+}
+
+/** Sin monto de inversión (estado 'sin-monto') estos valores no existen. */
+export const SIN_DATO = '—';
+
 /** Payback para mostrar: nunca "Infinity", "NaN" ni "-0". */
 export function textoPayback(r, mesesMax = 36) {
+  if (r.estado === 'sin-monto') return SIN_DATO;
   if (r.estado === 'sin-ahorro' || r.estado === 'sin-inversion') return 'No aplica';
   if (r.estado === 'sin-recuperacion' || r.paybackMeses === null) return 'Sin recuperación';
   if (r.paybackMeses > mesesMax) return `Más de ${mesesMax} meses`;
@@ -107,11 +132,36 @@ export function textoPayback(r, mesesMax = 36) {
 
 /** Lectura en una frase, prudente: estimación, no promesa. */
 export function lecturaRoi(r, mesesMax = 36) {
+  if (r.estado === 'sin-monto') return 'Falta el monto de la inversión en pesos: elige una opción o escribe «Otro monto» para ver el payback y el ROI.';
   if (r.estado === 'sin-ahorro') return 'Con estos valores no hay horas que recuperar: no hay ahorro que estimar.';
   if (r.estado === 'sin-recuperacion') return 'Con estos valores la automatización no se pagaría: el costo mensual iguala o supera el ahorro estimado.';
   if (r.estado === 'sin-inversion') return 'Sin inversión inicial, el ahorro estimado es el ahorro neto anual. El payback y el ROI no aplican.';
   if (/** @type {number} */ (r.paybackMeses) > mesesMax) return `Con estos números la inversión no se recuperaría dentro de ${mesesMax} meses solo con ahorro de tiempo. Conviene revisar si hay errores o reprocesos que cuesten más.`;
   return `Con esta inversión, el ahorro estimado la recuperaría en ${textoPayback(r, mesesMax).toLowerCase()}. Es un valor referencial: depende del proceso, del alcance y de la implementación.`;
+}
+
+/**
+ * Todos los textos del resultado de ROI, para que el HTML inicial y el
+ * navegador escriban exactamente lo mismo.
+ * @param {ReturnType<typeof roi>} r
+ * @param {number} [mesesMax]
+ */
+export function resumenRoi(r, mesesMax = 36) {
+  const sinMonto = r.estado === 'sin-monto';
+  return {
+    ahorroBruto: pesos(r.ahorroBruto),
+    horasAnuales: miles(r.horasAnuales) + ' h',
+    horasDespues: miles(r.horasAnuales - r.horasRecuperadas) + ' h',
+    costoAnual: pesos(r.costoAnual),
+    horasRecuperadas: miles(r.horasRecuperadas) + ' h',
+    inversion: sinMonto ? SIN_DATO : pesos(r.inversion),
+    recurrente: pesos(r.recurrenteAnual),
+    neto1: sinMonto ? SIN_DATO : pesos(r.ahorroNetoAno1),
+    payback: textoPayback(r, mesesMax),
+    roi1: sinMonto ? SIN_DATO : porcentaje(r.roi1),
+    roi3: sinMonto ? SIN_DATO : porcentaje(r.roi3),
+    lectura: lecturaRoi(r, mesesMax),
+  };
 }
 
 /* ---------------------------------------------------- punto de pedido */

@@ -96,7 +96,7 @@ resultado(11, 'Horas a la semana por persona', '=B7*B8/60', '0.0" h"', 'Veces po
 
 seccion(13, '2. La automatización')
 entrada(14, 'Parte del tiempo que se automatiza', 0.6, PCT, 'Si no sabes, deja 60%. El resto queda para revisión humana y excepciones.')
-entrada(15, 'Inversión inicial ($, neto)', 1640000, PESOS, 'Tu cotización real, si la tienes. El ejemplo es un piloto desde UF 40 + IVA con UF de $41.000 (24/09/2026); una Automatización Express parte en $199.900 + IVA. Actualiza con la UF del día.')
+entrada(15, 'Inversión inicial ($, neto)', 1640000, PESOS, 'Tu cotización real, si la tienes. El ejemplo usa $1.640.000. Como referencia, un piloto parte en UF 40 + IVA (pásalo a pesos con la UF del día) y una Automatización Express en $199.900 + IVA.')
 entrada(16, 'Costo mensual de operación o soporte ($)', 0, PESOS, 'Licencias, suscripciones o soporte. 0 si no hay.')
 
 seccion(18, '3. Resultados (mismas fórmulas que la calculadora en línea)')

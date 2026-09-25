@@ -20,7 +20,6 @@ export const PENDIENTES_PRIVACIDAD = [
   'Revisión por abogado frente a la Ley 19.628 y la Ley 21.719 (nueva ley de datos personales, con entrada en vigencia prevista para diciembre de 2026).',
   'Confirmar el proveedor de la casilla que recibe los formularios (variable NOTIFY_MAIL en Vercel) y nombrarlo en la sección de proveedores si corresponde.',
   'Si se activa el CRM en Google Sheets (SHEETS_WEBHOOK_URL) o una agenda externa, revisar esta política.',
-  'Si se configura CMF_API_KEY, nombrar a la CMF como fuente del valor de la UF.',
 ];
 
 const e = SITIO.empresa;

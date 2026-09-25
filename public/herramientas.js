@@ -226,22 +226,28 @@
     var empezo = false, anuncio = null;
     var P = K.pesos, M = K.miles;
 
-    // UF para pasar el piloto a pesos: la del día si llegó; si no, la de referencia (con su fecha a la vista).
-    var uf = { valor: C.ufRef.valor, fecha: C.ufRef.fecha, deHoy: false };
+    // El piloto (precio en UF) se pasa a pesos solo con la UF de HOY. Mientras no
+    // llega, o si no está disponible, el piloto queda sin monto: el ahorro se
+    // calcula igual y payback/ROI piden "Otro monto". Nunca un valor de respaldo.
+    var uf = A.ufDia();
     var leerMonto = function (el) { return K.leerPesos(el.value); };
     var escribirMonto = function (el) { var n = leerMonto(el); el.value = n ? M(n) : ''; };
     var inversionElegida = function () { var r = radios.filter(function (x) { return x.checked; })[0]; return r ? r.value : 'piloto'; };
     var montoInversion = function (tipo) {
       if (tipo === 'otro') return leerMonto(cMonto);
       var o = C.opciones[tipo];
-      return o.moneda === 'UF' ? o.valor * uf.valor : o.valor;
+      return o.moneda === 'UF' ? K.ufAPesos(o.valor, uf ? uf.valor : null) : o.valor;
     };
     var pintarPiloto = function () {
       var el = $('#c-piloto-d'), o = C.opciones.piloto;
       if (!el || o.moneda !== 'UF') return;
-      el.textContent = o.etiqueta + ' · ≈ ' + P(o.valor * uf.valor) + (uf.deHoy
-        ? ' con la UF del ' + A.fechaCorta(uf.fecha) + ' (' + P(uf.valor) + ')'
-        : ' con UF de referencia (' + P(uf.valor) + ' al ' + A.fechaCorta(uf.fecha) + ')');
+      el.textContent = o.etiqueta + (uf ? ' · ≈ ' + P(K.ufAPesos(o.valor, uf.valor)) + ' (UF del ' + A.fechaCorta(uf.fecha) + ')' : '');
+    };
+    // Sin monto para el piloto: qué decir según si la UF todavía viene o no está.
+    var lecturaSinMonto = function () {
+      return A.ufEstado() === 'pendiente'
+        ? 'Pasando el piloto a pesos con la UF de hoy…'
+        : 'La equivalencia en pesos del piloto no está disponible en este momento. Para ver payback y ROI, elige «Otro monto» y escribe el valor de tu propuesta, o compara con la Automatización Express.';
     };
 
     var calcular = function () {
@@ -258,20 +264,21 @@
       $('#c-horas-v').textContent = cHoras.value + ' h';
       $('#c-costo-v').textContent = P(+cCosto.value);
       $('#c-auto-v').textContent = cAuto.value + '%';
-      $('#c-valor').textContent = P(r.ahorroBruto);
-      $('#c-hoy').textContent = M(r.horasAnuales) + ' h';
-      $('#c-despues').textContent = M(r.horasAnuales - r.horasRecuperadas) + ' h';
+      var t = K.resumenRoi(r, C.mesesMax);
+      $('#c-valor').textContent = t.ahorroBruto;
+      $('#c-hoy').textContent = t.horasAnuales;
+      $('#c-despues').textContent = t.horasDespues;
       $('#c-barra-despues').style.width = (r.horasAnuales ? (r.horasAnuales - r.horasRecuperadas) / r.horasAnuales * 100 : 0) + '%';
-      $('#c-horas-ano').textContent = M(r.horasAnuales) + ' h';
-      $('#c-costo-ano').textContent = P(r.costoAnual);
-      $('#c-horas-lib').textContent = M(r.horasRecuperadas) + ' h';
-      $('#c-inv').textContent = P(r.inversion);
-      $('#c-recurrente').textContent = P(r.recurrenteAnual);
-      $('#c-neto1').textContent = P(r.ahorroNetoAno1);
-      $('#c-payback').textContent = K.textoPayback(r, C.mesesMax);
-      $('#c-roi1').textContent = K.porcentaje(r.roi1);
-      $('#c-roi3').textContent = K.porcentaje(r.roi3);
-      $('#c-lectura').textContent = K.lecturaRoi(r, C.mesesMax);
+      $('#c-horas-ano').textContent = t.horasAnuales;
+      $('#c-costo-ano').textContent = t.costoAnual;
+      $('#c-horas-lib').textContent = t.horasRecuperadas;
+      $('#c-inv').textContent = t.inversion;
+      $('#c-recurrente').textContent = t.recurrente;
+      $('#c-neto1').textContent = t.neto1;
+      $('#c-payback').textContent = t.payback;
+      $('#c-roi1').textContent = t.roi1;
+      $('#c-roi3').textContent = t.roi3;
+      $('#c-lectura').textContent = r.estado === 'sin-monto' && tipo === 'piloto' ? lecturaSinMonto() : t.lectura;
       return r;
     };
     // Lectores de pantalla: un resumen al soltar el control, no en cada paso del arrastre.
@@ -279,7 +286,7 @@
       clearTimeout(anuncio);
       anuncio = setTimeout(function () {
         var r = calcular();
-        $('#c-anuncio').textContent = 'Ahorro bruto anual estimado: ' + P(r.ahorroBruto) + '. Payback estimado: ' + K.textoPayback(r, C.mesesMax) + '.';
+        $('#c-anuncio').textContent = 'Ahorro bruto anual estimado: ' + P(r.ahorroBruto) + '. ' + (r.estado === 'sin-monto' ? $('#c-lectura').textContent : 'Payback estimado: ' + K.textoPayback(r, C.mesesMax) + '.');
       }, 400);
     };
     var marcarTuya = function (tuya) {
@@ -345,10 +352,8 @@
         } else { history.replaceState(null, '', u); listo('Copia el enlace desde la barra de direcciones.'); }
       });
     }
-    A.alCambiarUf(function (d) {
-      if (d) uf = { valor: d.valor, fecha: d.fecha, deHoy: true };
-      pintarPiloto(); calcular();
-    });
+    A.alCambiarUf(function (d) { uf = d; pintarPiloto(); calcular(); });
+    pintarPiloto();
     calcular();
   }
 

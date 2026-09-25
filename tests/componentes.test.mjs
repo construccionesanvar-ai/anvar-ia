@@ -33,25 +33,42 @@ test('testimonios: uno público muestra nombre, empresa y caso relacionado', () 
   assert.match(html, /\/casos#documentos-legales/);
 });
 
-test('calculadora: el HTML inicial muestra el ejemplo calculado con la fuente única', () => {
+test('calculadora: el HTML inicial no trae pesos del piloto (no conoce la UF de hoy) ni una UF de respaldo', () => {
   const r = calcularRoi(CALCULADORA.defecto);
   const html = calculadora({ compartir: true, formulas: '#como-se-calcula' });
-  assert.ok(html.includes(`id="c-valor">${pesos(r.ahorroBruto)}<`), 'valor inicial');
-  assert.match(html, /id="c-payback">2,8 meses</);
-  assert.match(html, /id="c-roi1">335%</);
+  assert.ok(html.includes(`id="c-valor">${pesos(r.ahorroBruto)}<`), 'el ahorro sí se calcula');
   assert.match(html, /name="c-inv" value="piloto" checked/);
-  assert.match(html, /UF de referencia \(\$41\.000 al 24\/09\/2026\)/, 'la UF de referencia va con su fecha');
+  assert.match(html, /id="c-piloto-d">desde UF 40 \+ IVA</, 'el piloto solo con su precio en UF');
+  for (const id of ['c-inv', 'c-neto1', 'c-payback', 'c-roi1', 'c-roi3']) assert.match(html, new RegExp(`id="${id}">—<`), `${id} sin monto`);
+  assert.doesNotMatch(html, /UF de referencia|41\.000|24\/09\/2026|≈\s*\$/);
   assert.match(html, /href="#como-se-calcula">Cómo calculamos esto/);
   assert.match(html, /Estimación referencial basada en los valores ingresados/);
   assert.doesNotMatch(html, /Infinity|NaN|vas a ahorrar/);
 });
 
-test('calculadora: las opciones de inversión salen de la fuente única de precios', () => {
-  const o = opcionesInversion(40000);
-  assert.equal(o.express.monto, SERVICIOS.express.precio.valor);
-  assert.equal(o.piloto.monto, SERVICIOS.piloto.precio.valor * 40000);
-  assert.equal(calcularRoi({ ...CALCULADORA.defecto, inversion: 'otro', monto: 500000 }).inversion, 500000);
-  assert.equal(calcularRoi({ ...CALCULADORA.defecto, inversion: 'express' }).inversion, SERVICIOS.express.precio.valor);
+test('calculadora: Express, piloto con UF de hoy, piloto sin UF y otro monto', () => {
+  const d = CALCULADORA.defecto;
+  // Express: precio en pesos, siempre disponible.
+  const ex = calcularRoi({ ...d, inversion: 'express' });
+  assert.equal(ex.inversion, SERVICIOS.express.precio.valor);
+  assert.equal(ex.estado, 'ok');
+  // Piloto con la UF de hoy: UF 40 × valor, redondeado al peso.
+  const conUf = calcularRoi({ ...d, inversion: 'piloto' }, 41016.28);
+  assert.equal(conUf.inversion, 1_640_651);
+  assert.equal(opcionesInversion(41016.28).piloto.monto, 1_640_651);
+  assert.equal(conUf.estado, 'ok');
+  assert.ok(/** @type {number} */ (conUf.paybackMeses) > 2.7 && /** @type {number} */ (conUf.paybackMeses) < 2.8);
+  // Piloto sin UF: sin monto; el ahorro sigue, payback y ROI no se inventan.
+  for (const sinUf of [null, undefined, Number.NaN, 0]) {
+    const r = calcularRoi({ ...d, inversion: 'piloto' }, /** @type {any} */ (sinUf));
+    assert.equal(r.estado, 'sin-monto', `UF ${sinUf}`);
+    assert.equal(r.inversion, null);
+    assert.equal(r.paybackMeses, null);
+    assert.equal(r.ahorroBruto, ex.ahorroBruto);
+  }
+  assert.equal(opcionesInversion().piloto.monto, null);
+  // Otro monto.
+  assert.equal(calcularRoi({ ...d, inversion: 'otro', monto: 500000 }).inversion, 500000);
 });
 
 test('portada: herramientas como tarjetas con enlace a su página, sin la experiencia completa', () => {

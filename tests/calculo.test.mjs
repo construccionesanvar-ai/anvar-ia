@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { roi, miles, pesos, porcentaje, textoPayback, lecturaRoi, leerPesos, MONTO_MAXIMO } from '../src/calculo.mjs';
+import { roi, miles, pesos, porcentaje, textoPayback, lecturaRoi, leerPesos, MONTO_MAXIMO, resumenRoi } from '../src/calculo.mjs';
 
 const casi = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6, `${msg}: ${a} ≠ ${b}`);
 const base = { personas: 5, horasSemana: 6, costoHora: 9000, pctAutomatizable: 60, inversion: 1_640_000, costoMensual: 0, semanas: 44 };
@@ -172,4 +172,31 @@ test('montos escritos a mano: separador de miles, signo $, decimales, vacíos y 
   assert.equal(leerPesos('-200.000'), 200_000);
   assert.equal(leerPesos('9'.repeat(40)), MONTO_MAXIMO);
   assert.equal(leerPesos('500.000', 100_000), 100_000);
+});
+
+test('inversión desconocida (piloto sin UF): se calcula el ahorro y todo lo demás queda "—", sin NaN', () => {
+  const r = roi({ personas: 5, horasSemana: 6, costoHora: 9000, pctAutomatizable: 60, inversion: null, costoMensual: 50_000 });
+  assert.equal(r.estado, 'sin-monto');
+  assert.equal(r.ahorroBruto, 7_128_000);
+  assert.equal(r.ahorroNetoAnual, 7_128_000 - 600_000);
+  assert.equal(r.inversion, null);
+  assert.equal(r.ahorroNetoAno1, null);
+  assert.equal(r.roi1, null);
+  const t = resumenRoi(r);
+  assert.deepEqual([t.inversion, t.neto1, t.payback, t.roi1, t.roi3], ['—', '—', '—', '—', '—']);
+  assert.equal(t.recurrente, '$600.000');
+  assert.ok(!/NaN|Infinity|undefined|null/.test(Object.values(t).join(' ')));
+});
+
+test('resumenRoi: los mismos textos que las funciones de formato, para el HTML y el navegador', () => {
+  const r = roi({ personas: 5, horasSemana: 6, costoHora: 9000, pctAutomatizable: 60, inversion: 1_640_651, costoMensual: 0 });
+  const t = resumenRoi(r, 36);
+  assert.equal(t.inversion, '$1.640.651');
+  assert.equal(t.payback, textoPayback(r, 36));
+  assert.equal(t.roi1, porcentaje(r.roi1));
+  assert.equal(t.lectura, lecturaRoi(r, 36));
+  // ROI negativo y sin recuperación, legibles.
+  const neg = resumenRoi(roi({ personas: 1, horasSemana: 1, costoHora: 3000, pctAutomatizable: 10, inversion: 1_640_651, costoMensual: 50_000 }), 36);
+  assert.equal(neg.payback, 'Sin recuperación');
+  assert.match(neg.roi1, /^−\d/);
 });

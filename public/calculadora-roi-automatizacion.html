@@ -97,7 +97,7 @@
     <fieldset class="calc-inversion">
       <legend>Inversión a comparar</legend>
       <label class="calc-opcion"><input type="radio" name="c-inv" value="express" data-defecto="0"> <span class="calc-opcion-t"><b>Automatización Express</b> <span class="calc-opcion-d">desde $199.900 + IVA</span></span></label>
-      <label class="calc-opcion"><input type="radio" name="c-inv" value="piloto" checked data-defecto="1"> <span class="calc-opcion-t"><b>Piloto en producción</b> <span class="calc-opcion-d" id="c-piloto-d">desde UF 40 + IVA · ≈ $1.640.000 con UF de referencia ($41.000 al 24/09/2026)</span></span></label>
+      <label class="calc-opcion"><input type="radio" name="c-inv" value="piloto" checked data-defecto="1"> <span class="calc-opcion-t"><b>Piloto en producción</b> <span class="calc-opcion-d" id="c-piloto-d">desde UF 40 + IVA</span></span></label>
       <label class="calc-opcion"><input type="radio" name="c-inv" value="otro" data-defecto="0"> <span class="calc-opcion-t"><b>Otro monto</b> <span class="calc-opcion-d">Tu cotización o presupuesto</span></span></label>
       <div class="calc-monto">
       <label for="c-monto">Monto de la inversión, neto</label>
@@ -131,25 +131,25 @@
 <dt>Horas potencialmente recuperadas</dt> <dd id="c-horas-lib">792 h</dd>
 </div>
       <div>
-<dt>Inversión inicial</dt> <dd id="c-inv">$1.640.000</dd>
+<dt>Inversión inicial</dt> <dd id="c-inv">—</dd>
 </div>
       <div>
 <dt>Costos recurrentes al año</dt> <dd id="c-recurrente">$0</dd>
 </div>
       <div>
-<dt>Ahorro neto estimado, año 1</dt> <dd id="c-neto1">$5.488.000</dd>
+<dt>Ahorro neto estimado, año 1</dt> <dd id="c-neto1">—</dd>
 </div>
       <div class="calc-dato-clave">
-<dt>Payback estimado</dt> <dd id="c-payback">2,8 meses</dd>
+<dt>Payback estimado</dt> <dd id="c-payback">—</dd>
 </div>
       <div>
-<dt>ROI año 1</dt> <dd id="c-roi1">335%</dd>
+<dt>ROI año 1</dt> <dd id="c-roi1">—</dd>
 </div>
       <div>
-<dt>ROI a 3 años</dt> <dd id="c-roi3">1.204%</dd>
+<dt>ROI a 3 años</dt> <dd id="c-roi3">—</dd>
 </div>
     </dl>
-    <p class="calc-lectura" id="c-lectura">Con esta inversión, el ahorro estimado la recuperaría en 2,8 meses. Es un valor referencial: depende del proceso, del alcance y de la implementación.</p>
+    <p class="calc-lectura" id="c-lectura">El piloto se pasa a pesos con la UF de hoy. Si no está disponible, elige «Otro monto» y escribe el valor de tu propuesta.</p>
     <p class="calc-aviso">Estimación referencial basada en los valores ingresados. El resultado real depende del proceso, alcance e implementación.</p>
     <p class="sr" id="c-anuncio" aria-live="polite" aria-atomic="true"></p>
     <div class="compartir"><button type="button" class="btn btn--secundario" id="c-compartir">Copiar enlace con estos valores</button> <span class="compartir-msg" id="c-compartir-msg" role="status" aria-live="polite"></span></div>
@@ -173,7 +173,7 @@
 <h2 id="que-significa">Qué significa el resultado</h2>
     <p><b>Ahorro bruto anual estimado</b> es cuánto le cuestan hoy a tu empresa, en un año, las horas que se van en la parte automatizable de la tarea. Con el ejemplo que trae la calculadora (5 personas, 6 horas a la semana cada una, <span class="cifra-ej">$9.000</span> la hora y 60% automatizable) son <span class="cifra-ej">$7.128.000</span> al año, sobre un costo anual del proceso de <span class="cifra-ej">$11.880.000</span>.</p>
     <p><b>Horas potencialmente recuperadas</b> es ese mismo tiempo en horas: 792 en el ejemplo. Es la cifra que conviene mirar primero, porque se entiende sin discutir el costo por hora.</p>
-    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. En el ejemplo, comparando con un piloto: payback <span class="cifra-ej">2,8 meses</span>, ROI año 1 <span class="cifra-ej">335%</span>.</p>
+    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. En el ejemplo, con una inversión de <span class="cifra-ej">$1.640.000</span>: payback <span class="cifra-ej">2,8 meses</span>, ROI año 1 <span class="cifra-ej">335%</span>.</p>
     <p>Cuando algo no se puede calcular, la calculadora lo dice en vez de mostrar un número engañoso: "No aplica" si no hay inversión o no hay ahorro, y "Sin recuperación" si el costo mensual iguala o supera el ahorro.</p>
 </section>
 <section class="prosa-sec" aria-labelledby="como-se-calcula">
@@ -190,7 +190,7 @@ Payback (meses)       = inversión ÷ (ahorro neto anual ÷ 12)
 ROI año 1             = ahorro neto año 1 ÷ inversión
 ROI a 3 años          = (ahorro neto anual × 3 − inversión) ÷ inversión</pre>
     <p>Las 44 semanas salen de restar a las 52 del año el feriado legal de 15 días hábiles que fija el <a href="https://www.bcn.cl/leychile/navegar?idNorma=207436" target="_blank" rel="noopener">Código del Trabajo</a> (tres semanas), los feriados y un margen para licencias y ausencias. Todos los montos son netos, sin IVA.</p>
-    <p>Las opciones de inversión usan los precios de entrada publicados: Automatización Express desde $199.900 + IVA, o un piloto desde UF 40 + IVA convertido a pesos con la UF del día (si no se puede obtener, con una UF de referencia, siempre con su fecha a la vista). Son pisos, no el precio de tu proceso: el valor final se fija por escrito después de verlo. Si pasa de 36 meses, la calculadora te dice que la inversión no se recuperaría dentro del período solo con ahorro de tiempo.</p>
+    <p>Las opciones de inversión usan los precios de entrada publicados: Automatización Express desde $199.900 + IVA, o un piloto desde UF 40 + IVA. Los precios en UF se convierten con la UF del día; si en ese momento no podemos obtenerla, mostramos solo el precio en UF y puedes comparar con «Otro monto». Son pisos, no el precio de tu proceso: el valor final se fija por escrito después de verlo. Si pasa de 36 meses, la calculadora te dice que la inversión no se recuperaría dentro del período solo con ahorro de tiempo.</p>
 </section>
 <section class="prosa-sec" aria-labelledby="cuando-vale-la-pena">
 <h2 id="cuando-vale-la-pena">Cuándo vale la pena automatizar</h2>
@@ -408,10 +408,10 @@ ROI a 3 años          = (ahorro neto anual × 3 − inversión) ÷ inversión</
   </div>
 </footer>
 <aside aria-label="Contacto rápido"><a class="wsp-flotante" href="https://wa.me/56926333760?text=Hola%20ANVAR%20TECH.%20Quiero%20evaluar%20si%20un%20proceso%20de%20mi%20empresa%20se%20puede%20automatizar.%0A%0A(ref%3A%20roi-calculator)" data-wsp="general" data-track-label="flotante" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5v-.5c0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2"/></svg><span>WhatsApp</span></a></aside>
-<script type="application/json" id="config">{"wsp":"56926333760","mensajes":{"general":"Hola ANVAR TECH. Quiero evaluar si un proceso de mi empresa se puede automatizar.","agenda":"Hola ANVAR TECH. Quiero coordinar una evaluación de 20 minutos para un proceso de mi empresa. ¿Qué horarios tienen disponibles?","express":"Hola ANVAR TECH. Quiero evaluar una Automatización Express para un proceso de mi empresa.","datos":"Hola ANVAR TECH. Quiero revisar una solución de datos e inteligencia operacional para mi empresa.","intelligence":"Hola ANVAR TECH. Quiero saber más de ANVAR Intelligence para mi empresa.","diagnostico":"Hola ANVAR TECH. Quiero cotizar un diagnóstico de automatización para mi empresa.","piloto":"Hola ANVAR TECH. Tengo un proceso manual en mi empresa y quiero evaluar un piloto de automatización.","capacitacion":"Hola ANVAR TECH. Quiero cotizar una capacitación en IA para mi equipo.","personal":"Hola ANVAR TECH. Quiero coordinar una sesión de asesoría personal en IA.","caso":"Hola ANVAR TECH. Vi sus casos y tengo un proceso parecido en mi empresa.","privacidad":"Hola ANVAR TECH. Tengo una consulta sobre mis datos personales."},"agenda":"","calc":{"semanas":44,"mesesMax":36,"ufRef":{"valor":41000,"fecha":"2026-09-24"},"opciones":{"express":{"moneda":"CLP","valor":199900,"etiqueta":"desde $199.900 + IVA"},"piloto":{"moneda":"UF","valor":40,"etiqueta":"desde UF 40 + IVA"}}}}</script>
+<script type="application/json" id="config">{"wsp":"56926333760","mensajes":{"general":"Hola ANVAR TECH. Quiero evaluar si un proceso de mi empresa se puede automatizar.","agenda":"Hola ANVAR TECH. Quiero coordinar una evaluación de 20 minutos para un proceso de mi empresa. ¿Qué horarios tienen disponibles?","express":"Hola ANVAR TECH. Quiero evaluar una Automatización Express para un proceso de mi empresa.","datos":"Hola ANVAR TECH. Quiero revisar una solución de datos e inteligencia operacional para mi empresa.","intelligence":"Hola ANVAR TECH. Quiero saber más de ANVAR Intelligence para mi empresa.","diagnostico":"Hola ANVAR TECH. Quiero cotizar un diagnóstico de automatización para mi empresa.","piloto":"Hola ANVAR TECH. Tengo un proceso manual en mi empresa y quiero evaluar un piloto de automatización.","capacitacion":"Hola ANVAR TECH. Quiero cotizar una capacitación en IA para mi equipo.","personal":"Hola ANVAR TECH. Quiero coordinar una sesión de asesoría personal en IA.","caso":"Hola ANVAR TECH. Vi sus casos y tengo un proceso parecido en mi empresa.","privacidad":"Hola ANVAR TECH. Tengo una consulta sobre mis datos personales."},"agenda":"","calc":{"semanas":44,"mesesMax":36,"opciones":{"express":{"moneda":"CLP","valor":199900,"etiqueta":"desde $199.900 + IVA"},"piloto":{"moneda":"UF","valor":40,"etiqueta":"desde UF 40 + IVA"}}}}</script>
 <script defer src="/_vercel/insights/script.js"></script>
-<script defer src="/calculo.js?v=072cfcf112"></script>
-<script defer src="/app.js?v=a32adef7ab"></script>
-<script defer src="/herramientas.js?v=e44d9dd2fb"></script>
+<script defer src="/calculo.js?v=cde9ed8861"></script>
+<script defer src="/app.js?v=2f405b65ff"></script>
+<script defer src="/herramientas.js?v=908b5601f8"></script>
 </body>
 </html>

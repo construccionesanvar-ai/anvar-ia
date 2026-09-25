@@ -3,13 +3,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
+import { fechaChile, segundosHastaMedianocheChile } from '../src/uf.mjs';
+
 const fetchReal = globalThis.fetch;
 let n = 0;
 
 /** Importa una instancia nueva del módulo con estas variables de entorno. */
 async function cargar(archivo, env) {
   const previas = {};
-  for (const k of ['RESEND_API_KEY', 'NOTIFY_EMAIL', 'NOTIFY_MAIL', 'SHEETS_WEBHOOK_URL', 'CMF_API_KEY', 'ANTHROPIC_API_KEY', 'CONTACTO_FROM']) {
+  for (const k of ['RESEND_API_KEY', 'NOTIFY_EMAIL', 'NOTIFY_MAIL', 'SHEETS_WEBHOOK_URL', 'ANTHROPIC_API_KEY', 'CONTACTO_FROM']) {
     previas[k] = process.env[k];
     if (k in env) process.env[k] = env[k]; else delete process.env[k];
   }
@@ -110,6 +112,21 @@ test('contacto: si el correo falla pero el CRM guardó el lead, no se pierde', a
   } finally { globalThis.fetch = fetchReal; console.error = errorReal; }
 });
 
+test('contacto: Resend caído y sin CRM → 502 (el sitio ofrece WhatsApp con el mensaje escrito)', async () => {
+  const h = await cargar('contacto.js', { RESEND_API_KEY: 'x' });
+  globalThis.fetch = /** @type {any} */ (async () => new Response('{"message":"internal"}', { status: 500 }));
+  const errorReal = console.error;
+  const registros = [];
+  console.error = (...a) => registros.push(a.join(' '));
+  try {
+    const { res, r } = respuesta();
+    await h(peticion({ body: valido() }), res);
+    assert.equal(r.statusCode, 502);
+    assert.deepEqual(r.cuerpo, { error: 'No se pudo enviar.' });
+    assert.ok(registros.length && !registros.join(' ').includes('Ana') && !registros.join(' ').includes('acme'), 'el registro no lleva datos personales');
+  } finally { globalThis.fetch = fetchReal; console.error = errorReal; }
+});
+
 test('contacto: límite de envíos por IP', async () => {
   const h = await cargar('contacto.js', { RESEND_API_KEY: 'x' });
   globalThis.fetch = /** @type {any} */ (async () => new Response('{}', { status: 200 }));
@@ -124,39 +141,49 @@ test('contacto: límite de envíos por IP', async () => {
   } finally { globalThis.fetch = fetchReal; }
 });
 
-test('uf: toma el valor de mindicador y lo cachea en la CDN', async () => {
+// La UF de hoy en Chile, para que las pruebas no dependan de la fecha en que corren.
+const hoyChile = fechaChile();
+const serieDeHoy = (valor) => ({ serie: [{ fecha: `${hoyChile}T12:00:00.000Z`, valor }] });
+
+test('uf: la UF de hoy desde mindicador.cl, sin clave, cacheada hasta 6 h y nunca más allá de la medianoche de Chile', async () => {
   const h = await cargar('uf.js', {});
-  globalThis.fetch = /** @type {any} */ (async () => new Response(JSON.stringify({ serie: [{ fecha: '2026-09-25T03:00:00.000Z', valor: 39876.54 }] })));
+  const urls = [];
+  globalThis.fetch = /** @type {any} */ (async (url) => { urls.push(String(url)); return new Response(JSON.stringify(serieDeHoy(41016.28))); });
   try {
     const { res, r } = respuesta();
     await h({ method: 'GET', headers: {} }, res);
     assert.equal(r.statusCode, 200);
-    assert.deepEqual(r.cuerpo, { valor: 39876.54, fecha: '2026-09-25', fuente: 'mindicador.cl' });
-    assert.match(r.headers['cache-control'], /s-maxage=21600/);
+    assert.deepEqual(r.cuerpo, { estado: 'vigente', valor: 41016.28, fecha: hoyChile, fuente: 'mindicador.cl' });
+    const ttl = Number((r.headers['cache-control'].match(/s-maxage=(\d+)/) || [])[1]);
+    assert.ok(ttl >= 30 && ttl <= 21600 && ttl <= segundosHastaMedianocheChile() + 1, `s-maxage ${ttl}`);
+    assert.doesNotMatch(r.headers['cache-control'], /stale-while-revalidate/, 'sin servir la UF de ayer mientras se renueva');
+    assert.match(urls[0], /^https:\/\/mindicador\.cl\/api\/uf\/\d{2}-\d{2}-\d{4}$/);
+    // Segunda visita: sale de la memoria, sin consultar de nuevo.
+    await h({ method: 'GET', headers: {} }, respuesta().res);
+    assert.equal(urls.length, 1);
   } finally { globalThis.fetch = fetchReal; }
 });
 
-test('uf: usa la CMF si hay clave (formato chileno de número)', async () => {
-  const h = await cargar('uf.js', { CMF_API_KEY: 'k' });
-  globalThis.fetch = /** @type {any} */ (async () => new Response(JSON.stringify({ UFs: [{ Valor: '39.876,54', Fecha: '2026-09-25' }] })));
+test('uf: sin UF de hoy (valor absurdo, fecha vieja o fuente caída) → no disponible, sin valor de respaldo', async () => {
+  const avisoReal = console.warn;
+  console.warn = () => {};
+  const casos = [
+    async () => new Response(JSON.stringify(serieDeHoy(12))),
+    async () => new Response(JSON.stringify({ serie: [{ fecha: '2020-01-01T03:00:00.000Z', valor: 28310.86 }] })),
+    async () => new Response('error', { status: 500 }),
+    async () => { throw new TypeError('fetch failed'); },
+  ];
   try {
-    const { res, r } = respuesta();
-    await h({ method: 'GET', headers: {} }, res);
-    assert.deepEqual(r.cuerpo, { valor: 39876.54, fecha: '2026-09-25', fuente: 'CMF' });
-  } finally { globalThis.fetch = fetchReal; }
-});
-
-test('uf: valores absurdos o fuentes caídas → 503, y el sitio usa su referencia', async () => {
-  const h = await cargar('uf.js', {});
-  const errorReal = console.error;
-  console.error = () => {};
-  globalThis.fetch = /** @type {any} */ (async () => new Response(JSON.stringify({ serie: [{ fecha: '2026-09-25', valor: 12 }] })));
-  try {
-    const { res, r } = respuesta();
-    await h({ method: 'GET', headers: {} }, res);
-    assert.equal(r.statusCode, 503);
-    assert.match(r.headers['cache-control'], /s-maxage=300/);
-  } finally { globalThis.fetch = fetchReal; console.error = errorReal; }
+    for (const simulada of casos) {
+      const h = await cargar('uf.js', {});
+      globalThis.fetch = /** @type {any} */ (simulada);
+      const { res, r } = respuesta();
+      await h({ method: 'GET', headers: {} }, res);
+      assert.equal(r.statusCode, 200);
+      assert.deepEqual(r.cuerpo, { estado: 'no-disponible' });
+      assert.match(r.headers['cache-control'], /s-maxage=([1-9]|[1-9]\d|[12]\d\d|300)$/, 'la falla se guarda como máximo 5 minutos');
+    }
+  } finally { globalThis.fetch = fetchReal; console.warn = avisoReal; }
 });
 
 test('diagnóstico: sin clave de IA responde 503 sin romper', async () => {

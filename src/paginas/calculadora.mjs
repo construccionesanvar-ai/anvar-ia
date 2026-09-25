@@ -14,6 +14,10 @@ import { migas, faq, aplicacionWeb } from './ld.mjs';
 
 const r = recurso('/calculadora-roi-automatizacion');
 const ejemplo = calcularRoi(CALC_DEFECTO);
+// Payback y ROI del texto: con un monto fijo de ejemplo (el mismo de la plantilla
+// Excel), no con el piloto, que depende de la UF del día.
+const INVERSION_EJEMPLO = 1_640_000;
+const ejemploInv = calcularRoi({ ...CALC_DEFECTO, inversion: 'otro', monto: INVERSION_EJEMPLO });
 const ex = SERVICIOS.express;
 
 const FAQ_CALC = [
@@ -35,7 +39,7 @@ const SECCIONES = [
   { id: 'que-significa', titulo: 'Qué significa el resultado', html: `
     <p><b>Ahorro bruto anual estimado</b> es cuánto le cuestan hoy a tu empresa, en un año, las horas que se van en la parte automatizable de la tarea. Con el ejemplo que trae la calculadora (${CALC_DEFECTO.personas} personas, ${CALC_DEFECTO.horas} horas a la semana cada una, ${ej(pesos(CALC_DEFECTO.costo))} la hora y ${CALC_DEFECTO.auto}% automatizable) son ${ej(pesos(ejemplo.ahorroBruto))} al año, sobre un costo anual del proceso de ${ej(pesos(ejemplo.costoAnual))}.</p>
     <p><b>Horas potencialmente recuperadas</b> es ese mismo tiempo en horas: ${miles(ejemplo.horasRecuperadas)} en el ejemplo. Es la cifra que conviene mirar primero, porque se entiende sin discutir el costo por hora.</p>
-    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. En el ejemplo, comparando con un piloto: payback ${ej(textoPayback(ejemplo, CALCULADORA.mesesMaximos).toLowerCase())}, ROI año 1 ${ej(porcentaje(ejemplo.roi1))}.</p>
+    <p><b>Inversión a comparar</b> es el monto que quieres evaluar: el precio de entrada de una Automatización Express, el de un piloto o el de una cotización que ya tengas. Con él, la calculadora estima el <b>payback</b> (en cuántos meses el ahorro neto recupera la inversión), el <b>ahorro neto del año 1</b> y el <b>ROI</b> a uno y tres años. En el ejemplo, con una inversión de ${ej(pesos(INVERSION_EJEMPLO))}: payback ${ej(textoPayback(ejemploInv, CALCULADORA.mesesMaximos).toLowerCase())}, ROI año 1 ${ej(porcentaje(ejemploInv.roi1))}.</p>
     <p>Cuando algo no se puede calcular, la calculadora lo dice en vez de mostrar un número engañoso: "No aplica" si no hay inversión o no hay ahorro, y "Sin recuperación" si el costo mensual iguala o supera el ahorro.</p>` },
   { id: 'como-se-calcula', titulo: 'Cómo calculamos esto', html: `
     <p>Sin cajas negras. Estas son las operaciones, en el mismo orden que la calculadora. La <a href="/recursos/plantilla-roi-automatizacion">plantilla Excel</a> usa exactamente las mismas:</p>
@@ -50,7 +54,7 @@ Payback (meses)       = inversión ÷ (ahorro neto anual ÷ 12)
 ROI año 1             = ahorro neto año 1 ÷ inversión
 ROI a 3 años          = (ahorro neto anual × 3 − inversión) ÷ inversión</pre>
     <p>Las ${CALCULADORA.semanas} semanas salen de restar a las 52 del año el feriado legal de 15 días hábiles que fija el <a href="https://www.bcn.cl/leychile/navegar?idNorma=207436" target="_blank" rel="noopener">Código del Trabajo</a> (tres semanas), los feriados y un margen para licencias y ausencias. Todos los montos son netos, sin IVA.</p>
-    <p>Las opciones de inversión usan los precios de entrada publicados: ${ex.nombre} ${precioTexto(ex.precio).principal} + IVA, o un piloto desde UF ${SERVICIOS.piloto.precio.valor} + IVA convertido a pesos con la UF del día (si no se puede obtener, con una UF de referencia, siempre con su fecha a la vista). Son pisos, no el precio de tu proceso: el valor final se fija por escrito después de verlo. Si pasa de ${CALCULADORA.mesesMaximos} meses, la calculadora te dice que la inversión no se recuperaría dentro del período solo con ahorro de tiempo.</p>` },
+    <p>Las opciones de inversión usan los precios de entrada publicados: ${ex.nombre} ${precioTexto(ex.precio).principal} + IVA, o un piloto desde UF ${SERVICIOS.piloto.precio.valor} + IVA. Los precios en UF se convierten con la UF del día; si en ese momento no podemos obtenerla, mostramos solo el precio en UF y puedes comparar con «Otro monto». Son pisos, no el precio de tu proceso: el valor final se fija por escrito después de verlo. Si pasa de ${CALCULADORA.mesesMaximos} meses, la calculadora te dice que la inversión no se recuperaría dentro del período solo con ahorro de tiempo.</p>` },
   { id: 'cuando-vale-la-pena', titulo: 'Cuándo vale la pena automatizar', html: `
     <p>En los procesos que hemos medido, lo que decide si una automatización rinde no es la tecnología, sino cuatro condiciones del proceso:</p>
     <ul>

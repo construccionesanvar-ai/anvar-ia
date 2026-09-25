@@ -136,7 +136,8 @@ function configCliente(h) {
   if (h.calculadora) {
     const ops = opcionesInversion();
     const op = (o) => ({ moneda: o.moneda, valor: o.valor, etiqueta: o.etiqueta });
-    c.calc = { semanas: CALCULADORA.semanas, mesesMax: CALCULADORA.mesesMaximos, ufRef: { valor: SITIO.uf.valor, fecha: SITIO.uf.fecha }, opciones: { express: op(ops.express), piloto: op(ops.piloto) } };
+    // Sin UF de respaldo: el piloto se pasa a pesos solo con la UF de hoy (/api/uf).
+    c.calc = { semanas: CALCULADORA.semanas, mesesMax: CALCULADORA.mesesMaximos, opciones: { express: op(ops.express), piloto: op(ops.piloto) } };
   }
   if (h.diagnostico) {
     c.diagnostico = {
