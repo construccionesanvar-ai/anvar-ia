@@ -46,7 +46,10 @@ export const ETIQUETAS = {
  *   antesDespues?: { antes: string, despues: string, texto: string, pct: number },
  *   metricas: Metrica[], construido: string[], flujo: [string, string][],
  *   medicion: string, disclaimer?: string, tecnologias: string[], servicio: string,
- *   media: Media | null, evidenciaPendiente?: string }} Caso
+ *   media: Media | null, evidenciaPendiente?: string,
+ *   paginaCaso?: string, guia?: { url: string, texto: string } }} Caso
+ * paginaCaso: ruta del caso largo, si existe (las tarjetas enlazan ahí).
+ * guia: página que explica en detalle cómo funciona lo construido.
  */
 
 /** @type {Caso[]} */
@@ -58,6 +61,7 @@ export const CASOS = [
     estado: 'En operación diaria',
     categoria: 'Automatización documental',
     titulo: 'Ocho documentos oficiales desde un solo ingreso de datos',
+    paginaCaso: '/casos/automatizacion-documental-retail',
     contexto: 'Prevención de pérdidas en un local de una cadena de retail.',
     cliente: { visibilidad: 'propio', industria: 'Retail' },
     problema: 'Cada procedimiento obligaba a llenar a mano ocho formatos oficiales en Word, repitiendo los mismos datos en cada uno y arriesgando errores de transcripción.',
@@ -135,6 +139,7 @@ export const CASOS = [
     estado: 'Entregado',
     categoria: 'Ingeniería y AutoCAD',
     titulo: 'Un plano de planta iterado por instrucciones, sobre el archivo real',
+    guia: { url: '/automatizacion-autocad', texto: 'Cómo funciona la automatización en AutoCAD, paso a paso' },
     contexto: 'Layout de una planta de proceso para una organización cliente.',
     cliente: { visibilidad: 'confidencial' },
     problema: 'Cada cambio de criterio obligaba a redibujar, volver a acotar y rehacer el cuadro de equipos a mano.',

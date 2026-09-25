@@ -13,6 +13,7 @@ export default {
   archivo: 'casos.html',
   prioridad: '0.9',
   titulo: 'Casos reales de automatización e IA | ANVAR TECH',
+  og: { titulo: 'Casos reales de automatización e IA', bajada: 'Cada caso con su etiqueta: proyecto propio, cliente o demostración', etiqueta: 'Casos' },
   descripcion: 'Casos de automatización documental, venta en línea, planos en AutoCAD y datos, con antes, después y cómo se midió. Cada caso indica si es propio, cliente o demo.',
   contextoWsp: 'caso',
   fuente: FUENTES.caseStudy,

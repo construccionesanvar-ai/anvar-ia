@@ -48,13 +48,24 @@ src/
     whatsapp.mjs          mensajes de WhatsApp, origen del lead y armado de enlaces
     contenido.mjs         navegación, problemas, método, seguridad, PROPIEDAD, autodiagnóstico
     faq.mjs               preguntas frecuentes por página (alimentan también el JSON-LD)
+    recursos.mjs          RECURSOS (guías, caso largo, herramientas, plantilla) y AUTOR: fuente del
+                          índice /recursos, del feed RSS, de llms.txt y de las tarjetas "Relacionado"
+    soluciones.mjs        landings de solución (pymes, documental, Excel, cotizaciones, AutoCAD)
   componentes/
     base.mjs              <head>, cabecera, pie, botones, bloque "Evaluar mi proceso"
     secciones.mjs         hero, métricas, casos, testimonios, precios, datos, seguridad, FAQ…
-    herramientas.mjs      autodiagnóstico y calculadora (primer render en el servidor)
+    herramientas.mjs      autodiagnóstico, calculadora de ROI y punto de pedido (primer render en el servidor)
+    articulo.mjs          contenido largo: autor y fechas, "En corto", índice, CTA de contenido, relacionados
   paginas/                una por URL (+ plantilla de industria y privacidad)
+    soluciones/           landings de alta intención
+    recursos/             índice, plantilla y guías (_guia.mjs arma cada guía)
 scripts/
   build.mjs  check.mjs  servidor.mjs  e2e.mjs
+  og.mjs                  imágenes para compartir (npm run og)
+  indexnow.mjs            aviso a Bing/IndexNow (lo corre .github/workflows/indexnow.yml)
+  utm.mjs                 enlaces con UTM (npm run utm)
+  plantillas/roi.py       genera public/descargas/plantilla-roi-automatizacion.xlsx
+docs/                     SEO, Search Console, Bing, distribución, Google Business Profile, lanzamiento
 tests/                    pruebas unitarias
 public/                   lo que publica Vercel (HTML generado, styles.css, app.js, fuentes/)
 api/
@@ -184,19 +195,31 @@ registra Vercel solo. Los eventos propios requieren un plan de Vercel que los in
 
 | Evento | Cuándo | Datos |
 |---|---|---|
+| `organic_landing_view` | Primera página de cada visita (1 vez por pestaña) | `landing`, `canal`, `campana` |
 | `hero_cta_click` | CTA principal del hero, cabecera, menú o resultado | `etiqueta` |
-| `case_study_click` | Clic en un caso, métrica o "Tengo un proceso parecido" | `etiqueta` |
+| `content_cta_click` | CTA dentro de una guía, landing o herramienta; tarjetas "Relacionado" | `etiqueta` |
+| `case_cta_click` | Clic en un caso, métrica, caso largo o "Tengo un proceso parecido" | `etiqueta` |
 | `cases_view` | La sección de casos entra en pantalla (1 vez) | — |
 | `service_click` | Clic hacia la página de un servicio | `etiqueta` |
-| `roi_calculator_start` / `_complete` | Primer uso de la calculadora / primer valor soltado (1 vez) | `tramo` |
+| `calculator_start` / `_complete` | Primer uso / primer resultado (1 vez por herramienta) | `herramienta` (`roi` o `punto-pedido`), `tramo` o `nivel` |
 | `diagnostic_start` / `_complete` | Primera respuesta / resultado mostrado (1 vez por visita) | `indice`, `recomendacion`, `categoria` |
 | `diagnostic_whatsapp_click` | "Conversar este resultado por WhatsApp" | `etiqueta` |
-| `whatsapp_click` | **Cualquier** enlace a WhatsApp (incluye el anterior) | `contexto`, `etiqueta` |
+| `template_download` | Descarga de la plantilla Excel de ROI | `etiqueta` |
+| `whatsapp_lead` | **Cualquier** enlace a WhatsApp (incluye el anterior) | `contexto`, `etiqueta` + atribución |
 | `calendar_click` | Botón de agenda real (solo con `SITIO.agenda.url`) | `etiqueta` |
 | `email_click` | Enlace al correo | `etiqueta` |
-| `form_start` / `form_submit` / `form_error` | Primer uso del formulario (1 vez) / enviado / falló | `tipo` o `motivo` |
+| `form_start` / `service_lead` / `form_error` | Primer uso del formulario (1 vez) / enviado / falló | `tipo` + atribución, o `motivo` |
 
-Todos llevan `pagina` y `fuente`. Nunca se envía nombre, correo, teléfono ni texto escrito.
+Todos llevan `pagina` y `fuente`. Los de lead (`whatsapp_lead`, `service_lead`) llevan además la
+**atribución de la visita**: `landing` (primera página), `canal` (`google/organic`, `bing/organic`,
+`linkedin/social`, `chatgpt.com/ai`, `directo`, `<dominio>/referral` o `utm_source/utm_medium`) y
+`campana` (`utm_campaign`). Se guarda en `sessionStorage` (se borra al cerrar la pestaña).
+Nunca se envía nombre, correo, teléfono, texto escrito ni la URL completa del referente.
+Los enlaces con UTM se arman con `npm run utm -- <ruta> <fuente> <medio> <campaña>`
+(convenciones en `docs/CONTENT_DISTRIBUTION.md`).
+
+> Hasta 2.1 los eventos se llamaban `whatsapp_click`, `form_submit`, `case_study_click` y
+> `roi_calculator_*`. Al comparar periodos en Vercel, suma el nombre antiguo y el nuevo.
 Para cambiar de proveedor: ajusta `medir()` y el CSP de `vercel.json`.
 
 ## Evidencia visual de los casos
@@ -253,24 +276,49 @@ y `SITIO.privacidad.actualizada`.
 
 ## SEO técnico
 
-- `robots.txt` y `sitemap.xml` se generan en cada build. El sitemap incluye todas las páginas
-  indexables (portada, Express, datos, casos, diagnóstico, piloto, capacitación, asesoría personal,
-  privacidad) y conserva `lastmod` si la página no cambió. Nunca incluye páginas `noindex` (404).
-- Cada página: título y descripción únicos, canonical absoluta sin barra final, Open Graph, un solo `<h1>`
-  y títulos sin saltos de nivel (el QA lo exige).
-- Datos estructurados: `ProfessionalService` (en todas), `WebSite` (portada), `Service` con ofertas,
-  `FAQPage` y `BreadcrumbList` por página, `WebPage` en privacidad. Sin reseñas ni calificaciones.
-- `vercel.json`: `cleanUrls` (`/casos.html` → `/casos`), `trailingSlash: false`, redirecciones de
-  `/index` y alias de privacidad, `noindex` para `/api/*`, CSP estricto.
+- `robots.txt`, `sitemap.xml` (24 URL), `feed.xml` (RSS de guías y caso largo), `llms.txt` y la
+  clave de IndexNow se generan en cada build. El sitemap conserva `lastmod` si la página no cambió
+  y nunca incluye páginas `noindex` (404).
+- Cada página: título y descripción únicos, canonical absoluta sin barra final, Open Graph con imagen
+  propia (`public/og/`, `npm run og`), un solo `<h1>` y títulos sin saltos de nivel (el QA lo exige).
+- Datos estructurados: `ProfessionalService` con logo, contacto y `sameAs` (en todas), `WebSite`
+  (portada), `Service` con ofertas, `WebApplication` gratuita en las herramientas, `Article` con autor
+  y fechas en guías y caso largo, `CollectionPage` en /recursos, `FAQPage` **solo con preguntas
+  visibles** y `BreadcrumbList`. Sin reseñas ni calificaciones: el QA falla si aparecen.
+- El QA también exige: ninguna página indexable huérfana, `og:image` existente, feed y llms.txt sin
+  enlaces rotos, clave de IndexNow publicada.
+- `vercel.json`: `cleanUrls`, `trailingSlash: false`, redirecciones (`/index`, alias de privacidad,
+  `/calculadora`, `/autodiagnostico`, `/herramientas`, `/blog`, `/guias`, `/rss`), `noindex` para
+  `/api/*` y `/descargas/*`, CSP estricto.
+- **IndexNow** (Bing y otros): clave pública en `src/config.mjs` → `public/<clave>.txt`. Después de
+  cada push a `main` que toca `public/`, `.github/workflows/indexnow.yml` espera a que producción
+  sirva el sitemap nuevo y avisa solo las URL que cambiaron. Manual: `npm run indexnow -- --urls /a,/b`.
+  Rotar la clave: poner una nueva de 32 caracteres hex en `SITIO.indexnow.clave` y `npm run build`
+  (el build borra la anterior).
+- Guías completas: `docs/SEARCH_CONSOLE_SETUP.md`, `docs/BING_WEBMASTER_SETUP.md`,
+  `docs/SEO_CONTENT_MAP.md` (qué página responde a qué búsqueda) y `docs/SEO_GROWTH_LOOP.md`.
+
+### Contenido orgánico: cómo agregar o cambiar
+
+- **Una guía nueva**: copia una de `src/paginas/recursos/`, regístrala en `RECURSOS`
+  (`src/datos/recursos.mjs`) con fechas reales, agrégala a `PAGINAS` en `scripts/build.mjs`,
+  corre `npm run og` y `npm run build`. Antes, revisa `docs/SEO_CONTENT_MAP.md`: si ya hay una
+  página para esa búsqueda, mejora esa en vez de crear otra.
+- **Actualizar una guía**: cambia `actualizado` en `RECURSOS` solo si cambió el contenido de verdad.
+- **Imágenes para compartir**: `npm run og` regenera solo las que cambiaron (`--todas` para todas).
+- **Plantilla Excel**: `python3 scripts/plantillas/roi.py` y luego recalcular con LibreOffice
+  (instrucciones al inicio del script). El QA verifica que el archivo exista.
 
 ### Google Search Console (lo hace el dueño de la cuenta)
+
+> Versión completa y actualizada: `docs/SEARCH_CONSOLE_SETUP.md`.
 
 1. **Propiedad**: ya hay verificación por archivo (`public/google122ea0ce84fcb2ef.html`) y por etiqueta
    `<meta name="google-site-verification">` en todas las páginas. En Search Console confirma que la
    propiedad `https://ia.anvartech.cl/` (prefijo de URL) aparece verificada. Si prefieres una propiedad
    de dominio (`anvartech.cl`), verifícala por DNS.
 2. **Sitemap**: Indexación → Sitemaps → enviar `https://ia.anvartech.cl/sitemap.xml`. Debe quedar
-   "Correcto" con 9 URLs descubiertas.
+   "Correcto" con 24 URLs descubiertas.
 3. **Inspección de URL** y **Solicitar indexación**, en este orden:
    `https://ia.anvartech.cl/`, `/automatizacion-express`, `/casos`, `/diagnostico-ia-empresas`,
    `/inteligencia-datos`, `/automatizacion-procesos-ia`, `/asesoria-ia-personal`, `/privacidad`,
@@ -284,7 +332,7 @@ y `SITIO.privacidad.actualizada`.
 6. **Mejoras**: el informe de Rutas de exploración (breadcrumbs) no debe mostrar errores.
    Si aparece un error de datos estructurados, pega la URL en https://search.google.com/test/rich-results.
 7. **Seguimiento**: una vez al mes, Rendimiento → consultas y páginas; cruza con los eventos
-   `whatsapp_click` y `form_submit` de Vercel Analytics por `fuente`.
+   `whatsapp_lead` y `service_lead` de Vercel Analytics por `fuente` y `canal`.
 
 ## Rendimiento
 

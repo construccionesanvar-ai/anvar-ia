@@ -44,8 +44,8 @@ export const notaPreciosUf = () => `<span data-uf-nota>${esc(notaUf())}</span>`;
 
 /* ------------------------------------------------------------------ hero */
 
-/** Tarjeta de prueba del hero: un caso real, con sus números. */
-function tarjetaPrueba(c) {
+/** Tarjeta de prueba: un caso real con su antes y después (hero de la portada y páginas de solución). */
+export function tarjetaPrueba(c) {
   const ad = c.antesDespues;
   if (!ad) return '';
   return `<aside class="prueba" aria-label="Caso real ${esc(c.codigo)}">
@@ -66,7 +66,7 @@ function tarjetaPrueba(c) {
     <div><dt>Estado</dt><dd>${esc(c.estado)}</dd></div>
     <div><dt>Medición</dt><dd>Antes y después</dd></div>
     <div><dt>Contexto</dt><dd>${esc(c.cliente.industria ?? c.categoria)}</dd></div>
-    <div><dt>Detalle</dt><dd><a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="hero-${esc(c.id)}">Ver caso<span class="sr"> ${esc(c.codigo)}</span></a></dd></div>
+    <div><dt>Detalle</dt><dd><a href="${esc(urlCaso(c))}" data-track="case_cta_click" data-track-label="hero-${esc(c.id)}">Ver caso<span class="sr"> ${esc(c.codigo)}</span></a></dd></div>
   </dl>
 </aside>`;
 }
@@ -103,7 +103,7 @@ export function tiraMetricas() {
       ${METRICAS.map((m) => {
         const c = caso(m.caso);
         const v = c.metricas[m.metrica].valor;
-        return `<li><a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="metrica-${esc(c.id)}"><span class="metrica-v">${esc(v)}</span><span class="metrica-t">${esc(m.texto)}</span><span class="metrica-f">${esc(c.codigo)} · ${esc(ETIQUETAS[c.etiqueta])}</span></a></li>`;
+        return `<li><a href="${esc(urlCaso(c))}" data-track="case_cta_click" data-track-label="metrica-${esc(c.id)}"><span class="metrica-v">${esc(v)}</span><span class="metrica-t">${esc(m.texto)}</span><span class="metrica-f">${esc(c.codigo)} · ${esc(ETIQUETAS[c.etiqueta])}</span></a></li>`;
       }).join('')}
     </ul>
     <p class="metricas-nota">Resultados de proyectos propios y de un cliente confidencial, con la etiqueta de cada uno. Así medimos también cada proyecto nuevo.</p>
@@ -128,8 +128,9 @@ export function problemas() {
         <p class="problema-pie">
           <span class="label">Se parte con</span>
           <a href="${esc(s.url)}" data-track="service_click" data-track-label="${esc(s.id)}">${esc(s.nombre)}</a>
-          ${c ? `<span class="problema-caso">· <a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="problema-${esc(c.id)}">caso ${esc(c.codigo)}</a></span>` : ''}
+          ${c ? `<span class="problema-caso">· <a href="${esc(urlCaso(c))}" data-track="case_cta_click" data-track-label="problema-${esc(c.id)}">caso ${esc(c.codigo)}</a></span>` : ''}
         </p>
+        ${p.guia ? `<p class="problema-guia"><a href="${esc(p.guia[0])}" data-track="content_cta_click" data-track-label="problema-${esc(p.id)}">${esc(p.guia[1])} →</a></p>` : ''}
       </li>`;
       }).join('')}
     </ul>
@@ -161,7 +162,7 @@ function evidenciaCaso(c) {
   const partes = [];
   if (m.principal) partes.push(medio(m.principal));
   if (m.galeria?.length) partes.push(`<div class="galeria">${m.galeria.map((g) => medio(g)).join('')}</div>`);
-  if (m.demo) partes.push(`<p class="demo-enlace"><a class="btn btn--secundario" href="${esc(m.demo.url)}" target="_blank" rel="noopener" data-track="case_study_click" data-track-label="demo-${esc(c.id)}"><span>${esc(m.demo.texto)}</span></a></p>`);
+  if (m.demo) partes.push(`<p class="demo-enlace"><a class="btn btn--secundario" href="${esc(m.demo.url)}" target="_blank" rel="noopener" data-track="case_cta_click" data-track-label="demo-${esc(c.id)}"><span>${esc(m.demo.texto)}</span></a></p>`);
   partes.push(flujoCaso(c, 'flujo-caso--compacto'));
   return `<div class="evidencia">${partes.join('')}</div>`;
 }
@@ -184,7 +185,7 @@ export function tarjetaCaso(c) {
     <div class="ad-bloque ad-bloque--despues"><span class="label">Después</span><p>${esc(c.despues)}</p></div>
   </div>
   <p class="caso-resultado"><span class="caso-resultado-v">${esc(c.resultado.valor)}</span><span>${esc(c.resultado.texto)}</span></p>
-  <a class="enlace-flecha" href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="${esc(c.id)}"><span>Ver caso completo<span class="sr"> ${esc(c.codigo)}</span></span>${icono('flecha')}</a>
+  <a class="enlace-flecha" href="${esc(c.paginaCaso ?? urlCaso(c))}" data-track="case_cta_click" data-track-label="${esc(c.id)}"><span>Ver caso completo<span class="sr"> ${esc(c.codigo)}</span></span>${icono('flecha')}</a>
 </article>`;
 }
 
@@ -196,7 +197,7 @@ export function casosInicio() {
     <div class="casos casos--desliza" role="region" aria-label="Casos reales" tabindex="0">
       ${CASOS.map(tarjetaCaso).join('')}
     </div>
-    <p class="casos-pie"><a class="enlace-flecha" href="/casos" data-track="case_study_click" data-track-label="todos"><span>Ver todos los casos en detalle</span>${icono('flecha')}</a></p>
+    <p class="casos-pie"><a class="enlace-flecha" href="/casos" data-track="case_cta_click" data-track-label="todos"><span>Ver todos los casos en detalle</span>${icono('flecha')}</a></p>
   </div>
 </section>`;
 }
@@ -228,9 +229,11 @@ export function detalleCaso(c) {
     <div class="detalle-bloque"><h3 class="label">Cómo se midió</h3><p>${esc(c.medicion)}</p>${c.disclaimer ? `<p class="alcance"><b>Alcance de la cifra.</b> ${esc(c.disclaimer)}</p>` : ''}</div>
   </div>
   <details class="tecnico"><summary>Detalles técnicos</summary><ul class="chips chips--tec">${c.tecnologias.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>
+  ${c.paginaCaso ? `<p class="detalle-mas"><a class="enlace-flecha" href="${esc(c.paginaCaso)}" data-track="case_cta_click" data-track-label="largo-${esc(c.id)}"><span>Leer el caso completo: contexto, proceso y cómo se midió</span>${icono('flecha')}</a></p>` : ''}
+  ${c.guia ? `<p class="detalle-mas"><a class="enlace-flecha" href="${esc(c.guia.url)}" data-track="content_cta_click" data-track-label="guia-${esc(c.id)}"><span>${esc(c.guia.texto)}</span>${icono('flecha')}</a></p>` : ''}
   <div class="detalle-pie">
     <p>¿Un proceso parecido en tu empresa? Lo más cercano es <a href="${esc(s.url)}" data-track="service_click" data-track-label="caso-${esc(s.id)}">${esc(s.nombre)}</a>.</p>
-    <a class="btn btn--secundario" href="${esc(wspCaso)}" data-wsp="caso" data-track="case_study_click" data-track-label="wsp-${esc(c.id)}" target="_blank" rel="noopener">${icono('whatsapp')}<span>Tengo un proceso parecido</span><span class="sr"> al caso ${esc(c.codigo)}</span></a>
+    <a class="btn btn--secundario" href="${esc(wspCaso)}" data-wsp="caso" data-track="case_cta_click" data-track-label="wsp-${esc(c.id)}" target="_blank" rel="noopener">${icono('whatsapp')}<span>Tengo un proceso parecido</span><span class="sr"> al caso ${esc(c.codigo)}</span></a>
   </div>
 </article>`;
 }
@@ -254,7 +257,7 @@ export function testimonios({ caso: idCaso = null, titulo = 'Lo que dicen quiene
     return `<figure class="testimonio">
       <blockquote><p>${esc(t.frase)}</p></blockquote>
       <figcaption>${foto}<span class="testimonio-quien">${quien}</span>${logo}</figcaption>
-      ${t.resultado || c ? `<p class="testimonio-res">${t.resultado ? `<b>${esc(t.resultado)}</b>` : ''}${c ? ` · <a href="${esc(urlCaso(c))}" data-track="case_study_click" data-track-label="testimonio-${esc(c.id)}">caso ${esc(c.codigo)}</a>` : ''}</p>` : ''}
+      ${t.resultado || c ? `<p class="testimonio-res">${t.resultado ? `<b>${esc(t.resultado)}</b>` : ''}${c ? ` · <a href="${esc(urlCaso(c))}" data-track="case_cta_click" data-track-label="testimonio-${esc(c.id)}">caso ${esc(c.codigo)}</a>` : ''}</p>` : ''}
     </figure>`;
   };
   return `<section class="seccion" id="testimonios" aria-labelledby="testimonios-tit">
@@ -499,7 +502,7 @@ export function heroServicio(o) {
       <p class="lead">${rico(o.lead)}</p>
       <div class="hero-cta">
         ${btnPrimario}
-        ${o.secundario ? boton({ href: o.secundario.href, texto: o.secundario.texto, variante: 'secundario', grande: true, track: o.secundario.track ?? null, trackData: o.secundario.track ? 'hero-' + o.contexto : null }) : boton({ href: '/casos', texto: 'Ver casos reales', variante: 'secundario', grande: true, track: 'case_study_click', trackData: 'hero-' + o.contexto })}
+        ${o.secundario ? boton({ href: o.secundario.href, texto: o.secundario.texto, variante: 'secundario', grande: true, track: o.secundario.track ?? null, trackData: o.secundario.track ? 'hero-' + o.contexto : null }) : boton({ href: '/casos', texto: 'Ver casos reales', variante: 'secundario', grande: true, track: 'case_cta_click', trackData: 'hero-' + o.contexto })}
       </div>
       <dl class="datos-servicio">${o.ficha.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${typeof v === 'string' ? esc(v) : v.html}</dd></div>`).join('')}</dl>
     </div>

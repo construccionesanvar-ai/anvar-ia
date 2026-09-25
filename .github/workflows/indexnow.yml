@@ -1,0 +1,44 @@
+# Avisa a Bing y a los demás buscadores de IndexNow qué páginas cambiaron,
+# después de que Vercel publica el push a main. Es un paso aparte: si falla,
+# el sitio y el deploy no se ven afectados. No usa secretos (la clave de
+# IndexNow es pública por diseño: public/<clave>.txt).
+name: IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths: ['public/**']
+  workflow_dispatch:
+    inputs:
+      todas:
+        description: 'Enviar todas las URL del sitemap (solo la primera vez o tras un cambio grande)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  notificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Esperar a que producción sirva este commit
+        run: node scripts/indexnow.mjs --esperar
+      - name: Notificar las páginas que cambiaron
+        if: ${{ github.event_name == 'push' }}
+        run: node scripts/indexnow.mjs --desde "${{ github.event.before }}"
+      - name: Notificar (manual)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ "${{ inputs.todas }}" = "true" ]; then node scripts/indexnow.mjs --todas; else node scripts/indexnow.mjs --desde HEAD~1; fi

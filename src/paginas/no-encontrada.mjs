@@ -23,7 +23,9 @@ export default {
         ${boton({ href: '/', texto: 'Ir al inicio' })}
         ${boton({ href: '/casos', texto: 'Ver casos reales', variante: 'secundario' })}
         ${boton({ href: '/automatizacion-express', texto: 'Automatización Express', variante: 'secundario' })}
-        ${boton({ href: '/#autodiagnostico', texto: 'Autodiagnóstico gratuito', variante: 'secundario' })}
+        ${boton({ href: '/diagnostico-automatizacion', texto: 'Autodiagnóstico gratuito', variante: 'secundario' })}
+        ${boton({ href: '/calculadora-roi-automatizacion', texto: 'Calculadora de ROI', variante: 'secundario' })}
+        ${boton({ href: '/recursos', texto: 'Recursos y guías', variante: 'secundario' })}
       </div>
     </div>
   </div>

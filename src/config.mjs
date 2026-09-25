@@ -57,6 +57,26 @@ export const SITIO = {
     script: '/_vercel/insights/script.js',
   },
 
+  // Perfiles públicos de ANVAR TECH (van a `sameAs` del JSON-LD y al pie).
+  // SOLO perfiles que existen y son de la empresa. Hoy: el sitio matriz.
+  // Para agregar LinkedIn, Instagram o YouTube, pega aquí la URL completa.
+  redes: [
+    // { nombre: 'LinkedIn', url: 'https://www.linkedin.com/company/…' },
+  ],
+
+  // IndexNow (Bing, Yandex, Seznam, Naver…): avisa a los buscadores cuando una
+  // URL se publica, cambia o se elimina. La clave NO es secreta: se publica en
+  // /<clave>.txt para demostrar que el dominio es nuestro. Para rotarla, ver
+  // docs/BING_WEBMASTER_SETUP.md.
+  indexnow: {
+    clave: 'd269de45b82b161e07fd9c4fd6224e58',
+  },
+  // Códigos de verificación de buscadores (son públicos: van en el HTML).
+  // Bing: solo si no importas el sitio desde Search Console (docs/BING_WEBMASTER_SETUP.md).
+  verificacion: {
+    bing: '',
+  },
+
   // Política de privacidad: fecha de la versión vigente (se muestra en /privacidad).
   privacidad: {
     actualizada: '2026-09-25',

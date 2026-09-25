@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>ANVAR TECH · Recursos sobre automatización de procesos</title>
+  <link>https://ia.anvartech.cl/recursos</link>
+  <atom:link href="https://ia.anvartech.cl/feed.xml" rel="self" type="application/rss+xml"/>
+  <description>Guías, casos y herramientas para decidir qué automatizar en una empresa, con experiencia real.</description>
+  <language>es-cl</language>
+  <lastBuildDate>Fri, 25 Sep 2026 15:00:00 GMT</lastBuildDate>
+  <item>
+    <title>Cómo pasamos de 45 a 4 minutos en un proceso documental</title>
+    <link>https://ia.anvartech.cl/casos/automatizacion-documental-retail</link>
+    <guid isPermaLink="true">https://ia.anvartech.cl/casos/automatizacion-documental-retail</guid>
+    <description>El caso completo: ocho documentos oficiales llenados a mano, cómo se rediseñó el proceso, la arquitectura, las limitaciones y cuándo se puede replicar.</description>
+    <pubDate>Fri, 25 Sep 2026 15:00:00 GMT</pubDate>
+    <author>contacto@anvartech.cl (Andrés Vargas)</author>
+  </item>
+  <item>
+    <title>Cuánto cuesta automatizar un proceso en Chile</title>
+    <link>https://ia.anvartech.cl/recursos/cuanto-cuesta-automatizar-proceso-chile</link>
+    <guid isPermaLink="true">https://ia.anvartech.cl/recursos/cuanto-cuesta-automatizar-proceso-chile</guid>
+    <description>Rangos reales por tipo de proyecto, qué encarece y qué abarata una automatización, y cómo saber si se paga sola. Con los precios publicados de ANVAR TECH.</description>
+    <pubDate>Fri, 25 Sep 2026 15:00:00 GMT</pubDate>
+    <author>contacto@anvartech.cl (Andrés Vargas)</author>
+  </item>
+  <item>
+    <title>Cómo saber si un proceso se puede automatizar: checklist práctico</title>
+    <link>https://ia.anvartech.cl/recursos/como-detectar-proceso-automatizable</link>
+    <guid isPermaLink="true">https://ia.anvartech.cl/recursos/como-detectar-proceso-automatizable</guid>
+    <description>Diez preguntas para revisar un proceso antes de invertir en automatizarlo, con ejemplos de procesos que califican y otros que todavía no.</description>
+    <pubDate>Fri, 25 Sep 2026 15:00:00 GMT</pubDate>
+    <author>contacto@anvartech.cl (Andrés Vargas)</author>
+  </item>
+  <item>
+    <title>7 procesos que probablemente no deberías automatizar todavía</title>
+    <link>https://ia.anvartech.cl/recursos/procesos-que-no-deberias-automatizar</link>
+    <guid isPermaLink="true">https://ia.anvartech.cl/recursos/procesos-que-no-deberias-automatizar</guid>
+    <description>Automatizar un proceso mal definido solo hace más rápido el desorden. Siete situaciones en que conviene esperar, y qué hacer antes.</description>
+    <pubDate>Fri, 25 Sep 2026 15:00:00 GMT</pubDate>
+    <author>contacto@anvartech.cl (Andrés Vargas)</author>
+  </item>
+  <item>
+    <title>IA o automatización tradicional: cuándo usar cada una</title>
+    <link>https://ia.anvartech.cl/recursos/ia-vs-automatizacion-tradicional</link>
+    <guid isPermaLink="true">https://ia.anvartech.cl/recursos/ia-vs-automatizacion-tradicional</guid>
+    <description>Reglas, scripts, RPA e inteligencia artificial resuelven problemas distintos. Cómo elegir, con ejemplos de procesos reales y una tabla para decidir.</description>
+    <pubDate>Fri, 25 Sep 2026 15:00:00 GMT</pubDate>
+    <author>contacto@anvartech.cl (Andrés Vargas)</author>
+  </item>
+  <item>
+    <title>Plantilla Excel para calcular el ROI de una automatización</title>
+    <link>https://ia.anvartech.cl/recursos/plantilla-roi-automatizacion</link>
+    <guid isPermaLink="true">https://ia.anvartech.cl/recursos/plantilla-roi-automatizacion</guid>
+    <description>Descarga gratis la planilla para calcular costo anual, horas liberadas, ahorro, payback y ROI de automatizar un proceso. Sin registro.</description>
+    <pubDate>Fri, 25 Sep 2026 15:00:00 GMT</pubDate>
+    <author>contacto@anvartech.cl (Andrés Vargas)</author>
+  </item>
+</channel>
+</rss>

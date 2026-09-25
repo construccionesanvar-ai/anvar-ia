@@ -3,6 +3,7 @@ import { SERVICIOS } from '../datos/oferta.mjs';
 import { FAQ } from '../datos/faq.mjs';
 import { evaluar } from '../componentes/base.mjs';
 import { heroServicio, paraQuien, etapas, bloquePrecio, casosRelacionados, preguntas, otrosServicios, precioLinea } from '../componentes/secciones.mjs';
+import { relacionados } from '../componentes/articulo.mjs';
 import { FUENTES } from '../datos/whatsapp.mjs';
 import { PROPIEDAD } from '../datos/contenido.mjs';
 import { migas, servicio, faq } from './ld.mjs';
@@ -14,6 +15,7 @@ export default {
   archivo: 'automatizacion-procesos-ia.html',
   prioridad: '0.8',
   titulo: 'Piloto e implementación de automatización con IA | ANVAR TECH',
+  og: { titulo: 'Piloto e implementación', bajada: 'Una solución en uso, medida antes y después', etiqueta: 'Servicio · empresas' },
   descripcion: 'Automatizamos procesos en etapas: un piloto medido antes y después, la implementación completa y soporte, con manual de uso y manual técnico para tu equipo.',
   contextoWsp: 'piloto',
   fuente: FUENTES.pilot,
@@ -61,6 +63,7 @@ ${etapas({
 ${bloquePrecio({ titulo: { id: 'valor-tit', texto: 'Cuánto cuesta' }, ids: ['piloto', 'implementacion', 'soporte'], nota: `Valores netos más IVA, cotizados en UF. El piloto incluye el diagnóstico: si ya lo hiciste, son *UF ${p.precio.valor - SERVICIOS.diagnostico.precio.valor} adicionales*. Las implementaciones se pagan por etapas contra entregables. ${PROPIEDAD.corta}` })}
 ${casosRelacionados(['documentos-legales', 'venta-en-linea', 'planos-autocad'])}
 ${preguntas(FAQ.automatizacion, { titulo: 'Preguntas sobre piloto e implementación' })}
+${relacionados(['/automatizacion-procesos-pymes', '/recursos/ia-vs-automatizacion-tradicional', '/automatizacion-autocad', '/recursos/cuanto-cuesta-automatizar-proceso-chile'])}
 ${otrosServicios('piloto')}
 ${evaluar({ contexto: 'piloto', tipo: 'diagnostico', titulo: 'Cuéntanos el proceso y te decimos si vale la pena', bajada: 'Veinte minutos, sin costo. Si tu caso no da los números, te lo decimos en la misma conversación.' })}
 `,

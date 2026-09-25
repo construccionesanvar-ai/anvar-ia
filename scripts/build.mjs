@@ -22,7 +22,9 @@ import { TESTIMONIOS } from '../src/datos/testimonios.mjs';
 import { publicadas } from '../src/datos/industrias.mjs';
 import { DIAGNOSTICO } from '../src/datos/contenido.mjs';
 import { MENSAJES } from '../src/datos/whatsapp.mjs';
-import { precioTexto, absoluta } from '../src/html.mjs';
+import { precioTexto, absoluta, rutaOg, esc } from '../src/html.mjs';
+import { RECURSOS, AUTOR } from '../src/datos/recursos.mjs';
+import { SOLUCIONES } from '../src/datos/soluciones.mjs';
 import { fijarPagina } from '../src/contexto.mjs';
 import { documento } from '../src/componentes/base.mjs';
 import { referenciasCalculadora } from '../src/componentes/herramientas.mjs';
@@ -36,6 +38,21 @@ import diagnostico from '../src/paginas/diagnostico.mjs';
 import automatizacion from '../src/paginas/automatizacion.mjs';
 import capacitacion from '../src/paginas/capacitacion.mjs';
 import personal from '../src/paginas/personal.mjs';
+import calculadora from '../src/paginas/calculadora.mjs';
+import autodiagnostico from '../src/paginas/autodiagnostico.mjs';
+import puntoPedido from '../src/paginas/punto-pedido.mjs';
+import pymes from '../src/paginas/soluciones/pymes.mjs';
+import documental from '../src/paginas/soluciones/documental.mjs';
+import excel from '../src/paginas/soluciones/excel.mjs';
+import cotizaciones from '../src/paginas/soluciones/cotizaciones.mjs';
+import autocad from '../src/paginas/soluciones/autocad.mjs';
+import casoC01 from '../src/paginas/caso-c01.mjs';
+import recursosIndice from '../src/paginas/recursos/indice.mjs';
+import plantillaRoi from '../src/paginas/recursos/plantilla-roi.mjs';
+import cuantoCuesta from '../src/paginas/recursos/cuanto-cuesta.mjs';
+import comoDetectar from '../src/paginas/recursos/como-detectar.mjs';
+import noAutomatizar from '../src/paginas/recursos/no-automatizar.mjs';
+import iaVsTradicional from '../src/paginas/recursos/ia-vs-tradicional.mjs';
 import privacidad from '../src/paginas/privacidad.mjs';
 import noEncontrada from '../src/paginas/no-encontrada.mjs';
 import { paginaIndustria } from '../src/paginas/industria.mjs';
@@ -43,16 +60,27 @@ import { paginaIndustria } from '../src/paginas/industria.mjs';
 /**
  * @typedef {{ ruta: string, archivo: string, titulo: string, descripcion: string,
  *   cuerpo: () => string, fuente: string, contextoWsp?: string, ogTitulo?: string,
+ *   og?: { titulo: string, bajada: string, etiqueta: string },
+ *   articulo?: { publicado: string, actualizado: string },
  *   jsonld?: object[], noindex?: boolean, enSitemap?: boolean, prioridad?: string }} Pagina
  */
 
 /** Para agregar una página: créala en src/paginas y súmala aquí. */
 /** @type {Pagina[]} */
 export const PAGINAS = [
-  inicio, casos, express, datos, diagnostico, automatizacion, capacitacion, personal, privacidad,
+  inicio, casos, express, datos, diagnostico, automatizacion, capacitacion,
+  // Herramientas gratuitas y soluciones de alta intención
+  calculadora, autodiagnostico, puntoPedido,
+  pymes, documental, excel, cotizaciones, autocad,
+  // Contenido: caso largo, índice y guías
+  casoC01, recursosIndice, plantillaRoi, cuantoCuesta, comoDetectar, noAutomatizar, iaVsTradicional,
+  personal, privacidad,
   ...publicadas().map(paginaIndustria),
   noEncontrada,
 ];
+
+/** Imagen para compartir: la propia si existe (scripts/og.mjs), si no la general. */
+export const imagenOg = (/** @type {Pagina} */ p) => (existsSync(join(PUBLIC, rutaOg(p.ruta))) ? rutaOg(p.ruta) : '/og-image.png');
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(RAIZ, 'public');
@@ -113,6 +141,68 @@ function configCliente() {
   };
 }
 
+/** RSS 2.0 con las guías y casos largos (lo que tiene sentido seguir). */
+function feed() {
+  const items = RECURSOS.filter((r) => r.enFeed).sort((a, b) => b.actualizado.localeCompare(a.actualizado));
+  const fecha = (iso) => new Date(iso + 'T12:00:00-03:00').toUTCString();
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>ANVAR TECH · Recursos sobre automatización de procesos</title>
+  <link>${SITIO.dominio}/recursos</link>
+  <atom:link href="${SITIO.dominio}/feed.xml" rel="self" type="application/rss+xml"/>
+  <description>Guías, casos y herramientas para decidir qué automatizar en una empresa, con experiencia real.</description>
+  <language>es-cl</language>
+  <lastBuildDate>${fecha(items[0]?.actualizado ?? SITIO.privacidad.actualizada)}</lastBuildDate>
+${items.map((r) => `  <item>
+    <title>${esc(r.titulo)}</title>
+    <link>${absoluta(r.ruta)}</link>
+    <guid isPermaLink="true">${absoluta(r.ruta)}</guid>
+    <description>${esc(r.descripcion)}</description>
+    <pubDate>${fecha(r.publicado)}</pubDate>
+    <author>${esc(SITIO.contacto.email)} (${esc(AUTOR.nombre)})</author>
+  </item>`).join('\n')}
+</channel>
+</rss>
+`;
+}
+
+/** llms.txt: resumen breve y verificable del sitio para sistemas que lo lean. */
+function llms() {
+  const S = SERVICIOS;
+  const precio = (id) => {
+    const t = precioTexto(S[id].precio);
+    return S[id].precio.moneda === 'UF' ? `${t.principal} + IVA` : `${t.principal} ${t.detalle}`;
+  };
+  const enlace = (nombre, ruta, texto) => `- [${nombre}](${absoluta(ruta)}): ${texto}`;
+  return `# ${SITIO.marca} · ${SITIO.linea}
+
+> Empresa chilena (${SITIO.empresa.nombre}, RUT ${SITIO.empresa.rut}) que automatiza procesos de empresas con software, datos e IA aplicada a operaciones. Trabaja sobre las herramientas que el cliente ya usa (Excel, Word, PDF, correo, WhatsApp, ERP, AutoCAD) y mide cada proceso antes y después. Atención presencial en la Región Metropolitana y remota en todo Chile. Contacto: ${SITIO.contacto.email}, WhatsApp +${SITIO.contacto.whatsapp}.
+
+Los casos publicados llevan una etiqueta que dice si son proyecto propio, cliente, cliente confidencial o demostración. Las cifras tienen su alcance declarado. Precios netos, para empresas.
+
+## Servicios
+${['express', 'diagnostico', 'piloto', 'implementacion', 'soporte', 'intelligence', 'capacitacion'].map((id) => enlace(S[id].nombre, S[id].url.split('#')[0], `${S[id].resumen} ${precio(id)}.`)).join('\n')}
+
+## Soluciones por tipo de proceso
+${SOLUCIONES.map((s) => enlace(s.nombre, s.ruta, s.texto)).join('\n')}
+
+## Casos
+- [Casos reales](${absoluta('/casos')}): documentos (C-01, 45 → 4 min por procedimiento), venta en línea (C-02), planos en AutoCAD (C-03), pronóstico de stock (C-04, prototipo académico).
+${RECURSOS.filter((r) => r.tipo === 'caso').map((r) => enlace(r.tituloCorto, r.ruta, r.descripcion)).join('\n')}
+
+## Herramientas gratuitas
+${RECURSOS.filter((r) => r.tipo === 'herramienta' || r.tipo === 'plantilla').map((r) => enlace(r.tituloCorto, r.ruta, r.descripcion)).join('\n')}
+
+## Guías
+${RECURSOS.filter((r) => r.tipo === 'guia').map((r) => enlace(r.tituloCorto, r.ruta, r.descripcion)).join('\n')}
+
+## Optional
+- [Asesoría personal en IA](${absoluta('/asesoria-ia-personal')}): línea secundaria para personas.
+- [Política de privacidad](${absoluta('/privacidad')})
+`;
+}
+
 function sitemapAnterior() {
   const f = join(PUBLIC, 'sitemap.xml');
   if (!existsSync(f)) return {};
@@ -142,6 +232,8 @@ export function construir({ silencioso = false } = {}) {
       noindex: p.noindex,
       contextoWsp: p.contextoWsp,
       fuente: p.fuente,
+      ogImagen: imagenOg(p),
+      articulo: p.articulo,
       hashes,
       cliente,
     });
@@ -165,6 +257,12 @@ ${urls.map((u) => `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${u.lastmod}</
 `;
   writeFileSync(join(PUBLIC, 'sitemap.xml'), sitemap, 'utf8');
   writeFileSync(join(PUBLIC, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITIO.dominio}/sitemap.xml\n`, 'utf8');
+  writeFileSync(join(PUBLIC, 'feed.xml'), feed(), 'utf8');
+  writeFileSync(join(PUBLIC, 'llms.txt'), llms(), 'utf8');
+  // IndexNow: la clave se publica en /<clave>.txt. Rotarla = cambiarla en config.mjs.
+  const clave = SITIO.indexnow.clave;
+  for (const f of readdirSync(PUBLIC)) if (/^[a-f0-9]{32}\.txt$/.test(f) && f !== `${clave}.txt`) unlinkSync(join(PUBLIC, f));
+  writeFileSync(join(PUBLIC, `${clave}.txt`), clave, 'utf8');
 
   // Obsoletos: archivos viejos y páginas de industria que dejaron de publicarse.
   const sobran = [...OBSOLETOS];

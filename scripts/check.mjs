@@ -14,7 +14,9 @@ import { SERVICIOS } from '../src/datos/oferta.mjs';
 import { CASOS, METRICAS } from '../src/datos/casos.mjs';
 import { TESTIMONIOS, publicables } from '../src/datos/testimonios.mjs';
 import { PENDIENTES_PRIVACIDAD } from '../src/paginas/privacidad.mjs';
-import { fechaCorta } from '../src/html.mjs';
+import { fechaCorta, rutaOg } from '../src/html.mjs';
+import { PAGINAS } from './build.mjs';
+import { huellaOg, MANIFIESTO } from './og.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(RAIZ, 'public');
@@ -88,7 +90,9 @@ for (const f of paginas) {
   if (canonical && /^https:\/\/[^/]+\/.+\/$/.test(canonical)) err(f, 'canonical con barra final (el sitio usa trailingSlash: false)');
   const ogUrl = (h.match(/property="og:url" content="([^"]+)"/) || [])[1];
   if (!noindex && ogUrl !== canonical) err(f, 'og:url distinta de la canonical');
-  if (!/property="og:image"/.test(h)) err(f, 'sin og:image');
+  const ogImg = (h.match(/property="og:image" content="([^"]+)"/) || [])[1];
+  if (!ogImg) err(f, 'sin og:image');
+  else if (!ogImg.startsWith(SITIO.dominio + '/') || !existsSync(join(PUBLIC, ogImg.slice(SITIO.dominio.length)))) err(f, `og:image inexistente ${ogImg}`);
   const h1 = (h.match(/<h1[\s>]/g) || []).length;
   if (h1 !== 1) err(f, `tiene ${h1} <h1> (debe ser 1)`);
   if (!/<html lang="es/.test(h)) err(f, 'sin lang en <html>');
@@ -106,6 +110,18 @@ for (const f of paginas) {
     try {
       const j = JSON.parse(m[1]);
       if (/"(AggregateRating|Review)"/.test(JSON.stringify(j))) err(f, 'JSON-LD con reseñas o calificaciones: no existen, no se declaran');
+      const nodos = (Array.isArray(j) ? j : [j]).flatMap((x) => x['@graph'] ?? [x]);
+      const visible = txt.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+      for (const n of nodos) {
+        // FAQPage solo con preguntas que se ven en la página
+        if (n['@type'] === 'FAQPage') {
+          for (const q of n.mainEntity ?? []) if (!visible.includes(q.name)) err(f, `FAQPage con una pregunta que no se ve en la página: "${q.name.slice(0, 50)}"`);
+        }
+        if (n['@type'] === 'Article' || n['@type'] === 'TechArticle') {
+          for (const k of ['headline', 'datePublished', 'dateModified', 'author', 'image']) if (!n[k]) err(f, `Article sin ${k}`);
+          if (n.headline && n.headline.length > 110) err(f, 'Article con headline de más de 110 caracteres');
+        }
+      }
     } catch (e) { err(f, 'JSON-LD inválido: ' + (e instanceof Error ? e.message : e)); }
   }
   try { JSON.parse((h.match(/<script type="application\/json" id="config">([\s\S]*?)<\/script>/) || [])[1] || '{}'); } catch { err(f, 'config del cliente inválida'); }
@@ -118,7 +134,8 @@ for (const f of paginas) {
   if (!SITIO.agenda.url && /Agendar/i.test(txt)) err(f, 'dice "Agendar" pero no hay agenda configurada: usa "Coordinar…"');
 
   // Precios: todo "UF n" y todo "$n.nnn" visible tiene que salir de la fuente única.
-  const txtPrecios = texto(h.replace(/<section[^>]*id="herramientas"[\s\S]*?<\/section>/, ''));
+  // Fuera de la revisión: las herramientas (montos que calcula el visitante) y las cifras de ejemplo marcadas con ej().
+  const txtPrecios = texto(h.replace(/<section[^>]*data-sin-precios[^>]*>[\s\S]*?<\/section>/g, '').replace(/<span class="cifra-ej">[^<]*<\/span>/g, ''));
   for (const m of txtPrecios.matchAll(/UF (\d+(?:\.\d{3})*)/g)) if (!UF_VALIDOS.has(numero(m[1]))) err(f, `precio "UF ${m[1]}" que no está en src/datos/oferta.mjs`);
   for (const m of txtPrecios.matchAll(/\$(\d{1,3}(?:\.\d{3})+)/g)) if (!CLP_VALIDOS.has(numero(m[1]))) err(f, `monto "$${m[1]}" que no sale de src/datos/oferta.mjs ni de la UF`);
 
@@ -138,7 +155,7 @@ for (const f of paginas) {
     if (/type="(hidden|submit)"/.test(m[0])) continue;
     if (!new RegExp(`<label[^>]*for="${m[1]}"`).test(h)) err(f, `campo #${m[1]} sin <label>`);
   }
-  if (/target="_blank"(?![^>]*rel="noopener)/.test(h)) err(f, 'target="_blank" sin rel="noopener"');
+  for (const m of h.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) if (!/rel="[^"]*noopener/.test(m[0])) err(f, 'target="_blank" sin rel="noopener": ' + m[0].slice(0, 70));
   for (const m of h.matchAll(/aria-(?:labelledby|describedby|controls)="([^"]+)"/g)) {
     for (const id of m[1].split(/\s+/)) if (!ids[f].has(id)) err(f, `aria referencia a #${id}, que no existe`);
   }
@@ -160,7 +177,7 @@ for (const f of paginas) {
   for (const m of h.matchAll(/href="(\/[^"#?]*|)(#[^"]*)?"/g)) {
     const ruta = m[1] || null;
     const ancla = m[2] ? m[2].slice(1) : null;
-    if (ruta && /\.(css|js|png|jpg|webp|svg|xml|txt|woff2|mp4)$/.test(ruta)) {
+    if (ruta && /\.(css|js|png|jpg|webp|svg|xml|txt|woff2|mp4|xlsx|pdf)$/.test(ruta)) {
       if (!existsSync(join(PUBLIC, ruta))) err(f, `recurso inexistente ${ruta}`);
       continue;
     }
@@ -186,6 +203,37 @@ for (const [campo, re] of /** @type {[string, RegExp][]} */ ([['título', /<titl
     if (vistos.has(v)) err(f, `${campo} repetido con ${vistos.get(v)}`);
     vistos.set(v, f);
   }
+}
+
+// Ninguna página indexable queda huérfana: al menos otra página la enlaza.
+for (const [ruta, f] of rutas) {
+  if (ruta === '/' || /name="robots" content="noindex/.test(htmls[f])) continue;
+  const enlazada = paginas.some((g) => g !== f && new RegExp(`href="${ruta.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:[#?"])`).test(htmls[g]));
+  if (!enlazada) err(f, 'página huérfana: ninguna otra página la enlaza');
+}
+
+// Imágenes para compartir al día (npm run og)
+const manifiestoOg = existsSync(MANIFIESTO) ? JSON.parse(readFileSync(MANIFIESTO, 'utf8')) : {};
+for (const p of PAGINAS.filter((x) => x.og)) {
+  const img = rutaOg(p.ruta);
+  if (!existsSync(join(PUBLIC, img))) aviso(p.archivo, `falta la imagen para compartir ${img}: npm run og`);
+  else if (manifiestoOg[p.ruta] !== huellaOg(p)) aviso(p.archivo, `imagen para compartir ${img} desactualizada: npm run og`);
+}
+
+// feed.xml y llms.txt solo apuntan a páginas que existen
+for (const archivo of ['feed.xml', 'llms.txt']) {
+  const contenido = readFileSync(join(PUBLIC, archivo), 'utf8');
+  for (const m of contenido.matchAll(/https:\/\/ia\.anvartech\.cl(\/[^\s<)"\]]*)?/g)) {
+    const ruta = (m[1] ?? '/').replace(/[#?].*$/, '') || '/';
+    if (/\.(xml|txt|png|xlsx)$/.test(ruta)) { if (!existsSync(join(PUBLIC, ruta))) err(archivo, `recurso inexistente ${ruta}`); continue; }
+    if (!rutas.has(ruta)) err(archivo, `enlace a una página inexistente ${ruta}`);
+  }
+}
+
+// IndexNow: la clave publicada coincide con la configurada
+if (SITIO.indexnow?.clave) {
+  const archivoClave = join(PUBLIC, `${SITIO.indexnow.clave}.txt`);
+  if (!existsSync(archivoClave) || readFileSync(archivoClave, 'utf8').trim() !== SITIO.indexnow.clave) err('indexnow', `falta public/${SITIO.indexnow.clave}.txt con la clave`);
 }
 
 // La privacidad está enlazada desde el pie de todas las páginas

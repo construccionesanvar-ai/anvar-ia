@@ -1,6 +1,6 @@
 {
   "name": "anvar-ia",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "description": "ANVAR TECH · IA & Automatización — sitio de automatización e inteligencia operacional para empresas.",
   "type": "module",
@@ -14,7 +14,10 @@
     "e2e": "npm run build && node scripts/e2e.mjs",
     "qa": "npm run lint && npm run typecheck && npm test && node scripts/e2e.mjs",
     "dev": "npm run build && node scripts/servidor.mjs",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "og": "node scripts/og.mjs",
+    "indexnow": "node scripts/indexnow.mjs",
+    "utm": "node scripts/utm.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

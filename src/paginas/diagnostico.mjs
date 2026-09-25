@@ -4,6 +4,7 @@ import { FAQ } from '../datos/faq.mjs';
 import { precioTexto, esc } from '../html.mjs';
 import { evaluar, encabezado } from '../componentes/base.mjs';
 import { heroServicio, paraQuien, etapas, bloquePrecio, casosRelacionados, preguntas, otrosServicios, precioLinea } from '../componentes/secciones.mjs';
+import { relacionados } from '../componentes/articulo.mjs';
 import { FUENTES } from '../datos/whatsapp.mjs';
 import { migas, servicio, faq } from './ld.mjs';
 
@@ -24,6 +25,7 @@ export default {
   archivo: 'diagnostico-ia-empresas.html',
   prioridad: '0.8',
   titulo: 'Diagnóstico de automatización e IA para empresas | ANVAR TECH',
+  og: { titulo: 'Diagnóstico de automatización e IA', bajada: 'Una semana midiendo en terreno para decidir por dónde partir', etiqueta: 'Servicio · empresas' },
   descripcion: `Una semana midiendo tus procesos en horas y pesos: qué automatizar, cuánto ahorra cada oportunidad y qué no tocar. ${pt.principal} + IVA, descontable del piloto.`,
   contextoWsp: 'diagnostico',
   fuente: FUENTES.diagnosis,
@@ -50,7 +52,7 @@ ${paraQuien({
 
 <section class="seccion seccion--angosta" aria-label="Autodiagnóstico gratuito">
   <div class="contenedor contenedor--estrecho">
-    <p class="nota nota--destacada">¿Todavía no sabes si te conviene? El <a href="/#autodiagnostico">autodiagnóstico gratuito</a> te da una primera orientación en dos minutos, sin pedir datos personales. No reemplaza la medición en terreno, pero te dice por dónde partir.</p>
+    <p class="nota nota--destacada">¿Todavía no sabes si te conviene? El <a href="/diagnostico-automatizacion">autodiagnóstico gratuito</a> te da una primera orientación en dos minutos, sin pedir datos personales. No reemplaza la medición en terreno, pero te dice por dónde partir.</p>
   </div>
 </section>
 
@@ -75,6 +77,7 @@ ${etapas({
 ${bloquePrecio({ titulo: { id: 'valor-tit', texto: 'Cuánto cuesta' }, ids: ['diagnostico', 'piloto'], nota: `El diagnóstico se descuenta completo del piloto: si ya lo hiciste, el piloto son *UF ${SERVICIOS.piloto.precio.valor - s.precio.valor} adicionales*. Firmamos confidencialidad antes de empezar. Emitimos factura.` })}
 ${casosRelacionados(['documentos-legales', 'planos-autocad'])}
 ${preguntas(FAQ.diagnostico, { titulo: 'Preguntas sobre el diagnóstico' })}
+${relacionados(['/diagnostico-automatizacion', '/recursos/como-detectar-proceso-automatizable', '/recursos/procesos-que-no-deberias-automatizar', '/calculadora-roi-automatizacion'], 'Antes del diagnóstico')}
 ${otrosServicios('diagnostico')}
 ${evaluar({ contexto: 'diagnostico', tipo: 'diagnostico', titulo: 'Veinte minutos para saber si un diagnóstico tiene sentido', bajada: 'Cuéntanos qué proceso les está costando caro. Te decimos derecho si conviene un diagnóstico o si tu caso es otro.' })}
 `,

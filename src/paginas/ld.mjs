@@ -14,15 +14,69 @@ export function organizacion() {
     name: SITIO.marca,
     alternateName: `${SITIO.marca} · ${SITIO.linea}`,
     url: SITIO.dominio + '/',
-    logo: SITIO.dominio + '/apple-touch-icon.png',
+    logo: { '@type': 'ImageObject', url: SITIO.dominio + '/logo-512.png', width: 512, height: 512 },
     image: SITIO.dominio + '/og-image.png',
-    description: 'Automatización e inteligencia operacional para empresas: automatización de procesos, inteligencia de datos y desarrollo a medida, medidos antes y después.',
+    description: 'Automatización de procesos, software, datos e IA aplicada a las operaciones de empresas en Chile. Cada proceso se mide antes y después.',
     email: SITIO.contacto.email,
     telephone: '+' + SITIO.contacto.whatsapp,
+    contactPoint: [{
+      '@type': 'ContactPoint',
+      contactType: 'sales',
+      telephone: '+' + SITIO.contacto.whatsapp,
+      email: SITIO.contacto.email,
+      areaServed: 'CL',
+      availableLanguage: ['es'],
+    }],
     areaServed: { '@type': 'Country', name: 'Chile' },
-    address: { '@type': 'PostalAddress', addressLocality: SITIO.empresa.ciudad, addressCountry: 'CL' },
-    founder: { '@type': 'Person', name: SITIO.fundador.nombre },
-    sameAs: [SITIO.sitioMatriz],
+    address: { '@type': 'PostalAddress', addressLocality: SITIO.empresa.ciudad, addressRegion: 'Región Metropolitana', addressCountry: 'CL' },
+    founder: { '@type': 'Person', name: SITIO.fundador.nombre, jobTitle: SITIO.fundador.cargo },
+    knowsAbout: ['Automatización de procesos', 'Automatización documental', 'Automatización de Excel', 'Inteligencia de datos', 'Gestión de inventario', 'Integración con AutoCAD', 'Inteligencia artificial aplicada a operaciones'],
+    sameAs: [SITIO.sitioMatriz, ...SITIO.redes.map((r) => r.url)],
+  };
+}
+
+/** Persona autora de los contenidos (el fundador, real). */
+export function autorLd() {
+  return { '@type': 'Person', name: SITIO.fundador.nombre, jobTitle: SITIO.fundador.cargo, url: SITIO.dominio + '/#nosotros', worksFor: { '@id': ORG_ID } };
+}
+
+/**
+ * Artículo o caso: autor, fechas e imagen para compartir.
+ * @param {{ titulo: string, descripcion: string, ruta: string, publicado: string, actualizado: string, imagen: string, tipo?: 'Article'|'TechArticle' }} o
+ */
+export function articulo(o) {
+  return {
+    '@type': o.tipo ?? 'Article',
+    '@id': absoluta(o.ruta) + '#articulo',
+    headline: o.titulo,
+    description: o.descripcion,
+    url: absoluta(o.ruta),
+    mainEntityOfPage: absoluta(o.ruta),
+    image: SITIO.dominio + o.imagen,
+    datePublished: o.publicado,
+    dateModified: o.actualizado,
+    inLanguage: SITIO.idioma,
+    author: autorLd(),
+    publisher: { '@id': ORG_ID },
+  };
+}
+
+/**
+ * Herramienta gratuita que funciona en el navegador. Sin calificaciones.
+ * @param {{ nombre: string, descripcion: string, ruta: string }} o
+ */
+export function aplicacionWeb(o) {
+  return {
+    '@type': 'WebApplication',
+    name: o.nombre,
+    description: o.descripcion,
+    url: absoluta(o.ruta),
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Cualquiera (funciona en el navegador)',
+    inLanguage: SITIO.idioma,
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'CLP' },
+    provider: { '@id': ORG_ID },
   };
 }
 

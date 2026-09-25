@@ -85,5 +85,15 @@ export function notaUf(o = {}) {
     : 'Precios en UF. El valor en pesos se calcula con la UF del día de la factura.';
 }
 
+/**
+ * Cifra de ejemplo (ilustrativa, no un precio). El QA revisa que todo monto
+ * visible salga de la fuente única de precios; los que van marcados con esto
+ * quedan fuera de esa revisión porque son ejemplos de cálculo.
+ */
+export const ej = (texto) => `<span class="cifra-ej">${esc(texto)}</span>`;
+
+/** Imagen para compartir de una página: /og/<ruta-con-guiones>.png (la genera scripts/og.mjs). */
+export const rutaOg = (ruta) => `/og/${ruta === '/' ? 'inicio' : ruta.replace(/^\//, '').replace(/\//g, '-')}.png`;
+
 /** URL absoluta a partir de una ruta del sitio. */
 export const absoluta = (ruta) => SITIO.dominio + (ruta === '/' ? '/' : ruta);
