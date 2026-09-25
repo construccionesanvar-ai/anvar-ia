@@ -19,8 +19,10 @@ npm test          # las dos cosas seguidas (correr siempre antes de un commit)
 npm run dev       # build + servidor local en http://127.0.0.1:8123
 ```
 
-El HTML generado **sí se versiona**, así que Vercel publica igual que antes: sin
-paso de build y sin tocar la configuración del proyecto.
+El HTML generado **sí se versiona**. Además, como `package.json` tiene un script
+`build`, Vercel lo vuelve a correr en cada deploy (en Linux) y publica exactamente
+lo mismo que ves en local. Lo que Vercel no corre es `npm run check`: eso hazlo tú
+antes del push.
 
 Si `npm run check` sale con errores, no hagas push: algo quedó roto (un enlace, un
 ancla, un precio prohibido, un `style=""` que el CSP bloquearía, etc.).
