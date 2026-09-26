@@ -162,7 +162,8 @@ export function herramientasEn(cuerpo) {
  * que expone window.ANVAR_CALCULO. Falla si el módulo empieza a importar algo.
  */
 function generarCalculo() {
-  const fuente = readFileSync(join(RAIZ, 'src', 'calculo.mjs'), 'utf8');
+  // Sin \r: en Windows el checkout trae CRLF y el resultado tiene que ser idéntico al de Vercel (Linux).
+  const fuente = readFileSync(join(RAIZ, 'src', 'calculo.mjs'), 'utf8').replace(/\r\n?/g, '\n');
   if (/^\s*import\s/m.test(fuente)) throw new Error('src/calculo.mjs no puede importar nada: se copia tal cual al navegador.');
   const nombres = [...fuente.matchAll(/^export (?:const|function) ([A-Za-z_]\w*)/gm)].map((m) => m[1]);
   const cuerpo = fuente.replace(/^\/\/ @ts-check\n/, '').replace(/^export (const|function) /gm, '$1 ');

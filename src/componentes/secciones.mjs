@@ -5,6 +5,7 @@ import { SERVICIOS, ESCALERA } from '../datos/oferta.mjs';
 import { CASOS, ETIQUETAS, METRICAS, caso, urlCaso } from '../datos/casos.mjs';
 import { PROBLEMAS, PROCESO, SEGURIDAD } from '../datos/contenido.mjs';
 import { publicables } from '../datos/testimonios.mjs';
+import { VIDEO_INICIO } from '../datos/video.mjs';
 import { urlWsp, conRef, mensajeCaso } from '../datos/whatsapp.mjs';
 import { PAGINA } from '../contexto.mjs';
 import { esc, rico, precioTexto, notaUf, attrs } from '../html.mjs';
@@ -69,6 +70,40 @@ export function tarjetaPrueba(c) {
     <div><dt>Detalle</dt><dd><a href="${esc(urlCaso(c))}" data-track="case_cta_click" data-track-label="hero-${esc(c.id)}">Ver caso<span class="sr"> ${esc(c.codigo)}</span></a></dd></div>
   </dl>
 </aside>`;
+}
+
+/**
+ * Video de la portada, bajo el hero. El poster se ve de inmediato (<picture>,
+ * 16:9 o 4:5 según el ancho) y el video no se descarga hasta que app.js lo
+ * pide: al entrar en pantalla, en silencio, salvo que la persona prefiera
+ * menos movimiento o esté ahorrando datos (entonces espera el botón). Se
+ * reproduce una vez, queda en el cierre y el botón permite pausar o repetir.
+ */
+export function videoInicio(v = VIDEO_INICIO) {
+  const c = caso(v.caso);
+  const fuentes = Object.fromEntries(Object.entries(v.formatos).map(([k, f]) => [k, { webm: f.webm, mp4: f.mp4 }]));
+  return `<section class="seccion seccion--video" id="en-24-segundos" aria-labelledby="video-tit">
+  <div class="contenedor">
+    <h2 class="sr" id="video-tit">ANVAR TECH en ${v.duracion} segundos</h2>
+    <figure class="video-inicio"${attrs({ 'data-video-inicio': JSON.stringify(fuentes) })}>
+      <div class="video-inicio-caja">
+        <div class="video-inicio-marco">
+          <video class="video-inicio-v" muted playsinline preload="none" aria-label="Animación: qué hace ANVAR TECH, en ${v.duracion} segundos" aria-describedby="video-texto"></video>
+          <picture class="video-inicio-portada">
+            <source media="(max-width: 640px)"${attrs({ srcset: v.formatos.v.poster, width: v.formatos.v.ancho, height: v.formatos.v.alto })}>
+            <img${attrs({ src: v.formatos.h.poster, alt: '', width: v.formatos.h.ancho, height: v.formatos.h.alto, decoding: 'async' })}>
+          </picture>
+        </div>
+        <button class="video-inicio-btn" type="button" data-estado="reproducir" hidden><span class="video-inicio-i" data-i="reproducir">${icono('play')}</span><span class="video-inicio-i" data-i="pausar">${icono('pausa')}</span><span class="video-inicio-i" data-i="repetir">${icono('repetir')}</span><span class="video-inicio-txt">Reproducir video</span></button>
+      </div>
+      <figcaption class="video-inicio-pie"><span>Animación · ${v.duracion} s · sin audio.</span> <span>Las cifras son las del <a${attrs({ href: c.paginaCaso || urlCaso(c), 'data-track': 'case_cta_click', 'data-track-label': 'video-inicio' })}>caso ${esc(c.codigo)}</a>, ${esc(ETIQUETAS[c.etiqueta].toLowerCase())} ${esc(c.estado.toLowerCase())}.</span></figcaption>
+      <details class="video-inicio-texto" id="video-texto">
+        <summary>Qué muestra el video, en texto</summary>
+        <ol>${v.escenas.map(([t, d]) => `<li><b>${esc(t)}.</b> ${esc(d)}</li>`).join('')}</ol>
+      </details>
+    </figure>
+  </div>
+</section>`;
 }
 
 export function heroInicio() {

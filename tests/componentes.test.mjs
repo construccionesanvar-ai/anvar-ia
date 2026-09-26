@@ -147,3 +147,31 @@ test('casos con video: miniatura → reproducir, con WebM, MP4, subtítulos y po
   assert.equal(datos.subtitulos, '/casos/x.vtt');
   assert.match(html, /Ver video <span class="medio-dur">\(0:24\)<\/span>/);
 });
+
+test('video de portada: rotulado como animación, sin autoplay en el HTML y con su texto', async () => {
+  const { videoInicio } = await import('../src/componentes/secciones.mjs');
+  const { VIDEO_INICIO } = await import('../src/datos/video.mjs');
+  const html = videoInicio();
+  assert.match(html, /Animación · 24 s · sin audio/, 'dice que es una animación');
+  assert.doesNotMatch(html, /<video[^>]*\s(autoplay|loop|controls)[\s>=]/, 'el video no arranca ni se repite desde el HTML: lo decide app.js');
+  assert.match(html, /<video[^>]*\smuted[^>]*\splaysinline[^>]*\spreload="none"/, 'mudo, en línea y sin descargar de entrada');
+  assert.doesNotMatch(html, /<source[^>]*\.(mp4|webm)/, 'las fuentes las agrega app.js al primer play');
+  assert.match(html, /<source media="\(max-width: 640px\)" srcset="\/video\/inicio-4x5\.webp"/, 'poster 4:5 en celulares');
+  assert.equal((html.match(/<li>/g) || []).length, VIDEO_INICIO.escenas.length, 'una línea de texto por escena');
+  assert.match(html, /href="\/casos\/automatizacion-documental-retail"/, 'enlaza al caso cuyas cifras muestra');
+  const fuentes = JSON.parse(html.match(/data-video-inicio="([^"]+)"/)[1].replace(/&quot;/g, '"'));
+  assert.deepEqual(Object.keys(fuentes).sort(), ['h', 'v']);
+});
+
+test('video de portada: los archivos existen y son livianos', async () => {
+  const { existsSync, statSync } = await import('node:fs');
+  const { VIDEO_INICIO } = await import('../src/datos/video.mjs');
+  for (const f of Object.values(VIDEO_INICIO.formatos)) {
+    for (const k of /** @type {const} */ (['webm', 'mp4', 'poster'])) {
+      const ruta = new URL(`../public${f[k]}`, import.meta.url);
+      assert.ok(existsSync(ruta), `falta ${f[k]}`);
+      const max = k === 'poster' ? 150_000 : 3_000_000;
+      assert.ok(statSync(ruta).size < max, `${f[k]} pesa más de ${max} bytes`);
+    }
+  }
+});

@@ -594,6 +594,34 @@ input[type=range]:focus-visible{outline:2px solid var(--focus);outline-offset:4p
 .video-play svg{width:22px;height:22px;color:var(--amber)}
 .video-miniatura:hover .video-play,.video-miniatura:focus-visible .video-play{background:rgba(16,26,30,.96)}
 .video-miniatura:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+
+/* Video de la portada: 16:9 en pantallas anchas, 4:5 en celulares. app.js fija
+   data-formato con el corte que eligió, para que el marco calce con el video. */
+.seccion--video{padding:clamp(28px,4vw,56px) 0;border-bottom:1px solid var(--rule)}
+.video-inicio{margin:0 auto;max-width:1120px}
+.video-inicio-marco{position:relative;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--rule);border-radius:6px;background:#EFF0EC;box-shadow:var(--sh)}
+.video-inicio-caja{position:relative}
+.video-inicio-v,.video-inicio-portada,.video-inicio-portada img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.video-inicio--andando .video-inicio-portada{visibility:hidden}
+.video-inicio-btn{position:absolute;left:12px;bottom:12px;display:inline-flex;align-items:center;gap:var(--s-2);min-height:44px;padding:0 18px 0 14px;border:0;border-radius:999px;background:rgba(16,26,30,.86);color:#fff;font:600 var(--fs-sm)/1 var(--body);cursor:pointer}
+.video-inicio-btn:hover{background:rgba(16,26,30,.96)}
+.video-inicio-btn:focus-visible{outline:3px solid #F0A92A;outline-offset:2px}
+.video-inicio-btn[hidden]{display:none}
+.video-inicio-i{display:none;color:#F0A92A}
+.video-inicio-i svg{width:20px;height:20px}
+.video-inicio-btn[data-estado="reproducir"] [data-i="reproducir"],
+.video-inicio-btn[data-estado="pausar"] [data-i="pausar"],
+.video-inicio-btn[data-estado="repetir"] [data-i="repetir"]{display:inline-flex}
+.video-inicio-pie{display:flex;flex-wrap:wrap;gap:2px var(--s-2);margin-top:var(--s-3);font-size:var(--fs-sm);color:var(--ink-3)}
+.video-inicio-pie a{color:var(--amber-text);font-weight:600;text-underline-offset:3px}
+.video-inicio-texto{margin-top:var(--s-2);font-size:var(--fs-sm);color:var(--ink-2)}
+.video-inicio-texto summary{display:inline-flex;align-items:center;min-height:44px;cursor:pointer;font-weight:600;color:var(--ink)}
+.video-inicio-texto ol{display:grid;gap:var(--s-2);margin:var(--s-2) 0 0;padding-left:1.25rem;max-width:72ch}
+/* Hasta 900 px el botón va bajo el video: encima taparía texto de la animación. */
+@media (max-width:900px){.video-inicio-btn{position:static;margin-top:var(--s-3)}}
+@media (max-width:640px){.video-inicio-marco{aspect-ratio:4/5}}
+.video-inicio[data-formato="h"] .video-inicio-marco{aspect-ratio:16/9}
+.video-inicio[data-formato="v"] .video-inicio-marco{aspect-ratio:4/5}
 .medio figcaption{padding:var(--s-2) var(--s-4);font-size:var(--fs-sm);color:var(--on-deep-2);background:var(--deep-2)}
 .medio-dur{font-family:var(--mono);color:var(--amber)}
 .galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s-3)}

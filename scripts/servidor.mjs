@@ -15,7 +15,7 @@ const PUBLIC = join(RAIZ, 'public');
 const TIPOS = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp',
-  '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.mp4': 'video/mp4', '.gif': 'image/gif',
+  '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.mp4': 'video/mp4', '.webm': 'video/webm', '.gif': 'image/gif',
   '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
@@ -70,7 +70,20 @@ export function iniciar({ puerto = 8123, silencioso = false } = {}) {
       }
       res.setHeader('Content-Type', TIPOS[extname(archivo)] || 'application/octet-stream');
       if (ruta.startsWith('/descargas/')) res.setHeader('Content-Disposition', 'attachment'); // igual que vercel.json
-      return res.end(await readFile(archivo));
+      const datos = await readFile(archivo);
+      // Rangos de bytes, como Vercel: sin esto el navegador no puede saltar dentro de un video.
+      res.setHeader('Accept-Ranges', 'bytes');
+      const rango = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range || ''));
+      if (rango && (rango[1] || rango[2])) {
+        const total = datos.length;
+        const desde = rango[1] ? Number(rango[1]) : Math.max(0, total - Number(rango[2]));
+        const hasta = rango[1] && rango[2] ? Math.min(Number(rango[2]), total - 1) : total - 1;
+        if (desde >= total || desde > hasta) { res.statusCode = 416; res.setHeader('Content-Range', `bytes */${total}`); return res.end(); }
+        res.statusCode = 206;
+        res.setHeader('Content-Range', `bytes ${desde}-${hasta}/${total}`);
+        return res.end(datos.subarray(desde, hasta + 1));
+      }
+      return res.end(datos);
     } catch (e) {
       console.error(e);
       res.statusCode = 500;

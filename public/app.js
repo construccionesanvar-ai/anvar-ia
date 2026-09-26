@@ -12,7 +12,8 @@
    Eventos (Vercel Web Analytics; page_view lo registra Vercel solo). Un clic
    genera UN evento. Lista completa y definición en README.md › Analítica.
      Visita:     organic_landing_view · resource_view · case_view
-     Portada:    home_roi_tool_click · home_diagnostic_tool_click
+     Portada:    home_roi_tool_click · home_diagnostic_tool_click ·
+                 home_video_play · home_video_complete
      Contenido:  hero_cta_click · content_cta_click · case_cta_click · service_click
                  template_download · email_click
      Leads:      whatsapp_lead · express_lead · data_lead · diagnostic_lead
@@ -229,6 +230,78 @@
     v.focus();
     medir('case_cta_click', { etiqueta: 'video-' + pagina.split('/').pop() });
   });
+
+  /* ------------------------------------------------ video de la portada */
+  // El HTML trae el poster y un <video> vacío: aquí se elige el corte (4:5 en
+  // celulares, 16:9 en el resto) y recién se descarga al primer play. Arranca
+  // solo, en silencio, cuando al menos la mitad está en pantalla; se pausa al
+  // salir y retoma al volver. Si la persona prefiere menos movimiento o ahorra
+  // datos, espera el botón. Se ve una vez y queda en el cierre (sin bucle).
+  var vi = $('[data-video-inicio]');
+  var viVideo = vi && $('video', vi), viBtn = vi && $('.video-inicio-btn', vi);
+  if (vi && viVideo && viBtn && viVideo.canPlayType) {
+    var viFuentes = {}; try { viFuentes = JSON.parse(vi.getAttribute('data-video-inicio')); } catch (e) { viFuentes = {}; }
+    var viMovil = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
+    var viQuieto = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+      !!(navigator.connection && navigator.connection.saveData);
+    var viFormato = '', viCargado = false, viPausaPersona = false, viModo = '';
+    var viElegir = function () {
+      viFormato = viMovil && viMovil.matches && viFuentes.v ? 'v' : 'h';
+      vi.setAttribute('data-formato', viFormato);
+    };
+    var viCargar = function () {
+      if (viCargado) return;
+      viCargado = true;
+      var f = viFuentes[viFormato] || {};
+      [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(function (t) {
+        if (!f[t[0]]) return;
+        var s = document.createElement('source'); s.src = f[t[0]]; s.type = t[1]; viVideo.appendChild(s);
+      });
+      viVideo.load();
+    };
+    var viTextos = { reproducir: 'Reproducir video', pausar: 'Pausar', repetir: 'Ver de nuevo' };
+    var viPintar = function (estado) {
+      viBtn.setAttribute('data-estado', estado);
+      $('.video-inicio-txt', viBtn).textContent = viTextos[estado];
+    };
+    var viReproducir = function (modo) {
+      viCargar();
+      if (!viModo) viModo = modo;
+      var p = viVideo.play();
+      if (p && p.catch) p.catch(function () { viPintar('reproducir'); });
+    };
+    viElegir();
+    // Si cambia el ancho antes de empezar (girar el teléfono), se vuelve a elegir.
+    if (viMovil && viMovil.addEventListener) viMovil.addEventListener('change', function () { if (!viCargado) viElegir(); });
+    viVideo.addEventListener('playing', function () {
+      vi.classList.add('video-inicio--andando');
+      viPintar('pausar');
+      medir('home_video_play', { modo: viModo, formato: viFormato }, true);
+    });
+    viVideo.addEventListener('pause', function () { if (!viVideo.ended) viPintar('reproducir'); });
+    viVideo.addEventListener('ended', function () {
+      viPintar('repetir');
+      medir('home_video_complete', { modo: viModo, formato: viFormato }, true);
+    });
+    viBtn.addEventListener('click', function () {
+      if (viBtn.getAttribute('data-estado') === 'pausar') { viPausaPersona = true; viVideo.pause(); return; }
+      viPausaPersona = false;
+      if (viVideo.ended) viVideo.currentTime = 0;
+      viReproducir('boton');
+    });
+    viBtn.hidden = false;
+    if (!viQuieto && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) {
+        en.forEach(function (x) {
+          if (x.intersectionRatio >= 0.5) {
+            if (!viPausaPersona && !viVideo.ended && viVideo.paused) viReproducir('auto');
+          } else if (!viVideo.paused) {
+            viVideo.pause();
+          }
+        });
+      }, { threshold: [0, 0.5] }).observe(vi);
+    }
+  }
 
   /* ------------------------------------------ para herramientas.js */
   window.ANVAR = {

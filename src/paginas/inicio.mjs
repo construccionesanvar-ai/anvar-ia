@@ -1,7 +1,7 @@
 // @ts-check
 import { FAQ } from '../datos/faq.mjs';
 import { evaluar } from '../componentes/base.mjs';
-import { heroInicio, tiraMetricas, problemas, casosInicio, testimonios, datosInicio, proceso, precios, seguridad, nosotros, preguntas } from '../componentes/secciones.mjs';
+import { heroInicio, videoInicio, tiraMetricas, problemas, casosInicio, testimonios, datosInicio, proceso, precios, seguridad, nosotros, preguntas } from '../componentes/secciones.mjs';
 import { FUENTES } from '../datos/whatsapp.mjs';
 import { herramientas } from '../componentes/herramientas.mjs';
 import { sitioWeb, faq } from './ld.mjs';
@@ -18,6 +18,7 @@ export default {
   jsonld: [sitioWeb(), faq(FAQ.inicio)],
   cuerpo: () => [
     heroInicio(),
+    videoInicio(),
     tiraMetricas(),
     problemas(),
     casosInicio(),
