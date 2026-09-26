@@ -148,13 +148,17 @@ test('casos con video: miniatura → reproducir, con WebM, MP4, subtítulos y po
   assert.match(html, /Ver video <span class="medio-dur">\(0:24\)<\/span>/);
 });
 
-test('video de portada: rotulado como animación, sin autoplay en el HTML y con su texto', async () => {
+test('video de portada: rotulado como animación con voz generada con IA, sin autoplay en el HTML y con su texto', async () => {
   const { videoInicio } = await import('../src/componentes/secciones.mjs');
   const { VIDEO_INICIO } = await import('../src/datos/video.mjs');
   const html = videoInicio();
-  assert.match(html, /Animación · 24 s · sin audio/, 'dice que es una animación');
+  assert.match(html, /Animación de \d+ s con voz en off generada con IA\. Parte sin sonido\./, 'dice que es una animación y que la voz es generada con IA');
   assert.doesNotMatch(html, /<video[^>]*\s(autoplay|loop|controls)[\s>=]/, 'el video no arranca ni se repite desde el HTML: lo decide app.js');
   assert.match(html, /<video[^>]*\smuted[^>]*\splaysinline[^>]*\spreload="none"/, 'mudo, en línea y sin descargar de entrada');
+  assert.match(html, /<track kind="captions" src="\/video\/inicio-voz\.vtt" srclang="es" label="Español">/, 'subtítulos de la voz');
+  assert.match(html, /<div class="video-inicio-controles" hidden>/, 'controles ocultos hasta que app.js los active');
+  for (const accion of ['reproducir', 'sonido', 'subtitulos']) assert.match(html, new RegExp(`data-accion="${accion}"`), `botón ${accion}`);
+  assert.match(html, /data-accion="sonido" aria-pressed="false"/, 'el sonido parte apagado');
   assert.doesNotMatch(html, /<source[^>]*\.(mp4|webm)/, 'las fuentes las agrega app.js al primer play');
   assert.match(html, /<source media="\(max-width: 640px\)" srcset="\/video\/inicio-4x5\.webp"/, 'poster 4:5 en celulares');
   assert.equal((html.match(/<li>/g) || []).length, VIDEO_INICIO.escenas.length, 'una línea de texto por escena');
@@ -164,13 +168,17 @@ test('video de portada: rotulado como animación, sin autoplay en el HTML y con 
 });
 
 test('video de portada: los archivos existen y son livianos', async () => {
-  const { existsSync, statSync } = await import('node:fs');
+  const { existsSync, statSync, readFileSync } = await import('node:fs');
   const { VIDEO_INICIO } = await import('../src/datos/video.mjs');
+  assert.ok(existsSync(new URL(`../public${VIDEO_INICIO.subtitulos}`, import.meta.url)), 'faltan los subtítulos');
+  const vtt = readFileSync(new URL(`../public${VIDEO_INICIO.subtitulos}`, import.meta.url), 'utf8');
+  assert.match(vtt, /^WEBVTT/, 'el .vtt es WebVTT');
   for (const f of Object.values(VIDEO_INICIO.formatos)) {
     for (const k of /** @type {const} */ (['webm', 'mp4', 'poster'])) {
       const ruta = new URL(`../public${f[k]}`, import.meta.url);
       assert.ok(existsSync(ruta), `falta ${f[k]}`);
-      const max = k === 'poster' ? 150_000 : 3_000_000;
+      // Con voz (31 s, audio AAC 128k / Opus 96k) cada video pesa ~2–3 MB.
+      const max = k === 'poster' ? 150_000 : 3_500_000;
       assert.ok(statSync(ruta).size < max, `${f[k]} pesa más de ${max} bytes`);
     }
   }

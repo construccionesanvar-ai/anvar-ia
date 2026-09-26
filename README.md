@@ -287,7 +287,8 @@ registra Vercel solo. Los eventos propios requieren un plan de Vercel que los in
 | Visita | `resource_view` | Abre `/recursos` o un recurso | `tipo` |
 | Visita | `case_view` | Abre un caso largo, o ve la sección de casos | `lugar` |
 | Portada | `home_roi_tool_click` / `home_diagnostic_tool_click` | Tarjetas de herramientas | `etiqueta` |
-| Portada | `home_video_play` · `home_video_complete` | El video empieza / llega al final (una vez por visita) | `modo` (`auto` o `boton`), `formato` (`h` 16:9, `v` 4:5) |
+| Portada | `home_video_play` · `home_video_complete` | El video empieza / llega al final (una vez por visita) | `modo` (`auto`, `boton` o `sonido`), `formato` (`h` 16:9, `v` 4:5) |
+| Portada | `home_video_sound_on` | Alguien activa la voz en off (una vez por visita) | `formato` |
 | Herramientas | `calculator_view` · `calculator_start` · `calculator_complete` | Se ve / primer uso / primer resultado | `herramienta` (`roi`, `punto-pedido`); `inversion`, `estado`, `tramo` o `nivel` |
 | Herramientas | `diagnostic_view` · `diagnostic_start` · `diagnostic_complete` | Se ve / primera respuesta / resultado | `indice`, `recomendacion`, `categoria` |
 | Contenido | `hero_cta_click`, `content_cta_click`, `case_cta_click`, `service_click`, `email_click` | Clics en CTA, guías, casos, servicios, correo | `etiqueta` |
@@ -317,36 +318,35 @@ Para cambiar de proveedor: ajusta `medir()` y el CSP de `vercel.json`.
 
 ## Video de la portada
 
-Bajo el hero hay una **animación de 24 s** (problema → solución → caso C-01 → método → cierre),
-hecha en Remotion en un proyecto aparte: `C:\Users\andre\Desktop\Remotion\my-video`,
-composiciones `AnvarHome` (16:9) y `AnvarHomeVertical` (4:5, con letra más grande para celulares).
+Bajo el hero hay una **animación de 31 s con voz en off** (problema → solución → caso C-01 →
+método → cierre), hecha en Remotion en un proyecto aparte: `C:\Users\andre\Desktop\Remotion\my-video`,
+composiciones `AnvarHomeVoz` (16:9) y `AnvarHomeVozVertical` (4:5, con letra más grande para
+celulares). La voz es de ElevenLabs ("Fernando Martinez", español latino). Guion, generación y
+revisión del audio: `VOZ.md` de ese proyecto (`npm run voz -- verificar` revisa saturación, volumen
+y que cada frase quede dentro de su escena).
 
-- **Es una animación, no una grabación**, y el sitio lo dice bajo el video. Sus cifras son las del
-  caso C-01. No sirve como video de un caso: esos tienen que mostrar la herramienta real
-  (`docs/CASE_VIDEO_SHOTLIST.md`).
+- **Es una animación, no una grabación**, y el sitio lo dice bajo el video, junto con que la voz es
+  generada con IA. Sus cifras son las del caso C-01. No sirve como video de un caso: esos tienen
+  que mostrar la herramienta real (`docs/CASE_VIDEO_SHOTLIST.md`).
 - Datos (rutas, texto escena por escena): `src/datos/video.mjs`. Componente: `videoInicio()` en
   `src/componentes/secciones.mjs`. Comportamiento: bloque "video de la portada" en `public/app.js`.
 - Cómo se comporta: el poster se ve de inmediato y el video no se descarga hasta el primer play.
   Arranca solo, en silencio, cuando la mitad está en pantalla; se pausa al salir y retoma al volver.
   Si la persona prefiere menos movimiento o ahorra datos, espera el botón. Se ve **una vez** y queda
-  en el cierre; el botón pausa, reanuda o repite. Hasta 900 px el botón va bajo el video (encima
-  taparía texto de la animación).
-- Archivos en `public/video/`: `inicio-16x9` e `inicio-4x5`, cada uno en `.webm` (VP9) y `.mp4`
-  (H.264, `yuv420p`, `faststart`), más el poster `.webp` (cuadro 275, "Conectamos lo que ya usas").
-  Los tests fallan si falta alguno o si un video pasa de 3 MB.
+  en el cierre; el botón pausa, reanuda o repite. Hasta 900 px los botones van bajo el video
+  (encima taparían texto de la animación).
+- **Voz:** el video arranca mudo (los navegadores no permiten sonido sin un clic). "Activar sonido"
+  la primera vez lo reinicia con voz, para escuchar el guion completo; después solo silencia o
+  activa. "Subtítulos" muestra `public/video/inicio-voz.vtt` (por frase). El desplegable de texto
+  incluye lo que dice la voz y lo que muestra la pantalla.
+- Archivos en `public/video/`: `inicio-16x9` e `inicio-4x5`, cada uno en `.webm` (VP9 + Opus) y
+  `.mp4` (H.264 + AAC, `yuv420p`, `faststart`), con el audio a -16 LUFS; el poster `.webp`
+  (cuadro "Conectamos lo que ya usas") y los subtítulos `inicio-voz.vtt`. Los tests fallan si
+  falta alguno o si un video pasa de 3,5 MB.
 
-Si cambias la animación, vuelve a exportar desde el proyecto de Remotion y recomprime para la web
-(el render directo sale de 4 a 7 MB y con rango de color de JPEG, que algunos navegadores muestran
-lavado). Con el ffmpeg que trae Remotion (`node_modules/@remotion/compositor-win32-x64-msvc`):
-
-```bash
-npx remotion render AnvarHome out/anvar-home-1080p.mp4 --codec=h264
-ffmpeg -i out/anvar-home-1080p.mp4 -an -c:v libx264 -preset slow -tune animation -crf 25 -pix_fmt yuv420p -vf "scale=in_range=full:out_range=tv" -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart inicio-16x9.mp4
-ffmpeg -i out/anvar-home-1080p.mp4 -an -vf "scale=in_range=full:out_range=tv,format=yuv420p" -c:v libvpx-vp9 -b:v 0 -crf 40 -row-mt 1 -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 inicio-16x9.webm
-```
-
-Lo mismo con `AnvarHomeVertical` → `inicio-4x5`. Poster: `npx remotion still <composición> --frame=275`,
-convertido a WebP.
+Si cambias la animación o la voz: en el proyecto de Remotion, `npm run voz -- exportar` deja las
+versiones web y los subtítulos en `out/voz/web/` (render, recompresión y volumen incluidos) y
+`npm run voz -- verificar` revisa el audio. Esos cinco archivos se copian tal cual a `public/video/`.
 
 ## Evidencia visual de los casos
 

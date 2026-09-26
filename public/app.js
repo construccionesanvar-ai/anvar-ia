@@ -13,7 +13,7 @@
    genera UN evento. Lista completa y definición en README.md › Analítica.
      Visita:     organic_landing_view · resource_view · case_view
      Portada:    home_roi_tool_click · home_diagnostic_tool_click ·
-                 home_video_play · home_video_complete
+                 home_video_play · home_video_complete · home_video_sound_on
      Contenido:  hero_cta_click · content_cta_click · case_cta_click · service_click
                  template_download · email_click
      Leads:      whatsapp_lead · express_lead · data_lead · diagnostic_lead
@@ -237,14 +237,23 @@
   // solo, en silencio, cuando al menos la mitad está en pantalla; se pausa al
   // salir y retoma al volver. Si la persona prefiere menos movimiento o ahorra
   // datos, espera el botón. Se ve una vez y queda en el cierre (sin bucle).
+  // Tiene voz en off: "Activar sonido" la primera vez reinicia el video con voz
+  // (para escuchar el guion completo); después solo silencia o activa.
+  // "Subtítulos" muestra la pista .vtt.
   var vi = $('[data-video-inicio]');
-  var viVideo = vi && $('video', vi), viBtn = vi && $('.video-inicio-btn', vi);
-  if (vi && viVideo && viBtn && viVideo.canPlayType) {
+  var viVideo = vi && $('video', vi);
+  var viBtn = vi && $('[data-accion="reproducir"]', vi);
+  var viSonido = vi && $('[data-accion="sonido"]', vi);
+  var viCC = vi && $('[data-accion="subtitulos"]', vi);
+  var viControles = vi && $('.video-inicio-controles', vi);
+  if (vi && viVideo && viBtn && viControles && viVideo.canPlayType) {
     var viFuentes = {}; try { viFuentes = JSON.parse(vi.getAttribute('data-video-inicio')); } catch (e) { viFuentes = {}; }
     var viMovil = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
+    var viEncima = window.matchMedia ? window.matchMedia('(min-width: 901px)') : null;
     var viQuieto = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
       !!(navigator.connection && navigator.connection.saveData);
-    var viFormato = '', viCargado = false, viPausaPersona = false, viModo = '';
+    var viFormato = '', viCargado = false, viPausaPersona = false, viModo = '', viOyo = false;
+    var viPista = $('track', viVideo);
     var viElegir = function () {
       viFormato = viMovil && viMovil.matches && viFuentes.v ? 'v' : 'h';
       vi.setAttribute('data-formato', viFormato);
@@ -255,7 +264,8 @@
       var f = viFuentes[viFormato] || {};
       [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(function (t) {
         if (!f[t[0]]) return;
-        var s = document.createElement('source'); s.src = f[t[0]]; s.type = t[1]; viVideo.appendChild(s);
+        // Las <source> van antes del <track>, como pide el HTML.
+        var s = document.createElement('source'); s.src = f[t[0]]; s.type = t[1]; viVideo.insertBefore(s, viPista);
       });
       viVideo.load();
     };
@@ -289,7 +299,46 @@
       if (viVideo.ended) viVideo.currentTime = 0;
       viReproducir('boton');
     });
-    viBtn.hidden = false;
+
+    // Sonido: el video parte mudo porque los navegadores no permiten sonido sin un clic.
+    if (viSonido) {
+      viSonido.addEventListener('click', function () {
+        var activar = viSonido.getAttribute('aria-pressed') !== 'true';
+        viVideo.muted = !activar;
+        viSonido.setAttribute('aria-pressed', activar ? 'true' : 'false');
+        $('.video-inicio-txt', viSonido).textContent = activar ? 'Silenciar' : 'Activar sonido';
+        if (!activar) return;
+        if (!viOyo || viVideo.ended) {
+          viOyo = true;
+          viVideo.currentTime = 0;
+          medir('home_video_sound_on', { formato: viFormato }, true);
+        }
+        viPausaPersona = false;
+        if (viVideo.paused) viReproducir('sonido');
+      });
+    }
+
+    // Subtítulos: en pantallas anchas los botones van encima del video, así que
+    // los subtítulos se suben tres líneas para no quedar detrás.
+    var viSubirSubtitulos = function () {
+      var t = viPista && viPista.track;
+      if (!t || !t.cues) return;
+      for (var c = 0; c < t.cues.length; c++) t.cues[c].line = viEncima && viEncima.matches ? -3 : 'auto';
+    };
+    if (viCC && viPista && viPista.track) {
+      viPista.addEventListener('load', viSubirSubtitulos);
+      if (viEncima && viEncima.addEventListener) viEncima.addEventListener('change', viSubirSubtitulos);
+      viCC.addEventListener('click', function () {
+        var mostrar = viCC.getAttribute('aria-pressed') !== 'true';
+        viPista.track.mode = mostrar ? 'showing' : 'hidden';
+        viCC.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+        viSubirSubtitulos();
+      });
+    } else if (viCC) {
+      viCC.hidden = true;
+    }
+
+    viControles.hidden = false;
     if (!viQuieto && 'IntersectionObserver' in window) {
       new IntersectionObserver(function (en) {
         en.forEach(function (x) {

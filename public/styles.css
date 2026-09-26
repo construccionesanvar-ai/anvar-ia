@@ -603,22 +603,29 @@ input[type=range]:focus-visible{outline:2px solid var(--focus);outline-offset:4p
 .video-inicio-caja{position:relative}
 .video-inicio-v,.video-inicio-portada,.video-inicio-portada img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .video-inicio--andando .video-inicio-portada{visibility:hidden}
-.video-inicio-btn{position:absolute;left:12px;bottom:12px;display:inline-flex;align-items:center;gap:var(--s-2);min-height:44px;padding:0 18px 0 14px;border:0;border-radius:999px;background:rgba(16,26,30,.86);color:#fff;font:600 var(--fs-sm)/1 var(--body);cursor:pointer}
+.video-inicio-controles{position:absolute;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.video-inicio-controles[hidden]{display:none}
+.video-inicio-btn{display:inline-flex;align-items:center;gap:var(--s-2);min-height:44px;padding:0 18px 0 14px;border:0;border-radius:999px;background:rgba(16,26,30,.86);color:#fff;font:600 var(--fs-sm)/1 var(--body);cursor:pointer}
+.video-inicio-btn[aria-pressed="true"]{background:#101A1E;box-shadow:inset 0 0 0 2px #F0A92A}
 .video-inicio-btn:hover{background:rgba(16,26,30,.96)}
 .video-inicio-btn:focus-visible{outline:3px solid #F0A92A;outline-offset:2px}
-.video-inicio-btn[hidden]{display:none}
 .video-inicio-i{display:none;color:#F0A92A}
 .video-inicio-i svg{width:20px;height:20px}
 .video-inicio-btn[data-estado="reproducir"] [data-i="reproducir"],
 .video-inicio-btn[data-estado="pausar"] [data-i="pausar"],
-.video-inicio-btn[data-estado="repetir"] [data-i="repetir"]{display:inline-flex}
+.video-inicio-btn[data-estado="repetir"] [data-i="repetir"],
+.video-inicio-btn[aria-pressed="false"] [data-i="sonido"],
+.video-inicio-btn[aria-pressed="true"] [data-i="silencio"],
+.video-inicio-btn [data-i="cc"]{display:inline-flex}
+/* Subtítulos de la voz en off (pista .vtt) */
+.video-inicio-v::cue{font-family:var(--body);background:rgba(16,26,30,.86);color:#fff}
 .video-inicio-pie{display:flex;flex-wrap:wrap;gap:2px var(--s-2);margin-top:var(--s-3);font-size:var(--fs-sm);color:var(--ink-3)}
 .video-inicio-pie a{color:var(--amber-text);font-weight:600;text-underline-offset:3px}
 .video-inicio-texto{margin-top:var(--s-2);font-size:var(--fs-sm);color:var(--ink-2)}
 .video-inicio-texto summary{display:inline-flex;align-items:center;min-height:44px;cursor:pointer;font-weight:600;color:var(--ink)}
 .video-inicio-texto ol{display:grid;gap:var(--s-2);margin:var(--s-2) 0 0;padding-left:1.25rem;max-width:72ch}
 /* Hasta 900 px el botón va bajo el video: encima taparía texto de la animación. */
-@media (max-width:900px){.video-inicio-btn{position:static;margin-top:var(--s-3)}}
+@media (max-width:900px){.video-inicio-controles{position:static;margin-top:var(--s-3)}}
 @media (max-width:640px){.video-inicio-marco{aspect-ratio:4/5}}
 .video-inicio[data-formato="h"] .video-inicio-marco{aspect-ratio:16/9}
 .video-inicio[data-formato="v"] .video-inicio-marco{aspect-ratio:4/5}

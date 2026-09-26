@@ -77,29 +77,37 @@ export function tarjetaPrueba(c) {
  * 16:9 o 4:5 según el ancho) y el video no se descarga hasta que app.js lo
  * pide: al entrar en pantalla, en silencio, salvo que la persona prefiera
  * menos movimiento o esté ahorrando datos (entonces espera el botón). Se
- * reproduce una vez, queda en el cierre y el botón permite pausar o repetir.
+ * reproduce una vez y queda en el cierre. Tiene voz en off: "Activar sonido" lo
+ * reinicia con voz, y "Subtítulos" muestra la pista .vtt.
  */
 export function videoInicio(v = VIDEO_INICIO) {
   const c = caso(v.caso);
   const fuentes = Object.fromEntries(Object.entries(v.formatos).map(([k, f]) => [k, { webm: f.webm, mp4: f.mp4 }]));
-  return `<section class="seccion seccion--video" id="en-24-segundos" aria-labelledby="video-tit">
+  const i = (n, icon) => `<span class="video-inicio-i" data-i="${n}">${icono(icon)}</span>`;
+  return `<section class="seccion seccion--video" id="video" aria-labelledby="video-tit">
   <div class="contenedor">
     <h2 class="sr" id="video-tit">ANVAR TECH en ${v.duracion} segundos</h2>
     <figure class="video-inicio"${attrs({ 'data-video-inicio': JSON.stringify(fuentes) })}>
       <div class="video-inicio-caja">
         <div class="video-inicio-marco">
-          <video class="video-inicio-v" muted playsinline preload="none" aria-label="Animación: qué hace ANVAR TECH, en ${v.duracion} segundos" aria-describedby="video-texto"></video>
+          <video class="video-inicio-v" muted playsinline preload="none" aria-label="Animación con voz en off: qué hace ANVAR TECH, en ${v.duracion} segundos" aria-describedby="video-texto">
+            <track kind="captions"${attrs({ src: v.subtitulos })} srclang="es" label="Español">
+          </video>
           <picture class="video-inicio-portada">
             <source media="(max-width: 640px)"${attrs({ srcset: v.formatos.v.poster, width: v.formatos.v.ancho, height: v.formatos.v.alto })}>
             <img${attrs({ src: v.formatos.h.poster, alt: '', width: v.formatos.h.ancho, height: v.formatos.h.alto, decoding: 'async' })}>
           </picture>
         </div>
-        <button class="video-inicio-btn" type="button" data-estado="reproducir" hidden><span class="video-inicio-i" data-i="reproducir">${icono('play')}</span><span class="video-inicio-i" data-i="pausar">${icono('pausa')}</span><span class="video-inicio-i" data-i="repetir">${icono('repetir')}</span><span class="video-inicio-txt">Reproducir video</span></button>
+        <div class="video-inicio-controles" hidden>
+          <button class="video-inicio-btn" type="button" data-accion="reproducir" data-estado="reproducir">${i('reproducir', 'play')}${i('pausar', 'pausa')}${i('repetir', 'repetir')}<span class="video-inicio-txt">Reproducir video</span></button>
+          <button class="video-inicio-btn" type="button" data-accion="sonido" aria-pressed="false">${i('sonido', 'sonido')}${i('silencio', 'silencio')}<span class="video-inicio-txt">Activar sonido</span></button>
+          <button class="video-inicio-btn" type="button" data-accion="subtitulos" aria-pressed="false">${i('cc', 'subtitulos')}<span class="video-inicio-txt">Subtítulos</span></button>
+        </div>
       </div>
-      <figcaption class="video-inicio-pie"><span>Animación · ${v.duracion} s · sin audio.</span> <span>Las cifras son las del <a${attrs({ href: c.paginaCaso || urlCaso(c), 'data-track': 'case_cta_click', 'data-track-label': 'video-inicio' })}>caso ${esc(c.codigo)}</a>, ${esc(ETIQUETAS[c.etiqueta].toLowerCase())} ${esc(c.estado.toLowerCase())}.</span></figcaption>
+      <figcaption class="video-inicio-pie"><span>Animación de ${v.duracion} s con voz en off generada con IA. Parte sin sonido.</span> <span>Las cifras son las del <a${attrs({ href: c.paginaCaso || urlCaso(c), 'data-track': 'case_cta_click', 'data-track-label': 'video-inicio' })}>caso ${esc(c.codigo)}</a>, ${esc(ETIQUETAS[c.etiqueta].toLowerCase())} ${esc(c.estado.toLowerCase())}.</span></figcaption>
       <details class="video-inicio-texto" id="video-texto">
-        <summary>Qué muestra el video, en texto</summary>
-        <ol>${v.escenas.map(([t, d]) => `<li><b>${esc(t)}.</b> ${esc(d)}</li>`).join('')}</ol>
+        <summary>Qué dice y muestra el video, en texto</summary>
+        <ol>${v.escenas.map(([t, voz, pantalla]) => `<li><b>${esc(t)}.</b> Voz: «${esc(voz)}» En pantalla: ${esc(pantalla)}</li>`).join('')}</ol>
       </details>
     </figure>
   </div>
